@@ -1,6 +1,6 @@
-# ResumEdit: Professional Resume Web App
+# CraftFinal: Professional Resume Web App
 
-Welcome to _ResumEdit_, a web-based application designed for professionals to craft and manage their resumes.
+Welcome to _CraftFinal_, a web-based application designed for professionals to craft and manage their resumes.
 
 ## Features
 
@@ -15,13 +15,13 @@ Welcome to _ResumEdit_, a web-based application designed for professionals to cr
 
 ## Data Organization
 
-ResumEdit is structured around a hierarchy of five primary data types. Each type is part of a nested relationship and is managed by a `ParentItemList` object.
+CraftFinal is structured around a hierarchy of five primary data types. Each type is part of a nested relationship and is managed by a `ParentItemList` object.
 
 ### Structure of Data Types
 
 #### Core Element: `ParentItemList`
 
-This is a TypeScript example showing the structure of data types used in ResumEdit:
+This is a TypeScript example showing the structure of data types used in CraftFinal:
 
 - **Item Disposition**: Enum to track the status of items (New, Modified, Deleted, Synced).
 - **Basic Item Type**: Represents an item with properties like ID, parent ID, creation, and modification timestamps.
@@ -39,4 +39,4 @@ For managing these components, the app utilizes distinct stores for each hierarc
 
 ## Running the App
 
-For instructions on setting up and running the development version of ResumEdit, please refer to the [Development Guide](./DEVELOPMENT.md).
+For instructions on setting up and running the development version of CraftFinal, please refer to the [Development Guide](./DEVELOPMENT.md).

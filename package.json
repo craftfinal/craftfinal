@@ -1,5 +1,5 @@
 {
-  "name": "resumedit",
+  "name": "craftfinal",
   "version": "0.1.0",
   "private": true,
   "author": {
@@ -8,12 +8,12 @@
   },
   "scripts": {
     "dev": "next dev",
-    "dev-local": "sudo ifconfig lo0 alias devel.resumedit.local up && next dev --hostname devel.resumedit.local -p 3000",
+    "dev-local": "sudo ifconfig lo0 alias devel.craftfinal.local up && next dev --hostname devel.craftfinal.local -p 3000",
     "prisma-migrate": "(set -a; source .env.local && npx prisma format && npx prisma migrate dev)",
     "prisma-studio": "(set -a; source .env.local && npx prisma studio)",
     "build": "next build",
     "start": "next start",
-    "start-local": "next start --hostname devel.resumedit.local -p 3000",
+    "start-local": "next start --hostname devel.craftfinal.local -p 3000",
     "lint": "next lint",
     "prettier-check": "prettier --check '**/*.ts' '**/*.tsx'",
     "prettier-format": "prettier --write '**/*.ts' '**/*.tsx'",
@@ -65,12 +65,10 @@
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
-    "devalue": "^4.3.2",
     "immer": "^10.0.3",
     "lucide-react": "^0.292.0",
     "next": "^14.0.2",
     "next-themes": "^0.2.1",
-    "nextjs-toploader": "^1.6.4",
     "posthog-js": "^1.93.5",
     "react": "latest",
     "react-day-picker": "^8.9.1",
@@ -80,7 +78,6 @@
     "react-hook-form": "^7.47.0",
     "react-icons": "^4.11.0",
     "react-markdown": "^9.0.1",
-    "resend": "^1.0.0",
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
     "uuidv4": "^6.2.13",
@@ -94,17 +91,25 @@
     "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.0.0",
     "autoprefixer": "latest",
+    "cz-conventional-changelog": "^3.3.0",
     "encoding": "^0.1.13",
     "eslint": "latest",
     "eslint-config-next": "latest",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-react": "^7.33.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
     "postcss": "latest",
     "prettier": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.7",
     "prisma": "^5.6.0",
     "tailwindcss": "latest",
     "typescript": "latest"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

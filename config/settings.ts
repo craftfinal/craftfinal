@@ -3,6 +3,6 @@
 import { SettingsConfig } from "@/types";
 
 export const settingsConfig: SettingsConfig = {
-  name: "ResumEdit",
+  name: "CraftFinal",
   description: "Settings are stored in your browser‘s **`localStorage`** area",
 };

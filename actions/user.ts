@@ -52,7 +52,7 @@ export const getCurrentUser = async (): Promise<PrismaUser> => {
       authUser = {
         id: developomentAuthProviderId,
         primaryEmailAddressId: "primary",
-        emailAddresses: [{ id: "primary", emailAddress: "development.user@resumedit.com" }],
+        emailAddresses: [{ id: "primary", emailAddress: "development.user@craftfinal.com" }],
         firstName,
         lastName,
         ...otherProps,

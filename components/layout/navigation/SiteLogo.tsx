@@ -17,7 +17,7 @@ const SiteLogo = ({ width, height }: LogoProps) => {
   }
   return (
     <div>
-      <Image src="/images/resumedit_logo.svg" width={logoWidth} height={logoHeight} alt="logo" />
+      <Image src="/images/logo.svg" width={logoWidth} height={logoHeight} alt="logo" />
     </div>
   );
 };
