@@ -8,7 +8,7 @@ import Breadcrumbs from "../../components/layout/navigation/Breadcrumbs";
 import Navbar from "../../components/layout/navigation/Navbar";
 
 export interface AuthenticatedContentLayoutChildrenProps {
-  user: PrismaUser | null;
+  user: PrismaUser | null | undefined;
 }
 
 export default async function AuthenticatedContentLayout({ children }: Readonly<{ children: ReactNode }>) {

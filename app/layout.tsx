@@ -31,7 +31,7 @@ export default function MarketingRootLayout({ children }: Readonly<{ children: R
           <PHProvider> */}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <div className="relative bg-background">
-            <div className="z-5 fixed left-0 top-0 h-screen w-full rounded-md bg-gradient-to-br from-neutral-300 to-indigo-300 opacity-50 blur-3xl filter dark:from-neutral-600 dark:to-indigo-900"></div>
+            <div className="z-5 fixed left-0 top-0 h-screen w-full bg-gradient-to-br from-neutral-300 to-indigo-300 opacity-50 blur-3xl filter dark:from-neutral-600 dark:to-indigo-900"></div>
             <div className="relative z-10 flex min-w-full flex-col justify-between">{children}</div>
           </div>
         </ThemeProvider>

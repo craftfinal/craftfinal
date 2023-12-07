@@ -3,7 +3,7 @@
 "use server";
 
 import { getCurrentUserOrNull } from "@/actions/user";
-import TryAppSection from "./TryAppMessage";
+import TryAppSection from "./TryAppSection";
 
 export default async function TryAppPage() {
   return <TryAppSection user={await getCurrentUserOrNull()} />;

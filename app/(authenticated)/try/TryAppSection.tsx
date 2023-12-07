@@ -35,10 +35,6 @@ export default async function TryAppSection({ user }: TryAppSectionProps) {
         </p>
         <div className="flex justify-center gap-4 pt-10">
           <TryAppButton user={user}></TryAppButton>
-
-          {/* <button className="bg-gray-600 text-white px-10 py-4 rounded-md text-lg font-bold">
-            Learn more
-          </button> */}
         </div>
       </div>
     </section>

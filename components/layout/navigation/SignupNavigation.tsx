@@ -5,6 +5,9 @@ import Link from "next/link";
 import { ReactNode } from "react";
 
 export function SignupNavigation({ user, signedInChildren, children }: SignupNavigationProps) {
+  if (user === undefined) {
+    return null;
+  }
   return user ? (
     <SignupNavigationWithUser signedInChildren={signedInChildren} />
   ) : (

@@ -1,13 +1,43 @@
 // @/app/(marketing)/(home)/HeroSection.tsx
 
-import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
-import WelcomeMessage from "./WelcomeMessage";
+import TryAppButton from "@/components/layout/main/TryAppButton";
+import { siteConfig } from "@/config/site";
+import { MarketingContentLayoutChildrenProps } from "../MarketingContentLayout";
 
-export interface HeroSectionProps extends AuthenticatedContentLayoutChildrenProps {}
+export interface HeroSectionProps extends MarketingContentLayoutChildrenProps {}
 export default async function HeroSection({ user }: HeroSectionProps) {
   return (
-    <section className="from gray-00 spacey-10 bg-gradient-to-r to-gray-200 py-10 md:py-20">
-      <WelcomeMessage user={user} />
-    </section>
+    <div className="mx-auto text-center">
+      <div
+        className="text-gradient flex justify-center bg-gradient-to-r from-green-800 to-indigo-900
+        bg-clip-text
+        pb-10
+        text-6xl font-bold
+        text-transparent dark:from-blue-500
+        dark:to-slate-400
+        md:px-20"
+      >
+        Deja Vu?
+      </div>
+
+      <p
+        className="md-10 bg-gradient-to-r from-gray-500
+        to-gray-900
+        bg-clip-text text-lg
+        font-bold text-transparent
+        dark:from-white
+        dark:to-gray-300
+        md:text-xl"
+      >
+        Have you ever felt like you were iterating on a document forever?
+      </p>
+      <div className="flex justify-center gap-4 pt-10">
+        <TryAppButton user={user}></TryAppButton>
+
+        {/* <button className="bg-gray-600 text-white px-10 py-4 rounded-md text-lg font-bold">
+            Learn more
+          </button> */}
+      </div>
+    </div>
   );
 }
