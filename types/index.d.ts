@@ -9,7 +9,7 @@ export type NavItem = {
 };
 
 export type MainNavItem = NavItem & {
-  menuTitle: string;
+  menuTitle?: string;
 };
 
 export type SidebarNavItem = {

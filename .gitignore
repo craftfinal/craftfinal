@@ -54,3 +54,5 @@ prisma/dev.db
 # React Email
 .react-email/
 
+# Contentlayer
+.contentlayer

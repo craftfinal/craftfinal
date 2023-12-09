@@ -6,8 +6,8 @@ const withAuth: MiddlewareFactory = (nextMiddlewareHandler) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
     const authMiddlewareImpl = authMiddleware({
       beforeAuth: (req, evt) => nextMiddlewareHandler(req, evt),
-      publicRoutes: ["/(try|resume)(/.*)?"],
-      ignoredRoutes: ["/", "/(about|legal)(/.*)?"],
+      publicRoutes: ["/(about|try|resume)(/.*)?"],
+      ignoredRoutes: ["/", "/(legal)(/.*)?"],
     });
 
     return await authMiddlewareImpl(request, event);

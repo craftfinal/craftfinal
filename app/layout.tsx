@@ -1,10 +1,9 @@
 import "@/app/globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import siteMetadata from "@/data/siteMetadata";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { headers } from "next/headers";
 import React from "react";
-import siteMetadata from "@/data/siteMetadata";
 import { AppThemeProvider } from "../components/layout/AppThemeProvider";
 // import ClerkAuthProvider from "@/auth/clerk/ClerkAuthProvider";
 // import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -12,10 +11,6 @@ import { AppThemeProvider } from "../components/layout/AppThemeProvider";
 // import { Suspense } from "react";
 // import { PHProvider, PostHogPageview } from "@/components/providers/PostHog";
 // import "css/tailwind.css";
-// import "pliny/search/algolia.css";
-// import { Space_Grotesk } from "next/font/google";
-// import { Analytics, AnalyticsConfig } from "pliny/analytics";
-// import { SearchProvider, SearchConfig } from 'pliny/search'
 // import Header from '@/components/Header'
 // import SectionContainer from '@/components/SectionContainer'
 // import Footer from '@/components/Footer'
@@ -81,9 +76,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const layoutHeaders = headers();
+  // const layoutHeaders = headers();
   // console.log(`Headers:`, JSON.stringify(layoutHeaders));
-  console.log(`Headers: x-pathname:`, layoutHeaders.get("x-pathname"), `x-query:`, layoutHeaders.get("x-query"));
+  // console.log(`Headers: x-pathname:`, layoutHeaders.get("x-pathname"), `x-query:`, layoutHeaders.get("x-query"));
   return (
     <html lang={siteMetadata.language} suppressHydrationWarning>
       <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />

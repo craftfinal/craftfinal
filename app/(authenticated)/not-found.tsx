@@ -1,7 +1,6 @@
-import Link from "next/link";
+import MainActionButton from "@/components/custom/MainActionButton";
 import { notFound } from "next/navigation";
 import { ReactNode } from "react";
-import UserActionButton from "../../components/custom/UserActionButton";
 
 export default function AuthenticatedNotFoundPage({ children }: { children?: ReactNode | ReactNode[] }) {
   notFound();
@@ -13,9 +12,7 @@ export default function AuthenticatedNotFoundPage({ children }: { children?: Rea
             This page could not be found
           </h1>
           <div className="py-8">
-            <Link href="javascript:histor(-1)" title="Back to previous page">
-              <UserActionButton>Back to previous page</UserActionButton>
-            </Link>
+            <MainActionButton navItem={{ href: "javascript:histor(-1)", title: "Back to previous page" }} />
           </div>
         </div>
       )}
