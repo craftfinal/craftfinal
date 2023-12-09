@@ -1,12 +1,18 @@
 // @/components/mdx/Image.tsx
 
+import { PlaceholderValue } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
 import React, { Ref } from "react";
 
 // TODO: Incorporate ideas from [https://amirardalan.com/blog/use-next-image-with-react-markdown]
 
 // Define the type for your custom Markdown image component props
-export type MarkdownImageProps = React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
+export type MarkdownImageProps = React.DetailedHTMLProps<
+  React.ImgHTMLAttributes<HTMLImageElement>,
+  HTMLImageElement
+> & {
+  placeholder?: PlaceholderValue | undefined;
+};
 
 const MarkdownImage = (props: MarkdownImageProps) => {
   const { alt, src, width, height, placeholder, ref, ...rest } = props;

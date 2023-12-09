@@ -27,7 +27,7 @@ export default function EditableFieldPersist({
         placeholder: placeholder || "",
         onChange: onChange,
       }}
-      viewProps={{ ...EditableFieldEdiTextProps.viewProps, placeholder: placeholder || "" }}
+      viewProps={{ ...EditableFieldEdiTextProps.viewProps }}
       {...rest}
     />
   );
