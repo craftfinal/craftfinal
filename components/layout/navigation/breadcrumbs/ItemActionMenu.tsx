@@ -30,7 +30,7 @@ type ResumeActionsURLMap = {
   [K in ResumeActionType]: ActionURL;
 };
 
-export function getItemActions(
+function getItemActions(
   pathname: string,
   title?: string,
 ): { menuTitle: string; actions: ResumeActionsURLMap } | undefined {
@@ -75,7 +75,7 @@ export function getItemActions(
   };
 }
 
-export function ItemActionMenu(pathname: string, title?: string): ReactNode {
+export default function ItemActionMenu(pathname: string, title?: string): ReactNode {
   // Render an action menu if and only if we are already on a specific item
   const itemActions = getItemActions(pathname, title);
   if (!itemActions) return null;

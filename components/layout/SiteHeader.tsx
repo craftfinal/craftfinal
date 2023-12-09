@@ -1,6 +1,6 @@
 import * as React from "react";
 import Navbar from "./navigation/Navbar";
-import Breadcrumbs from "./navigation/Breadcrumbs";
+import Breadcrumbs from "./navigation/breadcrumbs/Breadcrumbs";
 import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
 
 export interface SiteHeaderProps extends AuthenticatedContentLayoutChildrenProps {}

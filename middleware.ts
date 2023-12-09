@@ -17,7 +17,7 @@ import executeMiddleware, { MiddlewareFactory } from "@/middlewares/executeMiddl
 import withAuth from "@/middlewares/withAuth";
 import withPathname from "@/middlewares/withPathname";
 
-const auth = false;
+const auth = true;
 const pathname = true;
 
 const middlewares: Array<MiddlewareFactory> = [];

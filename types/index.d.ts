@@ -8,7 +8,9 @@ export type NavItem = {
   disabled?: boolean;
 };
 
-export type MainNavItem = NavItem;
+export type MainNavItem = NavItem & {
+  menuTitle: string;
+};
 
 export type SidebarNavItem = {
   title: string;

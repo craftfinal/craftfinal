@@ -4,7 +4,7 @@ import { getCurrentUserOrNull } from "@/actions/user";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { User as PrismaUser } from "@prisma/client";
 import { ReactNode } from "react";
-import Breadcrumbs from "../../components/layout/navigation/Breadcrumbs";
+import Breadcrumbs from "../../components/layout/navigation/breadcrumbs/Breadcrumbs";
 import Navbar from "../../components/layout/navigation/Navbar";
 
 export interface AuthenticatedContentLayoutChildrenProps {
