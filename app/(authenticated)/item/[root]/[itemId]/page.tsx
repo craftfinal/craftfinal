@@ -1,7 +1,5 @@
 // @/app/(authenticated)/item/[root]/[itemId]/[action]/page.tsx
 
-"use server";
-
 import ItemDescendantList from "@/components/itemDescendant/ItemDescendantList.server";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IdSchemaType, isValidItemId } from "@/schemas/id";

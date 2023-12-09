@@ -1,4 +1,3 @@
-"use server";
 
 import ItemDescendantScaffoldServerComponent from "@/components/itemDescendant/utils/ItemDescendantScaffold.server";
 import { Skeleton } from "@/components/ui/skeleton";

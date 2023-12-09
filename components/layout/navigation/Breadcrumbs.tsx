@@ -72,11 +72,6 @@ export interface SeparatorProps {
 }
 
 export interface BreadcrumbsProps {
-  /** If true, the default styles are used.
-   * Make sure to import the CSS in _app.js
-   * Example: true Default: false */
-  useDefaultStyle?: boolean;
-
   /** The title for the very first breadcrumb pointing to the root directory. Example: '/' Default: 'HOME' */
   rootLabel?: string | null;
 
@@ -150,9 +145,6 @@ export interface BreadcrumbsProps {
  */
 // https://github.com/marketsystems/nextjs13-appdir-breadcrumbs/blob/main/src/index.tsx
 function RenderBreadcrumbs({
-  useDefaultStyle = false,
-  rootLabel = "Home",
-  omitRootLabel = false,
   labelsToUppercase = false,
   replaceCharacterList = [
     { from: "-", to: " " },
@@ -160,10 +152,6 @@ function RenderBreadcrumbs({
   ],
   transformLabel = undefined,
   omitIndexList = undefined,
-  containerStyle = null,
-  containerClassName = "",
-  listStyle = null,
-  listClassName = "",
   inactiveItemStyle = null,
   inactiveItemClassName = "",
   activeItemStyle = null,
@@ -212,58 +200,46 @@ function RenderBreadcrumbs({
   const itemActionMenu = ItemActionMenu(pathname, actionMenuTitle);
   const actionMenuClassName = activeItemClassName;
 
-  return breadcrumbs.length === 0 || breadcrumbs[0].href === "/" ? null : (
-    <nav style={containerStyle} className={containerClassName} aria-label="breadcrumbs">
-      <ol style={listStyle} className={useDefaultStyle ? "_2jvtI" : listClassName}>
-        {!omitRootLabel && (
-          <li style={inactiveItemStyle} className={inactiveItemClassName}>
-            <Link href="/" className={inactiveItemLinkClassName} style={inactiveItemLinkStyle}>
-              {!separator?.home ? null : separator.home}
-              {convertBreadcrumb(rootLabel || "Home", labelsToUppercase, replaceCharacterList, transformLabel)}
-            </Link>
-          </li>
-        )}
-        {breadcrumbs.length >= 1 &&
-          breadcrumbs.map((breadcrumb, i) => {
-            if (
-              !breadcrumb ||
-              breadcrumb.breadcrumb.length === 0 ||
-              (omitIndexList && omitIndexList.find((value) => value === i))
-            ) {
-              return;
-            }
-            return (
-              <li
-                key={breadcrumb.href}
-                className={
-                  itemActionMenu && i === breadcrumbs.length - 2
-                    ? actionMenuClassName
-                    : i === breadcrumbs.length - 1
-                      ? activeItemClassName
-                      : inactiveItemClassName
-                }
-                style={i === breadcrumbs.length - 1 ? activeItemStyle : inactiveItemStyle}
-              >
-                {itemActionMenu && i === breadcrumbs.length - 2 ? (
-                  <>
-                    {!separator?.beforeInactive ? null : separator.beforeInactive} {itemActionMenu}
-                  </>
-                ) : itemActionMenu && i === breadcrumbs.length - 1 ? null : (
-                  <Link
-                    href={breadcrumb.href}
-                    className={i === breadcrumbs.length - 1 ? activeItemLinkClassName : inactiveItemLinkClassName}
-                    style={i === breadcrumbs.length - 1 ? activeItemLinkStyle : inactiveItemLinkStyle}
-                  >
-                    {!separator?.beforeInactive ? null : separator.beforeInactive}
-                    {convertBreadcrumb(breadcrumb.breadcrumb, labelsToUppercase, replaceCharacterList, transformLabel)}
-                  </Link>
-                )}
-              </li>
-            );
-          })}
-      </ol>
-    </nav>
-  );
+  return breadcrumbs.length === 0 || breadcrumbs[0].href === "/"
+    ? null
+    : breadcrumbs.length >= 1 &&
+        breadcrumbs.map((breadcrumb, i) => {
+          if (
+            !breadcrumb ||
+            breadcrumb.breadcrumb.length === 0 ||
+            (omitIndexList && omitIndexList.find((value) => value === i))
+          ) {
+            return;
+          }
+          return (
+            <li
+              key={breadcrumb.href}
+              className={
+                itemActionMenu && i === breadcrumbs.length - 2
+                  ? actionMenuClassName
+                  : i === breadcrumbs.length - 1
+                    ? activeItemClassName
+                    : inactiveItemClassName
+              }
+              style={i === breadcrumbs.length - 1 ? activeItemStyle : inactiveItemStyle}
+            >
+              {itemActionMenu && i === breadcrumbs.length - 2 ? (
+                <>
+                  {!separator?.beforeInactive ? null : separator.beforeInactive} {itemActionMenu}
+                </>
+              ) : itemActionMenu && i === breadcrumbs.length - 1 ? null : (
+                <Link
+                  href={breadcrumb.href}
+                  className={i === breadcrumbs.length - 1 ? activeItemLinkClassName : inactiveItemLinkClassName}
+                  style={i === breadcrumbs.length - 1 ? activeItemLinkStyle : inactiveItemLinkStyle}
+                >
+                  {!separator?.beforeInactive ? null : separator.beforeInactive}
+                  {convertBreadcrumb(breadcrumb.breadcrumb, labelsToUppercase, replaceCharacterList, transformLabel)}
+                </Link>
+              )}
+            </li>
+          );
+        });
 }
 
 export default function Breadcrumbs() {
@@ -309,8 +285,37 @@ export default function Breadcrumbs() {
       ),
     },
   };
+  const {
+    rootLabel = "Home",
+    omitRootLabel = false,
+    containerStyle = null,
+    containerClassName = "",
+    listStyle = null,
+    listClassName = "",
+    inactiveItemStyle,
+    inactiveItemClassName,
+    inactiveItemLinkClassName,
+    inactiveItemLinkStyle,
+    separator,
+    labelsToUppercase,
+    replaceCharacterList,
+  } = breadcrumbsProps;
 
-  return <RenderBreadcrumbs {...breadcrumbsProps} />;
+  return (
+    <nav style={containerStyle} className={containerClassName} aria-label="breadcrumbs">
+      <ol style={listStyle} className={listClassName}>
+        {!omitRootLabel && (
+          <li style={inactiveItemStyle} className={inactiveItemClassName}>
+            <Link href="/" className={inactiveItemLinkClassName} style={inactiveItemLinkStyle}>
+              {!separator?.home ? null : separator.home}
+              {convertBreadcrumb(rootLabel || "Home", labelsToUppercase, replaceCharacterList, transformLabel)}
+            </Link>
+          </li>
+        )}
+        <RenderBreadcrumbs {...breadcrumbsProps} />
+      </ol>
+    </nav>
+  );
 
   /*
     <nav

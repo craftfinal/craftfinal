@@ -4,8 +4,8 @@
 
 // FIXME: Somehow TypeScript has trouble importing react-markdown
 // import ReactMarkdown from "react-markdown";
-import dynamic from "next/dynamic";
-const ReactMarkdown = dynamic(() => import("react-markdown"), { ssr: false });
+// import dynamic from "next/dynamic";
+// const ReactMarkdown = dynamic(() => import("react-markdown"), { ssr: false });
 
 import {
   Sheet,
@@ -16,7 +16,7 @@ import {
   // SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { settingsConfig } from "@/config/settings";
+// import { settingsConfig } from "@/config/settings";
 import { siteConfig } from "@/config/site";
 import { Settings2Icon } from "lucide-react";
 import React from "react";
@@ -32,13 +32,13 @@ export default function AppSettingsSheet() {
         <SheetHeader>
           <SheetTitle>Configure {siteConfig.name}</SheetTitle>
           <SheetDescription className="py-4">
-            <ReactMarkdown
+            {/* <ReactMarkdown
               components={{
                 p: React.Fragment as unknown as keyof JSX.IntrinsicElements,
               }}
             >
               {settingsConfig.description}
-            </ReactMarkdown>
+            </ReactMarkdown> */}
           </SheetDescription>
         </SheetHeader>
         <AppSettingsForm />

@@ -5,12 +5,12 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { User as PrismaUser } from "@prisma/client";
 import { PropsWithChildren } from "react";
 
-export interface MarketingContentLayoutChildrenProps {
+export interface ContentLayoutChildrenProps {
   user: PrismaUser | null;
 }
 
-interface MarketingContentLayoutProps extends PropsWithChildren {}
-export default async function MarketingContentLayout({ children }: Readonly<MarketingContentLayoutProps>) {
+interface ContentLayoutProps extends PropsWithChildren {}
+export default async function ContentLayout({ children }: Readonly<ContentLayoutProps>) {
   const user = undefined;
   return (
     <>

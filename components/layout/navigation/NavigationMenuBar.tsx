@@ -1,22 +1,19 @@
 "use client";
 
-import React from "react";
-// import Link from "next/link";
-import { Logo } from "@/components/custom/Logo";
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  // NavigationMenuIndicator,
-  NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
+  // NavigationMenuItem,
+  // NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import { appNavigation } from "@/config/appNavigation";
-import { siteConfig } from "@/config/site";
+// import Link from "next/link";
+// import { appNavigation } from "@/config/appNavigation";
+// import { siteConfig } from "@/config/site";
 import { siteNavigation } from "@/config/siteNavigation";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { MainNavItem } from "@/types";
+// import { NavigationMenuItemProps } from "@radix-ui/react-navigation-menu";
+import React from "react";
 
 // const components: { title: string; description: string }[] = [
 //   {
@@ -36,8 +33,9 @@ import Link from "next/link";
 export function NavigationMenuBar() {
   return (
     <NavigationMenu>
-      <NavigationMenuList className="space-x-2 md:space-x-4">
-        <NavigationMenuItem>
+      <MainNavMenuItem navItem={siteNavigation.about}>{siteNavigation.about.menuTitle}</MainNavMenuItem>
+      {/*<NavigationMenuList className="space-x-2 sm:space-x-4 md:space-x-8">
+          <NavigationMenuItem>
           <NavigationMenuTrigger>About</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-6 sm:w-[24rem] md:w-[24rem] lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
@@ -47,7 +45,6 @@ export function NavigationMenuBar() {
                     className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                     href="/"
                   >
-                    <Logo />
                     <div className="mb-2 mt-4 text-lg font-medium">{siteConfig.name}</div>
                     <p className="text-sm leading-tight text-muted-foreground">
                       The last resume platform you will ever use.
@@ -61,11 +58,11 @@ export function NavigationMenuBar() {
               <ListItem href={appNavigation.tryApp.href} title="Try it yourself">
                 Experience, how you can import and tailor a resume in 60 seconds with {siteConfig.name}
               </ListItem>
-              {/* <ListItem title="Community">Join the community and get help or support.</ListItem> */}
+              <ListItem title="Community">Join the community and get help or support.</ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        {/* <NavigationMenuItem>
+        <NavigationMenuItem>
           <NavigationMenuTrigger>Templates</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
@@ -92,12 +89,53 @@ export function NavigationMenuBar() {
               Pricing
             </NavigationMenuLink>
           </Link>
-        </NavigationMenuItem> */}
-      </NavigationMenuList>
+        </NavigationMenuItem> 
+      </NavigationMenuList>*/}
     </NavigationMenu>
   );
 }
 
+const MainNavMenuItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a"> & { navItem: MainNavItem }
+>(({ navItem, className, children, ...props }, ref) => {
+  return (
+    <NavigationMenuLink asChild>
+      <a
+        ref={ref}
+        href={navItem.href}
+        className={cn(
+          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+          className,
+        )}
+        title={navItem.title}
+        {...props}
+      >
+        <p className="line-clamp-2 text-sm font-bold leading-none text-muted-foreground">
+          {children ?? navItem.menuTitle ?? navItem.title}
+        </p>
+      </a>
+    </NavigationMenuLink>
+  );
+});
+MainNavMenuItem.displayName = "MainNavMenuItem";
+
+/*
+interface NavMenuItemProps extends NavigationMenuItemProps {
+  navItem: MainNavItem;
+}
+function NavMenuItem({ navItem, ...props }: NavMenuItemProps) {
+  return (
+    <NavigationMenuItem {...props}>
+      <NavigationMenuLink>
+        <Link href={navItem.href}>{navItem.menuTitle}</Link>
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  );
+}
+*/
+
+/*
 const ListItem = React.forwardRef<React.ElementRef<"a">, React.ComponentPropsWithoutRef<"a">>(
   ({ className, title, children, ...props }, ref) => {
     return (
@@ -120,3 +158,4 @@ const ListItem = React.forwardRef<React.ElementRef<"a">, React.ComponentPropsWit
   },
 );
 ListItem.displayName = "ListItem";
+*/

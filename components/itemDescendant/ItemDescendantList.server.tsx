@@ -1,7 +1,5 @@
 // @/components/itemDescendant/ItemDescendant.server.tsx
 
-"use server";
-
 import { getItemDescendantList, getItemsByParentId } from "@/actions/itemDescendant";
 import { getCurrentUserIdOrNull } from "@/actions/user";
 import { IdSchemaType } from "@/schemas/id";

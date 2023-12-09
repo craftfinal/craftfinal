@@ -1,7 +1,5 @@
 // @/app/(authenticated)/resume/[resumeId]/page.tsx
 
-"use server";
-
 import ItemDescendantList from "@/components/itemDescendant/ItemDescendantList.server";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IdSchemaType } from "@/schemas/id";

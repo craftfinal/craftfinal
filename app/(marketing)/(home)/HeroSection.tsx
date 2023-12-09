@@ -1,10 +1,9 @@
 // @/app/(marketing)/(home)/HeroSection.tsx
 
-import TryAppButton from "@/components/layout/main/TryAppButton";
-import { siteConfig } from "@/config/site";
-import { MarketingContentLayoutChildrenProps } from "../MarketingContentLayout";
+import TryAppButton from "@/components/layout/buttons/TryAppButton";
+import { ContentLayoutChildrenProps } from "../../../components/layout/ContentLayout";
 
-export interface HeroSectionProps extends MarketingContentLayoutChildrenProps {}
+export interface HeroSectionProps extends ContentLayoutChildrenProps {}
 export default async function HeroSection({ user }: HeroSectionProps) {
   return (
     <div className="mx-auto text-center">
@@ -32,11 +31,7 @@ export default async function HeroSection({ user }: HeroSectionProps) {
         Have you ever felt like you were iterating on a document forever?
       </p>
       <div className="flex justify-center gap-4 pt-10">
-        <TryAppButton user={user}></TryAppButton>
-
-        {/* <button className="bg-gray-600 text-white px-10 py-4 rounded-md text-lg font-bold">
-            Learn more
-          </button> */}
+        <TryAppButton user={user} />
       </div>
     </div>
   );

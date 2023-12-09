@@ -1,7 +1,7 @@
 // @/app/(marketing)/(home)/WelcomeMessage.tsx
 
 import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
-import TryAppButton from "@/components/layout/main/TryAppButton";
+import TryAppButton from "@/components/layout/buttons/TryAppButton";
 import { siteConfig } from "@/config/site";
 
 export interface WelcomeMessageProps extends AuthenticatedContentLayoutChildrenProps {}

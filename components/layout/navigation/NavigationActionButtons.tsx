@@ -10,12 +10,14 @@ export default async function NavigationActionButtons(props: NavigationActionBut
   return (
     <div className="flex gap-4">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
-        <AppSettingsSheet />
-      </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
         <DarkModeToggle />
       </div>
       <SignupNavigation {...props} />
+      {!props.user ? null : (
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
+          <AppSettingsSheet />
+        </div>
+      )}
       <div className="flex items-center gap-4">
         <UserProfileNavigation {...props} />
       </div>

@@ -1,11 +1,9 @@
-"use server";
-
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ReactNode } from "react";
-import EnterActionButton from "../../components/custom/EnterActionButton";
+import UserActionButton from "../../components/custom/UserActionButton";
 
-const RootNotFoundPage = ({ children }: { children?: ReactNode | ReactNode[] }) => {
+export default function AuthenticatedNotFoundPage({ children }: { children?: ReactNode | ReactNode[] }) {
   notFound();
   return (
     <>
@@ -16,13 +14,11 @@ const RootNotFoundPage = ({ children }: { children?: ReactNode | ReactNode[] }) 
           </h1>
           <div className="py-8">
             <Link href="javascript:histor(-1)" title="Back to previous page">
-              <EnterActionButton>Back to previous page</EnterActionButton>
+              <UserActionButton>Back to previous page</UserActionButton>
             </Link>
           </div>
         </div>
       )}
     </>
   );
-};
-
-export default RootNotFoundPage;
+}

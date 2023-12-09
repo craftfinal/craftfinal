@@ -1,7 +1,5 @@
 // @/app/(authenticated)/item/[action]/page.tsx
 
-"use server";
-
 import ItemDescendantList from "@/components/itemDescendant/ItemDescendantList.server";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
