@@ -18,9 +18,9 @@ export default async function HeroSection({ user }: HeroSectionProps) {
         <p className="mb-6 max-w-2xl text-xl font-bold text-muted-foreground md:text-2xl lg:mb-8 lg:text-4xl">
           Have you ever felt like you were iterating on a document forever?
         </p>
-        <h1 className="mb-4 text-2xl font-bold leading-none dark:text-white md:text-4xl xl:mb-8 xl:text-5xl">
+        <h1 className="mb-4 flex flex-wrap items-baseline gap-4 text-2xl font-bold dark:text-white md:text-4xl xl:mb-8 xl:text-5xl">
           <TryAppButton user={user} />
-          <span className="text-xl font-normal md:text-2xl lg:text-4xl"> and craft the final version</span>
+          <div className="mt-4 text-xl font-normal md:text-2xl lg:text-4xl"> and craft the final version</div>
         </h1>
         {/* <a
           href="#"

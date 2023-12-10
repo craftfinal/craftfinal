@@ -34,7 +34,7 @@ export default async function TryAppSection({ user }: TryAppSectionProps) {
         dark:to-gray-300
         md:text-xl"
         >
-          Import your resume and tailor it with AI to get the job of your dreams!
+          Create and revise resumes in the playground
         </p>
         <div className="flex justify-center gap-4 pt-10">
           <TryAppButton user={currentUser}></TryAppButton>
