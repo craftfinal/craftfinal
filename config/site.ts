@@ -1,9 +1,21 @@
 import { SiteConfig } from "@/types";
 
 export const siteConfig: SiteConfig = {
-  name: `${process.env.NEXT_PUBLIC_CRAFTFINAL_APP_NAME ?? "CraftFinal"}`,
-  canonicalDomainName: `${process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DOMAIN ?? "craftfinal.com"}`,
-  description: `${process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DESCRIPTION ?? "Craft the final version"}`,
+  name: `${
+    process.env.NEXT_PUBLIC_CRAFTFINAL_APP_NAME && process.env.NEXT_PUBLIC_CRAFTFINAL_APP_NAME.length > 1
+      ? process.env.NEXT_PUBLIC_CRAFTFINAL_APP_NAME
+      : "CraftFinal"
+  }`,
+  canonicalDomainName: `${
+    process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DOMAIN && process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DOMAIN.length > 5
+      ? process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DOMAIN
+      : "craftfinal.com"
+  }`,
+  description: `${
+    process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DESCRIPTION && process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DESCRIPTION.length > 5
+      ? process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DESCRIPTION
+      : "Craft the final version"
+  }`,
   url: `${
     process.env.NEXT_PUBLIC_CRAFTFINAL_APP_URL ?? process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DOMAIN
       ? "https://" + process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DOMAIN

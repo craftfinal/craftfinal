@@ -1,6 +1,3 @@
-// TODO remove eslint-disable when fixed https://github.com/import-js/eslint-plugin-import/issues/1810
-// eslint-disable-next-line import/no-unresolved
-
 /** FIXME: It is imperative that this file is called `contentlayer.config.js`, not `contentlayer.config.ts`, to avoid the following error when running `npm run build`:
  * npm run build
 

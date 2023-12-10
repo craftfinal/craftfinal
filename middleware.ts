@@ -1,30 +1,30 @@
+// @/middleware.ts
+
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };
 
-// https://clerk.com/docs/references/nextjs/auth-middleware#making-pages-public-using-public-routes
-/*
-import { authMiddleware } from "@clerk/nextjs";
-const clerkAuthMiddleware = authMiddleware({
-  publicRoutes: ["/(try|resume)(/.*)?"],
-  // "/", "/about" and "/legal" will be accessible to visitors without an account
-  ignoredRoutes: ["/", "/(about|legal)(/.*)?"],
-});
-export default clerkAuthMiddleware;
-*/
-
-import executeMiddleware, { MiddlewareFactory } from "@/middlewares/executeMiddleware";
-import withAuth from "@/middlewares/withAuth";
+import executeMiddleware, { MiddlewareEntry } from "@/middlewares/executeMiddleware";
+import withClerkAuth from "@/middlewares/withClerkAuth";
 import withPathname from "@/middlewares/withPathname";
+import withTemporaryAccount from "./middlewares/withTemporaryAccount";
 
-const auth = true;
-const pathname = true;
+const middlewares: Array<MiddlewareEntry> = [
+  {
+    id: "pathname",
+    fn: withPathname,
+    // disabled: true,
+  },
+  {
+    id: "clerkauth",
+    fn: withClerkAuth,
+    // disabled: true,
+  },
+  {
+    id: "temporaryaccount",
+    fn: withTemporaryAccount,
+    // disabled: true,
+  },
+];
 
-const middlewares: Array<MiddlewareFactory> = [];
-if (auth) {
-  middlewares.push(withAuth);
-}
-if (pathname) {
-  middlewares.push(withPathname);
-}
 export default executeMiddleware(middlewares);

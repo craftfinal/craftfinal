@@ -2,12 +2,17 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { InvalidAuthUserErr, UserUpsertFailedErr, getPrimaryEmailAddress } from "@/auth/clerk/userActions";
+import { siteConfig } from "@/config/site";
+import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
+import { getAuthProviderIdCookieName } from "@/middlewares/withTemporaryAccount";
 import { prisma } from "@/prisma/client";
 import { IdSchemaType } from "@/schemas/id";
 import { ModificationTimestampType } from "@/types/timestamp";
 import { currentUser } from "@clerk/nextjs";
 import { User as ClerkAuthUser } from "@clerk/nextjs/server";
 import type { User as PrismaUser, User } from "@prisma/client";
+import Chance from "chance";
+import { cookies, headers } from "next/headers";
 
 export const getCurrentUserOrNull = async (): Promise<PrismaUser | null> => {
   try {
@@ -33,56 +38,75 @@ export const getCurrentUserIdOrNull = async (): Promise<IdSchemaType | null> => 
   return currentUserId;
 };
 
-export const getCurrentUser = async (): Promise<PrismaUser> => {
+/**
+ * Ensure that a `User` exists in the database, persist its unique `userId`
+ * as a cookie and return a promise of the `User` object
+ * There are two ways to obtain the `userId`:
+ * 1. If ClerkAuth middleware has been executed, a call to `currentUser()` will return
+ *    the `AuthProviderId`, which allows us to either create a user or retrieve it
+ * 2. Otherwise, if the user accepts cookies, a cookie may have been set and
+ *    we can obtain the
+ * @returns Promise<PrismaUser>
+ */
+
+export async function getCurrentUser(): Promise<PrismaUser> {
   let authUser = null;
-  if (process.env.NODE_ENV === "development" && process.env.DEVELOPMENT_USER_AUTH_PROVIDER_ID) {
-    const developomentAuthProviderId = process.env.DEVELOPMENT_USER_AUTH_PROVIDER_ID;
-    const developmentAuthUser = await getUserByAuthProviderId(developomentAuthProviderId);
+  // Determine which middleware has been executed
+  const authMiddlewareIds = getExecutedMiddlewareIds(headers());
+  console.log(`getCurrentUser: middlewares=${authMiddlewareIds}`);
 
-    if (developmentAuthUser) {
-      const {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        id: _id, // Rename 'id' to '_id' to indicate it's unused
-        authProviderId,
-        firstName = "DEVELOPMENT",
-        lastName = "USER",
-        ...otherProps
-      } = developmentAuthUser;
-
-      authUser = {
-        id: developomentAuthProviderId,
-        primaryEmailAddressId: "primary",
-        emailAddresses: [{ id: "primary", emailAddress: "development.user@craftfinal.com" }],
-        firstName,
-        lastName,
-        ...otherProps,
-      } as unknown as ClerkAuthUser;
-      console.log(`actions/user: DEVELOPMENT_USER_AUTH_PROVIDER_ID=(${authProviderId}) authUser=`, authUser);
-    } else {
-      console.log(
-        `actions/user: user with authProviderId=DEVELOPMENT_USER_AUTH_PROVIDER_ID=(${developomentAuthProviderId}) is ${developmentAuthUser}`,
-      );
-      throw new InvalidAuthUserErr(`Invalid DEVELOPMENT_USER_AUTH_PROVIDER_ID="${developomentAuthProviderId}"`);
-    }
-  } else {
+  let authProviderId: string | undefined, primaryEmail: string | undefined;
+  if (authMiddlewareIds.includes("clerkauth")) {
+    // Option 1: try to authenticate user basd on Clerk Auth
     authUser = await currentUser();
-    if (!authUser) {
-      if (process.env.NODE_ENV === "development") {
-        console.log(`actions/user: currentUser() returned authUser=`, authUser);
+    if (authUser) {
+      authProviderId = authUser.id;
+      if (!authUser?.primaryEmailAddressId) {
+        throw new InvalidAuthUserErr(`Invalid authUser.primaryEmailAddressId=${authUser.primaryEmailAddressId}`);
       }
-      throw new InvalidAuthUserErr(`Invalid authUser=${authUser}`);
+
+      primaryEmail = getPrimaryEmailAddress(authUser);
+      if (!primaryEmail) {
+        throw new InvalidAuthUserErr(
+          `Invalid authUser.primaryEmail=${primaryEmail} from authUser.primaryEmailAddressId=${authUser.primaryEmailAddressId}`,
+        );
+      }
+    }
+  }
+  if (!authUser) {
+    // Option 2: Try to authenticate a temporary user based on a cookie
+    const userCookies = cookies(); // Get all cookies
+    authProviderId = userCookies.get(getAuthProviderIdCookieName())?.value; // Retrieve specific cookie by name
+    if (authProviderId) {
+      const chance = new Chance(); // instantiate
+      primaryEmail = chance.email({ domain: siteConfig.canonicalDomainName });
+      const firstName = chance.first({ nationality: "en" });
+      const lastName = chance.last({ nationality: "en" });
+      // If the user already exists, fetch data from database
+      const userData = await prisma.user.findUnique({
+        where: { authProviderId },
+      });
+
+      if (userData) {
+        primaryEmail = userData.email ?? primaryEmail;
+        authUser = {
+          id: authProviderId,
+          firstName: userData.firstName ?? firstName,
+          lastName: userData.lastName ?? lastName,
+        };
+      } else {
+        authUser = {
+          id: authProviderId,
+          firstName: firstName,
+          lastName: lastName,
+        };
+      }
     }
   }
 
-  if (!authUser?.primaryEmailAddressId) {
-    throw new InvalidAuthUserErr(`Invalid authUser.primaryEmailAddressId=${authUser.primaryEmailAddressId}`);
+  if (!authUser) {
+    throw new InvalidAuthUserErr(`Invalid authUser:` + authUser);
   }
-
-  const primaryEmail = getPrimaryEmailAddress(authUser);
-  if (!primaryEmail) {
-    throw new InvalidAuthUserErr(`Invalid authUser.primaryEmailAddressId=${authUser.primaryEmailAddressId}`);
-  }
-
   // Create or update user
   const userData = {
     authProviderId: authUser.id,
@@ -91,14 +115,8 @@ export const getCurrentUser = async (): Promise<PrismaUser> => {
     lastName: authUser.lastName,
   };
 
-  /*
-  if (process.env.NODE_ENV === "development") {
-    console.log(`actions/user:getCurrentUser: userData:`, userData);
-  }
-  */
-
   const user = await prisma.user.upsert({
-    where: { authProviderId: authUser.id },
+    where: { authProviderId },
     update: userData,
     create: userData,
   });
@@ -118,7 +136,7 @@ export const getCurrentUser = async (): Promise<PrismaUser> => {
   // console.log(`actions/user: augmentedUser returned`, augmentedUser);
   // return augmentedUser;
   return user;
-};
+}
 
 export const getUserByAuthProviderId = async (authProviderId: string): Promise<User | undefined> => {
   const user = await prisma.user.findUnique({

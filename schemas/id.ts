@@ -35,7 +35,7 @@ export const isValidItemId = (id: string | null | undefined): boolean => {
   }
 };
 
-export const idPrefix: Record<ItemDescendantModelNameType, string> = {
+export const itemIdPrefix: Record<ItemDescendantModelNameType, string> = {
   user: "usr",
   resume: "res",
   organization: "org",
@@ -44,7 +44,19 @@ export const idPrefix: Record<ItemDescendantModelNameType, string> = {
 };
 
 export function getItemId(kind: ItemDescendantModelNameType | null) {
-  const kindPrefix = kind ? idPrefix[kind] || kind.substring(0, 3) : "und";
+  const kindPrefix = kind ? itemIdPrefix[kind] || kind.substring(0, 3) : "und";
+  return `${kindPrefix}-${v4()}`;
+}
+
+export const authProviderNames = ["temporary"] as const;
+export type AuthProviderNameType = (typeof authProviderNames)[number];
+
+export const authProviderIdPrefix: Record<AuthProviderNameType, string> = {
+  temporary: "auth_temp",
+};
+
+export function getAuthProviderId(kind: AuthProviderNameType | null) {
+  const kindPrefix = kind ? authProviderIdPrefix[kind] || kind.substring(0, 4) : "auth_unde";
   return `${kindPrefix}-${v4()}`;
 }
 
@@ -77,7 +89,7 @@ function findKeyByValue(map: object, value: string): string | undefined {
 export function getItemModelFromId(id: string | null | undefined): string | undefined {
   if (!id) return undefined;
   if (isValidItemId(id)) {
-    return findKeyByValue(idPrefix, id.slice(0, 3));
+    return findKeyByValue(itemIdPrefix, id.slice(0, 3));
   }
   return undefined;
 }

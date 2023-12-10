@@ -1,8 +1,10 @@
 import "@/app/globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import siteMetadata from "@/data/siteMetadata";
+import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 import React from "react";
 import { AppThemeProvider } from "../components/layout/AppThemeProvider";
 // import ClerkAuthProvider from "@/auth/clerk/ClerkAuthProvider";
@@ -29,10 +31,8 @@ const fontInter = Inter({ subsets: ["latin"] });
 // };
 
 export async function generateMetadata(): Promise<Metadata> {
-  // const url = new URL(headers().get("x-url")!);
-
-  // console.log(url.pathname);
-
+  // const pathname = headers().get("x-pathname");
+  // console.log(`generateMetadata: pathname: `, pathname);
   const metadata: Metadata = {
     metadataBase: new URL(siteMetadata.siteUrl),
     title: {
@@ -76,9 +76,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  // const layoutHeaders = headers();
-  // console.log(`Headers:`, JSON.stringify(layoutHeaders));
+  const layoutHeaders = headers();
+  // console.log(`RootLayout: headers:`, JSON.stringify(layoutHeaders));
+  const middlewares = getExecutedMiddlewareIds(layoutHeaders);
+  console.log(`RootLayout: pathname=${layoutHeaders.get("x-pathname")} executed middlewares:`, middlewares);
   // console.log(`Headers: x-pathname:`, layoutHeaders.get("x-pathname"), `x-query:`, layoutHeaders.get("x-query"));
+
   return (
     <html lang={siteMetadata.language} suppressHydrationWarning>
       <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />
