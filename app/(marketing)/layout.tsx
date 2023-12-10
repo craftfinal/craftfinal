@@ -1,7 +1,7 @@
 // @/app/(marketing)/layout.tsx
 
-import ContentLayout from "../../components/layout/ContentLayout";
+import MarketingLayout from "../../components/layout/MarketingLayout";
 
 export default function MarketingRootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <ContentLayout>{children}</ContentLayout>;
+  return <MarketingLayout>{children}</MarketingLayout>;
 }

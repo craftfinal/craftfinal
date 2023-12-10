@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  NavigationMenu,
-  NavigationMenuLink,
-  // NavigationMenuItem,
-  // NavigationMenuList,
-} from "@/components/ui/navigation-menu";
+import { NavigationMenu, NavigationMenuLink } from "@/components/ui/navigation-menu";
 // import Link from "next/link";
 // import { appNavigation } from "@/config/appNavigation";
 // import { siteConfig } from "@/config/site";
-import { siteNavigation } from "@/config/siteNavigation";
+import { siteNavigation, siteNavigationKeys } from "@/config/siteNavigation";
 import { cn } from "@/lib/utils";
 import { MainNavItem } from "@/types";
 // import { NavigationMenuItemProps } from "@radix-ui/react-navigation-menu";
@@ -33,7 +28,15 @@ import React from "react";
 export function NavigationMenuBar() {
   return (
     <NavigationMenu>
-      <MainNavMenuItem navItem={siteNavigation.about}>{siteNavigation.about.menuTitle}</MainNavMenuItem>
+      {siteNavigationKeys.map((key) => {
+        const navItem = siteNavigation[key];
+        return (
+          <MainNavMenuItem key={key} navItem={navItem}>
+            {navItem.menuTitle}
+          </MainNavMenuItem>
+        );
+      })}
+
       {/*<NavigationMenuList className="space-x-2 sm:space-x-4 md:space-x-8">
           <NavigationMenuItem>
           <NavigationMenuTrigger>About</NavigationMenuTrigger>

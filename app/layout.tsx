@@ -1,12 +1,12 @@
 import "@/app/globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import siteMetadata from "@/data/siteMetadata";
-import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { headers } from "next/headers";
 import React from "react";
 import { AppThemeProvider } from "../components/layout/AppThemeProvider";
+// import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
+// import { headers } from "next/headers";
 // import ClerkAuthProvider from "@/auth/clerk/ClerkAuthProvider";
 // import { ThemeProvider } from "@/components/providers/ThemeProvider";
 // import { siteConfig } from "@/config/site";
@@ -76,10 +76,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const layoutHeaders = headers();
+  // const layoutHeaders = headers();
   // console.log(`RootLayout: headers:`, JSON.stringify(layoutHeaders));
-  const middlewares = getExecutedMiddlewareIds(layoutHeaders);
-  console.log(`RootLayout: pathname=${layoutHeaders.get("x-pathname")} executed middlewares:`, middlewares);
+  // const middlewares = getExecutedMiddlewareIds(layoutHeaders);
+  // console.log(`RootLayout: pathname=${layoutHeaders.get("x-pathname")} executed middlewares:`, middlewares);
   // console.log(`Headers: x-pathname:`, layoutHeaders.get("x-pathname"), `x-query:`, layoutHeaders.get("x-query"));
 
   return (

@@ -1,5 +1,6 @@
 // @/app/(marketing)/(home)/WelcomeMessage.tsx
 
+import { getCurrentUserOrNull } from "@/actions/user";
 import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
 import TryAppButton from "@/components/layout/buttons/TryAppButton";
 import { siteConfig } from "@/config/site";
@@ -7,6 +8,8 @@ import { siteConfig } from "@/config/site";
 export interface TryAppSectionProps extends AuthenticatedContentLayoutChildrenProps {}
 
 export default async function TryAppSection({ user }: TryAppSectionProps) {
+  const currentUser = user ?? (await getCurrentUserOrNull());
+
   return (
     <section className="from gray-00 spacey-10 bg-gradient-to-r to-gray-200 py-10 md:py-20">
       <div className="mx-auto text-center">
@@ -34,7 +37,7 @@ export default async function TryAppSection({ user }: TryAppSectionProps) {
           Import your resume and tailor it with AI to get the job of your dreams!
         </p>
         <div className="flex justify-center gap-4 pt-10">
-          <TryAppButton user={user}></TryAppButton>
+          <TryAppButton user={currentUser}></TryAppButton>
         </div>
       </div>
     </section>
