@@ -1,4 +1,5 @@
 import "@/app/globals.css";
+import { PHProvider, PostHogPageview } from "@/components/providers/PostHog";
 import { Toaster } from "@/components/ui/toaster";
 import siteMetadata from "@/data/siteMetadata";
 import type { Metadata } from "next";
@@ -94,14 +95,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
       <body className={fontInter.className}>
-        <AppThemeProvider>
-          {/* <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} /> */}
-          <div className="relative bg-background">
-            <div className="z-5 fixed left-0 top-0 h-screen w-full bg-gradient-to-br from-neutral-300 to-indigo-300 opacity-50 blur-3xl filter dark:from-neutral-600 dark:to-indigo-900"></div>
-            <div className="relative z-10 flex min-w-full flex-col justify-between">{children}</div>
-          </div>
-          <Toaster />
-        </AppThemeProvider>
+        <PHProvider>
+          <PostHogPageview />
+          <AppThemeProvider>
+            {/* <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} /> */}
+            <div className="relative bg-background">
+              <div className="z-5 fixed left-0 top-0 h-screen w-full bg-gradient-to-br from-neutral-300 to-indigo-300 opacity-50 blur-3xl filter dark:from-neutral-600 dark:to-indigo-900"></div>
+              <div className="relative z-10 flex min-w-full flex-col justify-between">{children}</div>
+            </div>
+            <Toaster />
+          </AppThemeProvider>
+        </PHProvider>
       </body>
     </html>
   );
