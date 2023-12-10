@@ -19,7 +19,7 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
   faq: {
     title: `Frequently asked questions (FAQ) ${siteConfig.name}`,
     menuTitle: `FAQ`,
-    href: "/faq",
+    href: "/about/faq",
   },
   privacyPolicy: {
     title: `Privacy policy for ${siteConfig.name}`,
