@@ -35,46 +35,54 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
     title: `Try ${siteConfig.name}`,
     menuTitle: `Try`,
     href: "/try",
+    authenticated: true,
   },
   enterApp: {
     title: `Enter ${siteConfig.name}`,
     menuTitle: `Enter`,
     href: "/resume",
+    authenticated: true,
   },
   signUp: {
     title: `Sign up`,
     menuTitle: `Sign up`,
     href: "/sign-up",
+    authenticated: true,
   },
   afterSignUp: {
     title: `You have signed up for ${siteConfig.name}`,
     menuTitle: `After Sign Up`,
-    href: "/sign-up",
+    href: "/resume",
+    authenticated: true,
   },
   signIn: {
     title: `Sign in`,
     menuTitle: `Sign in`,
     href: "/sign-in",
+    authenticated: true,
   },
   afterSignIn: {
     title: `You have signed in to ${siteConfig.name}`,
     menuTitle: `After Sign In`,
-    href: "/sign-in",
+    href: "/resume",
+    authenticated: true,
   },
   signOut: {
     title: `Sign out`,
     menuTitle: `Sign out`,
     href: "/sign-out",
+    authenticated: true,
   },
   afterSignOut: {
     title: `You have signed out of ${siteConfig.name}`,
     menuTitle: `After Sign Out`,
-    href: "/sign-out",
+    href: "/",
   },
   userProfile: {
     title: `Settings and profile`,
     menuTitle: `Profile`,
     href: "/user-profile",
+    authenticated: true,
   },
 };
 

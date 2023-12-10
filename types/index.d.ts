@@ -11,6 +11,7 @@ export type NavItem = {
 export type MainNavItem = NavItem & {
   menuTitle?: string;
   hidden?: boolean;
+  authenticated?: boolean;
 };
 
 export type SidebarNavItem = {

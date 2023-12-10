@@ -53,7 +53,7 @@ export async function getCurrentUser(): Promise<PrismaUser> {
   let authUser = null;
   // Determine which middleware has been executed
   const authMiddlewareIds = getExecutedMiddlewareIds(headers());
-  console.log(`getCurrentUser: middlewares=${authMiddlewareIds}`);
+  // console.log(`getCurrentUser: middlewares=${authMiddlewareIds}`);
 
   let authProviderId: string | undefined, primaryEmail: string | undefined;
   if (authMiddlewareIds.includes("clerkauth")) {

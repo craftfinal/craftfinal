@@ -7,6 +7,7 @@ import { NavigationMenu, NavigationMenuLink } from "@/components/ui/navigation-m
 import { siteNavigation, siteNavigationKeys } from "@/config/siteNavigation";
 import { cn } from "@/lib/utils";
 import { MainNavItem } from "@/types";
+import Link from "next/link";
 // import { NavigationMenuItemProps } from "@radix-ui/react-navigation-menu";
 import React from "react";
 
@@ -104,9 +105,10 @@ const MainNavMenuItem = React.forwardRef<
 >(({ navItem, className, children, ...props }, ref) => {
   return (
     <NavigationMenuLink asChild>
-      <a
+      <Link
         ref={ref}
         href={navItem.href}
+        prefetch={navItem?.authenticated ? false : undefined}
         className={cn(
           "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
           className,
@@ -117,7 +119,7 @@ const MainNavMenuItem = React.forwardRef<
         <p className="line-clamp-2 text-sm font-bold leading-none text-muted-foreground">
           {children ?? navItem.menuTitle ?? navItem.title}
         </p>
-      </a>
+      </Link>
     </NavigationMenuLink>
   );
 });
