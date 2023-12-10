@@ -1,3 +1,4 @@
+import { itemSchema } from "@/schemas/item";
 import { z } from "zod";
 import { idSchema } from "./id";
 import { itemClientStateSchema } from "./item";
@@ -16,7 +17,7 @@ export const userPersistServerSchema = z.object({
 export const userSchema = {
   form: userFormSchema,
   display: userFormSchema,
-  persistServer: userFormSchema.merge(userPersistServerSchema),
+  persistServer: itemSchema.persist.merge(userFormSchema.merge(userPersistServerSchema)),
 };
 
 export type UserInputType = z.input<typeof userSchema.persistServer>;

@@ -35,6 +35,7 @@ const itemStateSchema = z.object({
 export const itemSchema = {
   form: itemDataSchema,
   display: itemDataSchema,
+  persist: itemPersistSchema,
   persistClient: itemDataSchema
     .merge(itemPersistSchema)
     .merge(itemPersistClientSchema)

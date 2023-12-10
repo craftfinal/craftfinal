@@ -19,7 +19,7 @@ import {
   itemDescendantServerStateSchema,
   itemDescendantServerToClientSchema,
 } from "@/schemas/itemDescendant";
-import { UserInputType } from "@/schemas/user";
+import { UserOutputType } from "@/schemas/user";
 import { ItemDisposition } from "@/types/item";
 import {
   ItemDescendantModelNameType,
@@ -242,7 +242,7 @@ async function updateServerItemWithClientItem(
     timestampRelation = ">";
     mergeStrategy = `MERGE: item exists`;
 
-    const updatedServerOutput = await updateWithClientItem(prismaItemModelInstance, clientItem, id);
+    const updatedServerOutput = await updateWithClientItem(prismaItemModelInstance, clientItem, id, logPrefix);
     // Return the item with a disposition of `Synced` to indicate that:
     // - The serverResponse indicates to the client that the server is now at the same state as the client
     // - Descendants of this item should be processed
@@ -316,7 +316,7 @@ async function createFromClientItem(
 
   createdServerOutput = ensureServerOutputHasParentId(createdServerOutput, clientItem.itemModel);
 
-  console.log(logPrefix, `CREATE `, "\n", clientItem);
+  console.log(logPrefix, `createFromClientItem: CREATE `, "\n", clientItem);
   console.log(logPrefix, `${clientItem.itemModel}.create:`, "\n", data);
 
   return createdServerOutput;
@@ -331,8 +331,9 @@ async function updateWithClientItem(
   let data;
   // The `User` model requires special treatment
   if (clientItem.itemModel === "user") {
-    const { id, email, firstName, lastName } = clientItem as unknown as UserInputType;
-    data = { id, email, firstName, lastName };
+    const { id, createdAt, lastModified, deletedAt, email, firstName, lastName } =
+      clientItem as unknown as UserOutputType;
+    data = { id, createdAt, lastModified, deletedAt, email, firstName, lastName };
   } else {
     data = getItemDataForUpdate<ItemClientToServerType>(clientItem);
   }
@@ -344,7 +345,7 @@ async function updateWithClientItem(
 
   updatedServerOutput = ensureServerOutputHasParentId(updatedServerOutput, clientItem.itemModel);
 
-  console.log(logPrefix, `UPDATE `, "\n", clientItem);
+  console.log(logPrefix, `updateWithClientItem: UPDATE `, "\n", clientItem);
   console.log(logPrefix, `${clientItem.itemModel}.update:`, "\n", data);
 
   return updatedServerOutput;

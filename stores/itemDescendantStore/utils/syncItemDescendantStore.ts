@@ -133,8 +133,6 @@ function updateClientItemWithServerItem(
   clientItem: Draft<ItemDescendantClientStateType>,
   serverItem: ItemDescendantServerStateType,
 ): void {
-  let timestampRelation = ">";
-  let mergeStrategy = "";
   const originalClientItem = { ...clientItem };
   // Obtain a copy of the serverState but exclude `lastModified` and `descendants`,
   // as those properties require separate handling
@@ -155,8 +153,14 @@ function updateClientItemWithServerItem(
   // at the time of initiating the sync
   let itemUpdateProperties = serverItemProperties as ItemDescendantClientStateType;
   const logPrefix = "updateClientItemWithServerItem:";
+  let mergeStrategy = "";
+  const timestampRelation: string[] = [
+    `serverLastModified=${dateToISOLocal(serverLastModified)}`,
+    ">",
+    `${dateToISOLocal(clientLastModified)}=clientLastModified`,
+  ];
   if (serverLastModified > clientLastModified) {
-    // The server has not applied our update and responding with a more recent version of this item
+    // The server has not applied our update and is responding with a more recent version of this item
     // Disposition determines, how we interpret this update
     if (serverItem.disposition === ItemDisposition.Deleted) {
       // Item has been deleted, either by business logic on the server or triggered by another client
@@ -174,6 +178,15 @@ function updateClientItemWithServerItem(
         deletedAt: getDeletedAtProperty(clientItem, serverItem),
       } as ItemDescendantClientStateType;
     } else {
+      window.consoleLog(
+        logPrefix,
+        ` unexpected serverItem.disposition ${serverItem.disposition}:`,
+        timestampRelation.join(` `),
+        "\noriginalClientItem:",
+        originalClientItem,
+        "\nserverItem:",
+        serverItem,
+      );
       throw Error(logPrefix + ` unexpected serverItem.disposition ${serverItem.disposition}`);
     }
 
@@ -181,7 +194,7 @@ function updateClientItemWithServerItem(
     // with server up to the server's timestamp
   } else if (serverLastModified < clientLastModified) {
     // There have been changes on the client after initiating the sync, but the server is not aware of those.
-    timestampRelation = "<";
+    timestampRelation[1] = "<";
     if (serverItem.disposition === ItemDisposition.Deleted) {
       // Item has been deleted, either by business logic on the server or triggered by another client
       // Since there have been local modifications in the meantime, we need to persist this item on the
@@ -201,13 +214,22 @@ function updateClientItemWithServerItem(
     ) {
       mergeStrategy = "IGNORE";
     } else {
+      window.consoleLog(
+        logPrefix,
+        ` unexpected serverItem.disposition ${serverItem.disposition}:`,
+        timestampRelation.join(` `),
+        "\noriginalClientItem:",
+        originalClientItem,
+        "\nserverItem:",
+        serverItem,
+      );
       throw Error(logPrefix + ` unexpected serverItem.disposition ${serverItem.disposition}`);
     }
     // Client was in sync with server up to the server's timestamp, but has since diverged
     // and is in fact not in sync anymore
   } else {
     // The server has applied the update the client sent and both are now in sync
-    timestampRelation = "=";
+    timestampRelation[1] = "=";
     if (serverItem.disposition === ItemDisposition.Synced || serverItem.disposition === ItemDisposition.Initial) {
       mergeStrategy = "SYNCED";
       itemUpdateProperties = {
@@ -216,6 +238,15 @@ function updateClientItemWithServerItem(
         deletedAt: getDeletedAtProperty(clientItem, serverItem),
       } as ItemDescendantClientStateType;
     } else {
+      window.consoleLog(
+        logPrefix,
+        ` unexpected serverItem.disposition ${serverItem.disposition}:`,
+        timestampRelation.join(` `),
+        "\noriginalClientItem:",
+        originalClientItem,
+        "\nserverItem:",
+        serverItem,
+      );
       throw Error(logPrefix + ` unexpected serverItem.disposition ${serverItem.disposition}`);
     }
     // Server confirms to have applied all modifications from the client (if any)
@@ -235,19 +266,14 @@ function updateClientItemWithServerItem(
   // Mutate the properties of the clientItem
   Object.assign(clientItem, itemUpdateProperties);
 
-  timestampRelation =
-    `clientLastModified=${dateToISOLocal(clientLastModified)} ` +
-    timestampRelation +
-    ` ${dateToISOLocal(serverLastModified)}=serverLastModified`;
-
   window.consoleLog(
     logPrefix,
     mergeStrategy,
-    timestampRelation,
+    timestampRelation.join(` `),
     "\n",
     originalClientItem,
     "\n updated to\n",
-    clientItem,
+    JSON.stringify(clientItem, undefined, 2).split("\n", 20).join("\n"),
   );
 }
 

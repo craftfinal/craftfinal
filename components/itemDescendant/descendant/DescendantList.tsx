@@ -59,7 +59,7 @@ export default function DescendantList(props: DescendantListProps) {
   const markDescendantAsDeleted = store((state) => state.markDescendantAsDeleted);
 
   const getItems = (): ItemDescendantOrderableClientStateListType => {
-    window.consoleLog(`DescendantInput:getItems(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
+    // window.consoleLog(`DescendantInput:getItems(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
     return getDescendants(ancestorClientIdChain) as ItemDescendantOrderableClientStateListType;
   };
 
@@ -101,7 +101,7 @@ export default function DescendantList(props: DescendantListProps) {
   const commitDescendantDraft = store((state) => state.commitDescendantDraft);
 
   const getItemDraft = (): ItemDataType<ItemClientStateType> => {
-    window.consoleLog(`DescendantInput:getItemDraft(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
+    // window.consoleLog(`DescendantInput:getItemDraft(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
     return getDescendantDraft(ancestorClientIdChain);
   };
 
