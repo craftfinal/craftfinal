@@ -24,6 +24,33 @@ NoConfigFoundError {
 
 import { defineDocumentType, makeSource } from "contentlayer/source-files";
 
+export const Author = defineDocumentType(() => ({
+  name: "Author",
+  filePathPattern: `authors/*.md`,
+  fields: {
+    name: { type: "string", required: true },
+    image: { type: "string", required: true },
+  },
+  computedFields: {
+    slug: {
+      type: "string",
+      resolve: (author) => {
+        const parts = author._raw.flattenedPath.split("/");
+        return parts[parts.length - 1];
+      },
+    },
+  },
+}));
+
+export const Fragment = defineDocumentType(() => ({
+  name: "Fragment",
+  filePathPattern: "**/*.md",
+  fields: {
+    title: { type: "string", required: true },
+    headline: { type: "markdown", required: true },
+  },
+}));
+
 export const Post = defineDocumentType(() => ({
   name: "Post",
   filePathPattern: `**/*.md`,
@@ -36,4 +63,5 @@ export const Post = defineDocumentType(() => ({
   },
 }));
 
-export default makeSource({ contentDirPath: "posts", documentTypes: [Post] });
+export default makeSource({ contentDirPath: "content", documentTypes: [Author, Fragment, Post] });
+// export default makeSource({ contentDirPath: "content", documentTypes: [MarkdownContent] });
