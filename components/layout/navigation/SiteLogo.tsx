@@ -5,16 +5,8 @@ interface LogoProps {
   height?: number;
 }
 const SiteLogo = ({ width, height }: LogoProps) => {
-  let logoWidth = 50;
-  let logoHeight = 50;
-  if (width) {
-    logoWidth = width;
-  }
-  if (height) {
-    logoHeight = height;
-  } else {
-    logoHeight = logoWidth;
-  }
+  const logoWidth = width ?? 96;
+  const logoHeight = height ?? width ?? 96;
   return (
     <div>
       <Image src="/images/logo.svg" width={logoWidth} height={logoHeight} alt="logo" />

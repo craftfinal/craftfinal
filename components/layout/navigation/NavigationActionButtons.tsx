@@ -9,18 +9,14 @@ interface NavigationActionButtonsProps extends NavbarProps {}
 export default async function NavigationActionButtons(props: NavigationActionButtonsProps) {
   return (
     <div className="flex gap-4">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
-        <DarkModeToggle />
-      </div>
+      <DarkModeToggle className="flex items-center" />
       <SignupNavigation {...props} />
       {!props.user ? null : (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
           <AppSettingsSheet />
         </div>
       )}
-      <div className="flex items-center gap-4">
-        <UserProfileNavigation {...props} />
-      </div>
+      <UserProfileNavigation {...props} className="flex items-center" />
     </div>
   );
 }

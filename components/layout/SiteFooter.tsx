@@ -6,83 +6,82 @@ import { Logo } from "../custom/Logo";
 
 export function SiteFooter() {
   return (
-    <>
-      <footer className="p-4 sm:p-6">
-        <hr className="my-6 border-gray-200 dark:border-gray-700 sm:mx-auto lg:my-8" />
-        <div className="mx-auto max-w-screen-xl">
-          <div className="md:flex md:justify-between">
-            <div className="mb-6 md:mb-0">
-              <a href="https://craftfinal.com" className="flex items-center">
-                <Logo />
-              </a>
+    <footer className="p-4 sm:p-6">
+      <hr className="my-6 border-gray-200 dark:border-gray-700 sm:mx-auto lg:my-8" />
+      <div className="mx-auto max-w-screen-xl">
+        <div className="md:flex md:justify-between">
+          <div className="mb-6 md:mb-0">
+            <a href="https://craftfinal.com" className="flex items-center">
+              <Logo />
+            </a>
+          </div>
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-6">
+            <div>
+              <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Resources</h2>
+              <ul className="text-gray-600 dark:text-gray-400">
+                <li className="mb-4">
+                  <Link href={siteNavigation.about.href} className="hover:underline">
+                    {siteNavigation.about.title}
+                  </Link>
+                </li>
+              </ul>
             </div>
-            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-6">
-              <div>
-                <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Resources</h2>
-                <ul className="text-gray-600 dark:text-gray-400">
-                  <li className="mb-4">
-                    <Link href={siteNavigation.about.href} className="hover:underline">
-                      {siteNavigation.about.title}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Follow us</h2>
-                <ul className="text-gray-600 dark:text-gray-400">
-                  <li className="mb-4">
-                    <a href="https://github.com/craftfinal/craftfinal" className="hover:underline ">
-                      Github
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Legal</h2>
-                <ul className="text-gray-600 dark:text-gray-400">
-                  <li className="mb-4">
-                    <a href="/privacy" className="hover:underline">
-                      Privacy policy
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/terms" className="hover:underline">
-                      Terms &amp; conditions
-                    </a>
-                  </li>
-                </ul>
-              </div>
+            <div>
+              <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Follow us</h2>
+              <ul className="text-gray-600 dark:text-gray-400">
+                <li className="mb-4">
+                  <a href="https://github.com/craftfinal/craftfinal" className="hover:underline ">
+                    Github
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Legal</h2>
+              <ul className="text-gray-600 dark:text-gray-400">
+                <li className="mb-4">
+                  <a href="/privacy" className="hover:underline">
+                    Privacy policy
+                  </a>
+                </li>
+                <li>
+                  <a href="/terms" className="hover:underline">
+                    Terms &amp; conditions
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
-          <hr className="my-6  sm:mx-auto lg:my-8" />
-          <div className="sm:flex sm:justify-between">
-            <div className="flex flex-col items-center justify-center gap-4 align-baseline sm:flex-row sm:justify-between">
-              {siteConfig.platforms && (
-                <div className="text-sm md:text-left" dangerouslySetInnerHTML={{ __html: siteConfig.platforms }} />
-              )}
-              {/* <div className="flex items-center space-x-2 text-sm">
+        </div>
+        <hr className="my-6  sm:mx-auto lg:my-8" />
+        <div className="sm:flex sm:justify-between">
+          <div className="flex flex-col items-center justify-center gap-4 align-baseline sm:flex-row sm:justify-between">
+            {siteConfig.platforms && (
+              <div className="text-sm md:text-left" dangerouslySetInnerHTML={{ __html: siteConfig.platforms }} />
+            )}
+            {/* <div className="flex items-center space-x-2 text-sm">
                 <span className="uppercase text-muted-foreground">Dark mode</span>
                 <DarkModeMenu />
               </div> */}
+          </div>
+          <div className="md:min-h-8 flex w-full flex-col items-start justify-center gap-4 sm:items-end sm:justify-between">
+            <div className="flex items-center justify-end gap-4 p-0">
+              <Icons.logo />
+              <p className="text-sm leading-loose md:text-left">
+                Built by{" "}
+                <a
+                  href={siteConfig.author.links.professionalWebsite}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium underline underline-offset-4"
+                >
+                  {siteConfig.author.name}
+                </a>
+                .
+              </p>
             </div>
-            <div className="md:min-h-8 flex w-full flex-col items-start justify-center gap-4 sm:items-end sm:justify-between">
-              <div className="flex items-center justify-end gap-4 p-0">
-                <Icons.logo />
-                <p className="text-sm leading-loose md:text-left">
-                  Built by{" "}
-                  <a
-                    href={siteConfig.author.links.professionalWebsite}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-medium underline underline-offset-4"
-                  >
-                    {siteConfig.author.name}
-                  </a>
-                  .
-                </p>
-              </div>
-            </div>
-            {/* <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
+          </div>
+          {/* <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
               <a href="#" className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -125,18 +124,17 @@ export function SiteFooter() {
                 </svg>
               </a>
             </div> */}
-          </div>
         </div>
-        <div className="mt-4 flex items-center justify-center gap-4 p-0">
-          <p className="text-sm leading-loose md:text-left">
-            © 2023{" "}
-            <a href="https://craftfinal.com" className="hover:underline">
-              CraftFinal™
-            </a>
-            . All Rights Reserved.
-          </p>
-        </div>
-      </footer>
-    </>
+      </div>
+      <div className="mt-4 flex items-center justify-center gap-4 p-0">
+        <p className="text-sm leading-loose md:text-left">
+          © 2023{" "}
+          <a href="https://craftfinal.com" className="hover:underline">
+            CraftFinal™
+          </a>
+          . All Rights Reserved.
+        </p>
+      </div>
+    </footer>
   );
 }

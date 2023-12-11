@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Icons } from "@/components/custom/Icons";
 import { Button } from "@/components/ui/button";
 
-export function DarkModeToggle() {
+export function DarkModeToggle({ className }: { className: string }) {
   const defaultTheme = "system";
   const themes = {
     system: { icon: <Icons.sunMoon className="absolute transition-all" />, label: "auto" },
@@ -25,7 +25,7 @@ export function DarkModeToggle() {
   // const [currentThemeIcon, setCurrentThemeIcon] = useState(themeIcons[theme as keyof typeof themeIcons]);
   const [currentTheme, setCurrentTheme] = useState(themes[defaultTheme]);
 
-  function switchTheme(targetTheme = theme || "system") {
+  function switchTheme(targetTheme = theme ?? "system") {
     const targetThemeTyped = targetTheme as keyof typeof themes;
     setThemeIcon(targetThemeTyped);
     setTheme(targetTheme);
@@ -69,16 +69,18 @@ export function DarkModeToggle() {
   }, []);
 
   return (
-    <Button
-      variant="ghost"
-      onClick={toggleTheme}
-      name="Dark mode toggle"
-      aria-label="Toggle between dark mode, light mode and system-defined"
-      size="sm"
-      className="group relative h-8 w-8 px-0"
-    >
-      {currentTheme.icon}
-      <div className="text-2xs absolute -bottom-6 hidden uppercase group-hover:block">{currentTheme.label}</div>
-    </Button>
+    <div className={className}>
+      <Button
+        variant="ghost"
+        onClick={toggleTheme}
+        name="Dark mode toggle"
+        aria-label="Toggle between dark mode, light mode and system-defined"
+        size="sm"
+        className="group relative h-8 w-8 px-0"
+      >
+        {currentTheme.icon}
+        <div className="text-2xs absolute -bottom-6 hidden uppercase group-hover:block">{currentTheme.label}</div>
+      </Button>
+    </div>
   );
 }
