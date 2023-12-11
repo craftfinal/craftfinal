@@ -40,7 +40,7 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
   enterApp: {
     title: `Enter ${siteConfig.name}`,
     menuTitle: `Enter`,
-    href: "/resume",
+    href: "/playground",
     authenticated: true,
   },
   signUp: {
@@ -52,7 +52,7 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
   afterSignUp: {
     title: `You have signed up for ${siteConfig.name}`,
     menuTitle: `After Sign Up`,
-    href: "/resume",
+    href: "/playground",
     authenticated: true,
   },
   signIn: {
@@ -64,7 +64,7 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
   afterSignIn: {
     title: `You have signed in to ${siteConfig.name}`,
     menuTitle: `After Sign In`,
-    href: "/resume",
+    href: "/playground",
     authenticated: true,
   },
   signOut: {

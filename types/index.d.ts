@@ -30,25 +30,6 @@ export type SidebarNavItem = {
     }
 );
 
-export type SiteConfig = {
-  name: string;
-  canonicalDomainName: string;
-  description: string;
-  url: string;
-  ogImage: string;
-  author: {
-    name: string;
-    links: {
-      twitter: string;
-      github: string;
-      linkedin: string;
-      professionalWebsite: string;
-      personalWebsite: string;
-    };
-  };
-  platforms: string;
-};
-
 export type SettingsConfig = {
   name: string;
   description: string;

@@ -2,7 +2,7 @@ import { Icons } from "@/components/custom/Icons";
 import { siteConfig } from "@/config/site";
 import { siteNavigation } from "@/config/siteNavigation";
 import Link from "next/link";
-import { Logo } from "../custom/Logo";
+import { SiteLogo } from "./SiteLogo";
 
 export function SiteFooter() {
   return (
@@ -11,9 +11,9 @@ export function SiteFooter() {
       <div className="mx-auto max-w-screen-xl">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
-            <a href="https://craftfinal.com" className="flex items-center">
-              <Logo />
-            </a>
+            <Link href={siteNavigation.home.href} className="flex items-center">
+              <SiteLogo />
+            </Link>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-6">
             <div>
@@ -40,14 +40,14 @@ export function SiteFooter() {
               <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Legal</h2>
               <ul className="text-gray-600 dark:text-gray-400">
                 <li className="mb-4">
-                  <a href="/privacy" className="hover:underline">
+                  <Link href="/privacy" className="hover:underline">
                     Privacy policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/terms" className="hover:underline">
+                  <Link href="/terms" className="hover:underline">
                     Terms &amp; conditions
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -129,9 +129,9 @@ export function SiteFooter() {
       <div className="mt-4 flex items-center justify-center gap-4 p-0">
         <p className="text-sm leading-loose md:text-left">
           © 2023{" "}
-          <a href="https://craftfinal.com" className="hover:underline">
+          <Link href={siteNavigation.home.href} className="hover:underline">
             CraftFinal™
-          </a>
+          </Link>
           . All Rights Reserved.
         </p>
       </div>

@@ -20,7 +20,7 @@ export const appNavigation: AppNavigation = {
   },
   enterApp: {
     title: `Enter ${siteConfig.name}`,
-    href: "/resume",
+    href: "/playground",
   },
   signUp: {
     title: `Sign up`,

@@ -7,7 +7,7 @@ CraftFinal is based on Next.js 14 and requires a PostgreSQL database to run.
 In a nutshell, running the app requires five steps
 
 1. **Database:** Deploy a PostgreSQL database (version 14 or later) and obtain the connection strings for development and production.
-2. **Authentication:** Create an account with *[Clerk Auth](https://clerk.com/)*
+2. **Authentication:** Create an account with _[Clerk Auth](https://clerk.com/)_
 3. **Environment:** Create a local environment file, `.env.local` that provides access to the database and authentication provider
 4. Run the development server
 5. Deploy
@@ -16,9 +16,9 @@ Here's how to execute these steps one by one.
 
 ### 1. Set up the **Database**
 
-There are many ways to get a PostgreSQL database (version 14 or later) up and running. If you are familiar with *Docker*, you may want to simply adapt the `docker-compose.yml` file in `docker/development/docker-compose.yml`.
+There are many ways to get a PostgreSQL database (version 14 or later) up and running. If you are familiar with _Docker_, you may want to simply adapt the `docker-compose.yml` file in `docker/development/docker-compose.yml`.
 
-Once you have the database up and running, obtain the [connection strings](https://www.postgresql.org/docs/14/libpq-connect.html#LIBPQ-CONNSTRING) for development and production. See section *34.1.1.2. Connection URIs* in the linked documentation from PostgreSQL.
+Once you have the database up and running, obtain the [connection strings](https://www.postgresql.org/docs/14/libpq-connect.html#LIBPQ-CONNSTRING) for development and production. See section _34.1.1.2. Connection URIs_ in the linked documentation from PostgreSQL.
 
 ```zsh
 postgresql://[userspec@][hostspec][/dbname][?paramspec]
@@ -40,7 +40,7 @@ POSTGRES_URL_NON_POOLING="postgresql://user:password@localhost/craftfinal"
 
 ### 2. Set up **authentication**
 
-Visit *[Clerk Auth](https://clerk.com/)* at [https://clerk.com/](https://clerk.com/) and create an account. Follow the instructions to obtain the development environment variables.
+Visit _[Clerk Auth](https://clerk.com/)_ at [https://clerk.com/](https://clerk.com/) and create an account. Follow the instructions to obtain the development environment variables.
 
 The environment variables at the time of writing look as follows (with the account-specific bits redacted):
 
@@ -50,8 +50,8 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_<REDACTED>
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_PROFILE_URL=/user-profile
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=http://localhost:3000/resume
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=http://localhost:3000/resume
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=http://localhost:3000/playground
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=http://localhost:3000/playground
 NEXT_PUBLIC_CLERK_AFTER_SIGN_OUT_URL=http://localhost:3000/
 CLERK_SECRET_KEY=sk_test_<REDACTED>
 ```
@@ -69,8 +69,8 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_<REDACTED>
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_PROFILE_URL=/user-profile
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=http://localhost:3000/resume
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=http://localhost:3000/resume
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=http://localhost:3000/playground
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=http://localhost:3000/playground
 NEXT_PUBLIC_CLERK_AFTER_SIGN_OUT_URL=http://localhost:3000/
 CLERK_SECRET_KEY=sk_test_<REDACTED>
 ```

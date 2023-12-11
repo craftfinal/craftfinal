@@ -1,5 +1,3 @@
-import { SiteConfig } from "@/types";
-
 export const siteConfig: SiteConfig = {
   name: `${
     process.env.NEXT_PUBLIC_CRAFTFINAL_APP_NAME && process.env.NEXT_PUBLIC_CRAFTFINAL_APP_NAME.length > 1
@@ -21,6 +19,7 @@ export const siteConfig: SiteConfig = {
       ? "https://" + process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DOMAIN
       : "craftfinal.com"
   }`,
+  logo: "/images/craftfinal-logo_mono.svg",
   ogImage: "https://tx.shadcn.com/og.jpg",
   author: {
     name: "Simon Heimlicher",
@@ -33,4 +32,24 @@ export const siteConfig: SiteConfig = {
     },
   },
   platforms: `<span class="uppercase text-muted-foreground">Supported browsers:</span> latest version of Google Chrome on Windows and macOS.`,
+};
+
+export type SiteConfig = {
+  name: string;
+  canonicalDomainName: string;
+  description: string;
+  url: string;
+  logo: string;
+  ogImage: string;
+  author: {
+    name: string;
+    links: {
+      twitter: string;
+      github: string;
+      linkedin: string;
+      professionalWebsite: string;
+      personalWebsite: string;
+    };
+  };
+  platforms: string;
 };
