@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import siteMetadata from "@/data/siteMetadata";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import React from "react";
+import React, { Suspense } from "react";
 import { AppThemeProvider } from "../components/layout/AppThemeProvider";
 // import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
 // import { headers } from "next/headers";
@@ -96,7 +96,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
       <body className={fontInter.className}>
         <PHProvider>
-          <PostHogPageview />
+          {/** Ensure that the component can be statically rendered by wrapping
+           `PostHogPageview`, which calls `useSearchParams`, in a `Suspense` boundary */}
+          <Suspense>
+            <PostHogPageview />
+          </Suspense>
           <AppThemeProvider>
             {/* <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} /> */}
             <div className="relative bg-background">
