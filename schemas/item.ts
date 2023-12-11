@@ -141,5 +141,6 @@ export type ItemDataFieldNameType<T> = keyof ItemDataType<T>;
 // FIXME: The following two types don't add much type safety but
 // are currently used to be able to work with components without a type parameter
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ItemDataUntypedType = Omit<Record<string, any>, keyof ItemClientStateType>;
+// export type ItemDataUntypedType = Omit<Record<string, any>, keyof ItemClientStateType>;
+export type ItemDataUntypedType = Record<string, string | number>;
 export type ItemDataUntypedFieldNameType = keyof ItemDataUntypedType;

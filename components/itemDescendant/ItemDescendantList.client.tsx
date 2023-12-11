@@ -22,6 +22,7 @@ import { ItemDescendantListSynchronization } from "./utils/ItemDescendantListSyn
 
 export interface ItemDescendantRenderProps {
   index: number;
+  inputFieldIndex: number;
   ancestorClientIdChain: Array<ClientIdType>;
   // id: string;
   item: ItemDescendantClientStateType;
@@ -50,6 +51,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
   const { ancestorClientIdChain, item, rootItemModel, leafItemModel, editingInput } = props;
   const { itemModel, descendantModel, descendants } = item;
 
+  let inputFieldIndex = props.inputFieldIndex;
   const atRootLevel = itemModel === rootItemModel;
   if (!descendantModel) return;
 
@@ -59,6 +61,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const descendantProps = {
     ...props,
+    inputFieldIndex: inputFieldIndex,
     itemModel: descendantModel,
     descendantModel: descendantDescendantModel,
     parentId: item.id,
@@ -80,14 +83,19 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
               item.descendantModel === leafItemModel
             }\n!descendantDescendantModel=${!descendantDescendantModel}`}</pre>
           ) : (
-            <DescendantInput {...descendantProps} />
+            <DescendantInput {...descendantProps} inputFieldIndex={inputFieldIndex++} />
           )}
           <ul key={item.clientId}>
             {descendants
               ?.filter((descendant) => !descendant.deletedAt)
               .map((descendant, descendantIndex) => (
                 <li key={descendant.clientId}>
-                  <ItemDescendantListRender {...descendantProps} index={descendantIndex} item={descendant} />
+                  <ItemDescendantListRender
+                    {...descendantProps}
+                    index={descendantIndex}
+                    item={descendant}
+                    inputFieldIndex={inputFieldIndex}
+                  />
                   {/*
                     !editingInput || item.descendantModel === leafItemModel || !descendantDescendantModel ? (
                       <div>{`editingInput=${editingInput} item.descendantModel === leafItemModel=${
@@ -131,6 +139,7 @@ function ItemDescendantListState(props: ItemDescendantListStateProps) {
   const clientProps = {
     ...props,
     index: 0,
+    inputFieldIndex: 0,
     ancestorClientIdChain: [],
     item: rootState,
     itemModel: props.rootItemModel,

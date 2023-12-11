@@ -26,7 +26,7 @@ export default async function ItemDescendantList({ itemModel, itemId, ...props }
     levels: Array<Record<string, string>> = [],
     leafItemModel: ItemDescendantModelNameType | null =
       itemDescendantModelHierarchy[itemDescendantModelHierarchy.length - 1];
-
+  const renderLevels = false;
   try {
     const userId = await getCurrentUserIdOrNull();
     if (!userId) {
@@ -88,7 +88,7 @@ export default async function ItemDescendantList({ itemModel, itemId, ...props }
         if (itemList?.length > 0) {
           derivedItemId = itemList[0].id;
           levels = [...levels, { itemModel: derivedItemModel, itemId: derivedItemId }];
-        } else {
+        } else if (renderLevels) {
           return (
             <>
               <RenderLevels itemModel={targetItemModel} levels={levels} />
@@ -128,7 +128,7 @@ export default async function ItemDescendantList({ itemModel, itemId, ...props }
 
   return !serverState ? null : (
     <>
-      <RenderLevels itemModel={itemModel} levels={levels} />
+      {renderLevels && <RenderLevels itemModel={itemModel} levels={levels} />}
       <ItemDescendantListContext
         serverState={serverState}
         rootItemModel={itemModel}

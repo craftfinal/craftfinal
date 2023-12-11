@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { appNavigation } from "@/config/appNavigation";
+import { siteNavigation } from "@/config/siteNavigation";
 import { User as PrismaUser } from "@prisma/client";
 import Link from "next/link";
 import { ReactNode } from "react";
@@ -15,14 +15,14 @@ export function SignupNavigation({ user, signedInChildren, children }: SignupNav
   );
 }
 function SignupNavigationWithUser({ signedInChildren }: { signedInChildren?: ReactNode }) {
-  return signedInChildren ? <Link href={appNavigation.enterPlayground.href}>{signedInChildren}</Link> : null;
+  return signedInChildren ? <Link href={siteNavigation.enterPlayground.href}>{signedInChildren}</Link> : null;
 }
 function SignupNavigationWithoutUser({ children }: { children?: ReactNode }) {
   return children ? (
-    <Link href={appNavigation.signUp.href}>{children}</Link>
+    <Link href={siteNavigation.signUp.href}>{children}</Link>
   ) : (
     <Button variant="default">
-      <Link href={appNavigation.signUp.href}>{appNavigation.signUp.title}</Link>
+      <Link href={siteNavigation.signUp.href}>{siteNavigation.signUp.title}</Link>
     </Button>
   );
 }

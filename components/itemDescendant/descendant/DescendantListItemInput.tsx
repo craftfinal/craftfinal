@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { getItemSchema, getSchemaFields, isNumberField } from "@/lib/utils/itemDescendantListUtils";
-import { ItemClientStateType, ItemDataType, ItemDataUntypedFieldNameType, ItemDataUntypedType } from "@/schemas/item";
+import { ItemDataUntypedFieldNameType, ItemDataUntypedType } from "@/schemas/item";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ItemDescendantModelNameType } from "@/types/itemDescendant";
 import { Plus } from "lucide-react";
@@ -14,7 +14,7 @@ import EditableInputField from "../utils/EditableInputField";
 
 interface DescendantListItemInputProps {
   itemModel: ItemDescendantModelNameType;
-  itemDraft: ItemDataType<ItemClientStateType>;
+  itemDraft: ItemDataUntypedType;
   updateItemDraft: (itemData: ItemDataUntypedType) => void;
   commitItemDraft: () => void;
   canEdit: boolean;
@@ -41,8 +41,18 @@ export default function DescendantListItemInput({
 
   // Initialize local state for field values
   const [fieldValues, setFieldValues] = useState(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    itemFormFields.reduce((acc, field) => ({ ...acc, [field]: "" }), {} as Record<string, any>),
+    itemFormFields.reduce(
+      (acc, field) => {
+        let initialFieldValue: string | number | undefined = undefined;
+        if (itemDraft && field in itemDraft) {
+          initialFieldValue = itemDraft[field];
+        }
+        const fieldDraft = { [field]: initialFieldValue };
+        return { ...acc, ...fieldDraft };
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      {} as Record<string, any>,
+    ),
   );
 
   const validate = (itemDraft: object) => {
@@ -128,7 +138,7 @@ export default function DescendantListItemInput({
   // };
 
   return (
-    <div className="flex flex-grow">
+    <div className="flex flex-grow items-center">
       <div className="flex flex-grow flex-wrap justify-between gap-x-4 gap-y-2">
         {itemFormFields.map((fieldName) => (
           <EditableInputField

@@ -1,10 +1,10 @@
 // @/components/layout/buttons/SignupButton.tsx
 
 import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
-import { appNavigation } from "@/config/appNavigation";
+import { siteNavigation } from "@/config/siteNavigation";
 import UserActionButton from "../../custom/UserActionButton";
 
 export interface SignupButtonProps extends AuthenticatedContentLayoutChildrenProps {}
 export default async function SignupButton({ user }: SignupButtonProps) {
-  return <UserActionButton user={user} signedIn={appNavigation.afterSignIn} signedOut={appNavigation.signUp} />;
+  return <UserActionButton user={user} signedIn={siteNavigation.afterSignIn} signedOut={siteNavigation.signUp} />;
 }

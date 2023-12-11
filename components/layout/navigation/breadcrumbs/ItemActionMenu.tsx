@@ -13,7 +13,8 @@ import {
 import { cn } from "@/lib/utils";
 import { sentenceCase } from "@/lib/utils/misc";
 import { idRegex } from "@/schemas/id";
-import { itemDescendantModelHierarchy } from "@/types/itemDescendant";
+import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
+import { ItemDescendantModelNameType, itemDescendantModelHierarchy } from "@/types/itemDescendant";
 import { ResumeActionType, resumeActionTypes } from "@/types/resume";
 import Link from "next/link";
 import React, { ReactNode } from "react";
@@ -30,37 +31,78 @@ type ResumeActionsURLMap = {
   [K in ResumeActionType]: ActionURL;
 };
 
-function getItemActions(
+interface ItemActionURLMap {
+  model: ItemDescendantModelNameType;
+  currentAction: ResumeActionType | undefined;
+  availableActions: ResumeActionsURLMap;
+}
+
+export function getItemActionURLMap(
   pathname: string,
-  title?: string,
-): { menuTitle: string; actions: ResumeActionsURLMap } | undefined {
+  item?: ItemDescendantClientStateType,
+): ItemActionURLMap | undefined {
   // Define the regular expression with named groups
-  const itemModelRE = itemDescendantModelHierarchy.join("|");
-  const itemIdRE = idRegex.substring(1, idRegex.length - 1);
-  const itemActionRE = resumeActionTypes.join("|");
+  const pathBaseURLRE = `(?<pathBaseURL>(?:/[^/]+)*?)`;
+  const itemModelRE = `(?<pathItemModel>(?:` + itemDescendantModelHierarchy.join("|") + `))`;
+  const itemIdRE = `(?<pathItemId>` + idRegex.substring(1, idRegex.length - 1) + `)`;
+  const itemActionRE = `(?<pathItemAction>(?:` + resumeActionTypes.join("|") + `))`;
 
-  const extractRegExp = new RegExp(
-    `^(.*?)/(?<itemModel>${itemModelRE})/(?<itemId>${itemIdRE})(?:/(?<itemAction>${itemActionRE}))?`,
-  );
+  // const extractRegExp = new RegExp(
+  //   `^(?<pathBaseURL>.*?)(?:/(?<pathItemModel>${itemModelRE})/(?<pathItemId>${itemIdRE})(?:/(?<pathItemAction>${itemActionRE}))?)?`,
+  // );
 
+  const extractRE = `^` + pathBaseURLRE + `(?:/` + itemModelRE + `)?(?:/` + itemIdRE + `)?(?:/` + itemActionRE + `)?$`;
+  const extractRegExp = new RegExp(extractRE);
   // Execute the regular expression
   const match = extractRegExp.exec(pathname);
   if (!match?.groups) {
+    console.log(`getItemActionURLMap: pathname`, pathname, `did not match`, extractRegExp.source);
     return undefined;
   }
+  // Construct the URLs
+  const { pathBaseURL } = match.groups;
 
-  // Extract named groups
-  const { itemModel, itemId, itemAction = resumeActionTypes[0] } = match.groups;
+  // If an item is passed in, we use it to define the path elements to construct the action path
+  let itemModel = item?.itemModel,
+    itemId = item?.id,
+    currentAction: ResumeActionType | null = null;
 
+  // Otherwise, the itemModel and itemId must be available in the pathname
   // Check if itemModel and itemId are available
   if (!itemModel || !itemId) {
-    return undefined;
+    const { pathItemModel, pathItemId, pathItemAction } = match.groups;
+    itemModel = pathItemModel as ItemDescendantModelNameType;
+    itemId = pathItemId;
+    currentAction = pathItemAction as ResumeActionType;
+
+    // Check if itemModel and itemId are available
+    if (!itemModel || !itemId) {
+      return undefined;
+    }
   }
 
-  // Construct the URLs
-  const actionBaseURL = `${match[1]}/${itemModel}/${itemId}`;
+  const actionBaseURL = `${pathBaseURL}/${itemModel}/${itemId}`;
+
   const viewActionURL = `${actionBaseURL}/view`;
   const editActionURL = `${actionBaseURL}/edit`;
+
+  const itemActionURLMap = {
+    model: itemModel as ItemDescendantModelNameType,
+    id: itemId,
+    currentAction: currentAction as ResumeActionType,
+    availableActions: {
+      view: { title: `View ${itemModel}`, url: viewActionURL, active: currentAction === "view" },
+      edit: { title: `Edit ${itemModel}`, url: editActionURL, active: currentAction === "edit" },
+    },
+  };
+  return itemActionURLMap;
+}
+
+export function getItemActionMenu(pathname: string, title?: string) {
+  const actionURLMap = getItemActionURLMap(pathname);
+  if (!actionURLMap) return actionURLMap;
+
+  const itemModel = actionURLMap.model;
 
   // Construct the menu title unless it has been passed as an argument
   const menuTitle = title ?? sentenceCase(`${itemModel} actions`);
@@ -68,16 +110,13 @@ function getItemActions(
   // Construct and return the object with URLs
   return {
     menuTitle,
-    actions: {
-      view: { title: `View ${itemModel}`, url: viewActionURL, active: itemAction === "view" },
-      edit: { title: `Edit ${itemModel}`, url: editActionURL, active: itemAction === "edit" },
-    },
+    actions: actionURLMap.availableActions,
   };
 }
 
 export default function ItemActionMenu(pathname: string, title?: string): ReactNode {
   // Render an action menu if and only if we are already on a specific item
-  const itemActions = getItemActions(pathname, title);
+  const itemActions = getItemActionMenu(pathname, title);
   if (!itemActions) return null;
 
   return (

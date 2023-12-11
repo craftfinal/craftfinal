@@ -31,6 +31,12 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
     menuTitle: `Terms of use`,
     href: "/terms",
   },
+  enterPlayground: {
+    title: `Enter the playground`,
+    menuTitle: `Playground`,
+    href: "/playground",
+    authenticated: true,
+  },
   tryApp: {
     title: `Try ${siteConfig.name}`,
     menuTitle: `Try`,
@@ -40,7 +46,7 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
   enterApp: {
     title: `Enter ${siteConfig.name}`,
     menuTitle: `Enter`,
-    href: "/playground",
+    href: "/app",
     authenticated: true,
   },
   signUp: {
@@ -82,6 +88,12 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
     title: `Settings and profile`,
     menuTitle: `Profile`,
     href: "/user-profile",
+    authenticated: true,
+  },
+  itemRoot: {
+    title: `Item root`,
+    menuTitle: `Item`,
+    href: "/item",
     authenticated: true,
   },
 };

@@ -299,7 +299,6 @@ function mergeDescendantListFromServer(
         );
         if (clientDescendant && serverDescendant.disposition === ItemDisposition.Obsoleted) {
           window.consoleLog(logPrefix, "descendant has been deleted:", clientDescendant);
-          // FIXME: make sure to remove the descendant on the client
           obsoleteDescendants.push(clientDescendant);
           continue;
         }

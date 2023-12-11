@@ -1,26 +1,12 @@
-// @/components/itemDescendant/ItemDescendant.client.tsx
+// @/components/itemDescendant/utils/ItemActionButton.tsx
+
 "use client";
-import { idRegex } from "@/schemas/id";
+import { getItemActionURLMap } from "@/components/layout/navigation/breadcrumbs/ItemActionMenu";
 import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
-import { itemDescendantModelHierarchy } from "@/types/itemDescendant";
-import { ResumeActionType, resumeActionButtonIcons, resumeActionTypes } from "@/types/resume";
+import { ResumeActionType, resumeActionButtonIcons } from "@/types/resume";
 import Link from "next/link";
 import { Button } from "../../ui/button";
 import { ItemDescendantListSynchronization } from "./ItemDescendantListSynchronization";
-
-export function getActionURL(pathname: string, item: ItemDescendantClientStateType, action: ResumeActionType = "edit") {
-  // Regex pattern that combines item model and ID patterns
-  const itemModelRE = new RegExp(itemDescendantModelHierarchy.join("|"));
-  const idUnanchoredRE = new RegExp(idRegex.substring(1, idRegex.length - 1));
-  const resumeActionRE = new RegExp(resumeActionTypes.join("|"));
-  const combinedRE = new RegExp(`(${itemModelRE.source}|${idUnanchoredRE.source}|${resumeActionRE.source})*/*`, "g");
-
-  // Replace segments in the pathname that match either of the regexes
-  const baseURL = pathname.replace(combinedRE, "");
-
-  // Construct and return the new URL
-  return `/${baseURL ? baseURL + "/" : ""}${item.itemModel}/${item.id}/${action}`;
-}
 
 export interface ItemActionButtonProps {
   pathname: string;
@@ -32,7 +18,10 @@ export function ItemActionButton(props: ItemActionButtonProps) {
   if (!item.id) {
     return <ItemDescendantListSynchronization title="Save" />;
   }
-  const actionURL = getActionURL(pathname, item, action);
+  // const actionURL = getActionURL(pathname, item, action);
+  const itemActionURLMap = getItemActionURLMap(pathname, item);
+  // console.log(`ItemActionButton:getItemActionURLMap.availableActions.edit`, itemActionURLMap?.availableActions?.edit);
+  const actionURL = itemActionURLMap?.availableActions.edit.url;
   const actionButtonInner = resumeActionButtonIcons[action];
 
   return actionURL ? (

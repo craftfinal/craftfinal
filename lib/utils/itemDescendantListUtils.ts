@@ -1,7 +1,7 @@
 // @/lib/utils/itemDescendantListUtils.ts
 
 import { achievementSchema } from "@/schemas/achievement";
-import { ItemDataUntypedFieldNameType } from "@/schemas/item";
+import { ItemDataUntypedFieldNameType, ItemDataUntypedType } from "@/schemas/item";
 import { organizationSchema } from "@/schemas/organization";
 import { resumeSchema } from "@/schemas/resume";
 import { roleSchema } from "@/schemas/role";
@@ -101,7 +101,7 @@ function parseUpdate(itemFormSchema: ZodTypeAny, updatedKeyValue: FormKeyValueTy
 export function getUpdateFromEvent(
   itemFormSchema: ZodTypeAny,
   event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
-): object | undefined {
+): ItemDataUntypedType | undefined {
   return parseUpdate(itemFormSchema, getUpdatedKeyValueFromEvent(event));
 }
 
@@ -109,6 +109,6 @@ export function getUpdateFromEdiTextField(
   itemFormSchema: ZodTypeAny,
   value?: string,
   inputProps?: InputProps,
-): object | undefined {
+): ItemDataUntypedType | undefined {
   return parseUpdate(itemFormSchema, getUpdatedKeyValueFromEdiTextField(value, inputProps));
 }

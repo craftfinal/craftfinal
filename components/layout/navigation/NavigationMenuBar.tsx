@@ -2,7 +2,7 @@
 
 import { NavigationMenu, NavigationMenuLink } from "@/components/ui/navigation-menu";
 // import Link from "next/link";
-// import { appNavigation } from "@/config/appNavigation";
+// import { siteNavigation } from "@/config/siteNavigation";
 // import { siteConfig } from "@/config/site";
 import { siteNavigation, siteNavigationKeys } from "@/config/siteNavigation";
 import { cn } from "@/lib/utils";
@@ -59,7 +59,7 @@ export function NavigationMenuBar() {
               <ListItem href={siteNavigation.about.href} title="About">
                 Learn about the basics of {siteConfig.name}.
               </ListItem>
-              <ListItem href={appNavigation.tryApp.href} title="Try it yourself">
+              <ListItem href={siteNavigation.tryApp.href} title="Try it yourself">
                 Experience, how you can import and tailor a resume in 60 seconds with {siteConfig.name}
               </ListItem>
               <ListItem title="Community">Join the community and get help or support.</ListItem>
