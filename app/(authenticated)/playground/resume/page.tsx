@@ -6,16 +6,16 @@ import ItemDescendantList from "@/components/itemDescendant/ItemDescendantList.s
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
 
-export default async function PlaygroundPage() {
+export default async function ItemDescendantPage() {
   const itemModel = "user";
   const resumeAction = "edit";
   return (
-    <Suspense fallback={<PlaygroundSkeleton />}>
+    <Suspense fallback={<ItemDescendantSkeleton />}>
       <ItemDescendantList itemModel={itemModel} resumeAction={resumeAction} />
     </Suspense>
   );
 }
 
-function PlaygroundSkeleton() {
+function ItemDescendantSkeleton() {
   return <Skeleton className="border-primary-/20 h-48 w-full border-2 shadow-lg" />;
 }
