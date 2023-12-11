@@ -1,7 +1,7 @@
 // @/app/(marketing)/(home)/CallToAction.tsx
 
 import { ContentLayoutChildrenProps } from "@/components/layout/ContentLayout";
-import TryAppButton from "@/components/layout/buttons/TryAppButton";
+import EnterPlaygroundButton from "@/components/layout/buttons/EnterPlaygroundButton";
 
 export interface CallToActionProps extends ContentLayoutChildrenProps {}
 
@@ -15,7 +15,7 @@ export default async function CallToAction({ user }: CallToActionProps) {
         <p className="mb-6 font-light text-gray-500 dark:text-gray-400 md:text-lg">
           Try CraftFinal for 30 days. No email address or credit card required
         </p>
-        <TryAppButton user={user} />
+        <EnterPlaygroundButton user={user} />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 // @/app/(marketing)/(home)/HeroSection.tsx
 
-import TryAppButton from "@/components/layout/buttons/TryAppButton";
+import EnterPlaygroundButton from "@/components/layout/buttons/EnterPlaygroundButton";
 import { ContentLayoutChildrenProps } from "../../../components/layout/ContentLayout";
 
 import Image from "next/image";
@@ -19,8 +19,11 @@ export default async function HeroSection({ user }: HeroSectionProps) {
           Have you ever felt like you were iterating on a document forever?
         </p>
         <h1 className="mb-4 flex flex-wrap items-baseline gap-4 text-2xl font-bold dark:text-white md:text-4xl xl:mb-8 xl:text-5xl">
-          <TryAppButton user={user} />
-          <div className="mt-4 text-xl font-normal md:text-2xl lg:text-4xl"> and craft the final version</div>
+          <EnterPlaygroundButton user={user} />
+          <div className="mt-4 text-xl font-normal md:text-2xl lg:text-4xl">
+            {" "}
+            to see, how CraftFinal helps creating the final version
+          </div>
         </h1>
         {/* <a
           href="#"

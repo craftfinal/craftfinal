@@ -1,4 +1,4 @@
-// @/components/layout/main/SignupButton.tsx
+// @/components/layout/buttons/SignupButton.tsx
 
 import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
 import { appNavigation } from "@/config/appNavigation";

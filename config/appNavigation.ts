@@ -2,6 +2,7 @@ import { MainNavItem } from "@/types";
 import { siteConfig } from "./site";
 
 export type AppNavigation = {
+  enterPlayground: MainNavItem;
   tryApp: MainNavItem;
   enterApp: MainNavItem;
   signUp: MainNavItem;
@@ -14,13 +15,17 @@ export type AppNavigation = {
 };
 
 export const appNavigation: AppNavigation = {
+  enterPlayground: {
+    title: `Enter the playground`,
+    href: "/playground",
+  },
   tryApp: {
     title: `Try ${siteConfig.name}`,
     href: "/try",
   },
   enterApp: {
     title: `Enter ${siteConfig.name}`,
-    href: "/playground",
+    href: "/app",
   },
   signUp: {
     title: `Sign up`,

@@ -1,7 +1,7 @@
 // @/app/(marketing)/(home)/WelcomeMessage.tsx
 
 import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
-import TryAppButton from "@/components/layout/buttons/TryAppButton";
+import EnterPlaygroundButton from "@/components/layout/buttons/EnterPlaygroundButton";
 import { siteConfig } from "@/config/site";
 
 export interface WelcomeMessageProps extends AuthenticatedContentLayoutChildrenProps {}
@@ -33,7 +33,7 @@ export default async function WelcomeMessage({ user }: WelcomeMessageProps) {
         Import your resume and tailor it with AI to get the job of your dreams!
       </p>
       <div className="flex justify-center gap-4 pt-10">
-        <TryAppButton user={user}></TryAppButton>
+        <EnterPlaygroundButton user={user}></EnterPlaygroundButton>
 
         {/* <button className="bg-gray-600 text-white px-10 py-4 rounded-md text-lg font-bold">
             Learn more

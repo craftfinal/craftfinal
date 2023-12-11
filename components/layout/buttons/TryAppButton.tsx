@@ -1,4 +1,4 @@
-// @/components/layout/main/TryAppButton.tsx
+// @/components/layout/buttons/TryAppButton.tsx
 
 import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
 import { appNavigation } from "@/config/appNavigation";
