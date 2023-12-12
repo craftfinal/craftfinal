@@ -56,7 +56,7 @@ export function getItemActionURLMap(
   // Execute the regular expression
   const match = extractRegExp.exec(pathname);
   if (!match?.groups) {
-    console.log(`getItemActionURLMap: pathname`, pathname, `did not match`, extractRegExp.source);
+    // window.consoleLog(`getItemActionURLMap: pathname`, pathname, `did not match`, extractRegExp.source);
     return undefined;
   }
   // Construct the URLs

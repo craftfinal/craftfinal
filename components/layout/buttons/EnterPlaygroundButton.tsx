@@ -7,10 +7,6 @@ import UserActionButton from "../../custom/UserActionButton";
 export interface EnterPlaygroundButtonProps extends AuthenticatedContentLayoutChildrenProps {}
 export default async function EnterPlaygroundButton({ user }: EnterPlaygroundButtonProps) {
   return (
-    <UserActionButton
-      signedIn={siteNavigation.enterPlayground}
-      signedOut={siteNavigation.enterPlayground}
-      user={user}
-    />
+    <UserActionButton signedIn={siteNavigation.antePlayground} signedOut={siteNavigation.antePlayground} user={user} />
   );
 }

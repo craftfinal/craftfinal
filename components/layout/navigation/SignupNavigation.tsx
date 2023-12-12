@@ -15,7 +15,7 @@ export function SignupNavigation({ user, signedInChildren, children }: SignupNav
   );
 }
 function SignupNavigationWithUser({ signedInChildren }: { signedInChildren?: ReactNode }) {
-  return signedInChildren ? <Link href={siteNavigation.enterPlayground.href}>{signedInChildren}</Link> : null;
+  return signedInChildren ? <Link href={siteNavigation.antePlayground.href}>{signedInChildren}</Link> : null;
 }
 function SignupNavigationWithoutUser({ children }: { children?: ReactNode }) {
   return children ? (

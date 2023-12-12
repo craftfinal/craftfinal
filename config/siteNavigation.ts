@@ -31,10 +31,16 @@ export const siteNavigation: Record<string, MainNavItemWithMenuTitle> = {
     menuTitle: `Terms of use`,
     href: "/terms",
   },
-  enterPlayground: {
+  antePlayground: {
     title: `Enter the playground`,
     menuTitle: `Playground`,
     href: "/playground",
+    authenticated: true,
+  },
+  inPlayground: {
+    title: `Enter the playground`,
+    menuTitle: `Playground`,
+    href: "/playground/resume",
     authenticated: true,
   },
   tryApp: {
