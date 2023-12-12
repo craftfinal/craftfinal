@@ -106,7 +106,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <div className="relative bg-background">
               <div className="relative z-10 flex min-w-full flex-col justify-between">{children}</div>
               {/* <div className="z-5 fixed left-0 top-0 h-screen w-full bg-gradient-to-br from-neutral-300 to-indigo-300 opacity-50 blur-3xl filter dark:from-neutral-600 dark:to-indigo-900"></div> */}
-              <div className="z-5 fixed left-0 top-0 h-screen w-full filter dark:bg-gradient-to-br dark:from-neutral-600 dark:to-indigo-900 dark:opacity-50 dark:blur-3xl"></div>
+              <div className="z-5 fixed left-0 top-0 h-screen w-full filter dark:bg-gradient-to-br dark:from-neutral-600 dark:to-slate-950 dark:opacity-90 dark:blur-3xl"></div>
             </div>
             <Toaster />
           </AppThemeProvider>

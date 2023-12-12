@@ -8,7 +8,7 @@ export function SiteFooter() {
   const footerClassName = {
     text: "text-slate-800 dark:text-slate-400",
     textMuted: "text-slate-600 dark:text-slate-400",
-    link: "text-indigo-950 dark:text-indigo-200 hover:text-foreground focus:text-foreground font-medium focus:underline underline-offset-4 decoration-indigo-900 hover:decoration-indigo-100",
+    link: "text-indigo-800 dark:text-indigo-200 hover:text-foreground focus:text-foreground font-medium hover:underline focus:underline underline-offset-[25%] decoration-indigo-900 hover:decoration-indigo-200  dark:hover:decoration-indigo-600",
     heading: "text-sm font-semibold uppercase text-slate-500 dark:text-slate-400 ",
   };
   return (

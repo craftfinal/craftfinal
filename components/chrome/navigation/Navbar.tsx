@@ -27,7 +27,7 @@ export const menuClassName = {
   topLevel: {
     text: "text-base font-medium sm:leading-none lg:text-lg lg:leading-none",
     textColor: "text-muted-foreground hover:text-foreground",
-    container: "h-9 lg:h-10 xl:h-12",
+    container: "min-h-[2rem] lg:min-h-[2.5rem] xl:min-h-[3rem]",
   },
   subItem: { container: "p-1 sm:p-2 lg:p-3 xl:p-4" },
 };
