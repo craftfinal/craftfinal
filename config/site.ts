@@ -19,7 +19,6 @@ export const siteConfig: SiteConfig = {
       ? "https://" + process.env.NEXT_PUBLIC_CRAFTFINAL_APP_DOMAIN
       : "craftfinal.com"
   }`,
-  logo: "/images/craftfinal-logo_mono.svg",
   ogImage: "https://tx.shadcn.com/og.jpg",
   author: {
     name: "Simon Heimlicher",
@@ -39,7 +38,6 @@ export type SiteConfig = {
   canonicalDomainName: string;
   description: string;
   url: string;
-  logo: string;
   ogImage: string;
   author: {
     name: string;

@@ -1,8 +1,8 @@
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
-import Image from "next/image";
 import React from "react";
+import { AppLogoSVG } from "./AppLogoSVG";
 
 const brandIconVariants = cva("font-bold text-foreground", {
   variants: {
@@ -27,36 +27,25 @@ const brandIconVariants = cva("font-bold text-foreground", {
   },
 });
 
-export interface BrandIconProps
-  extends React.ImgHTMLAttributes<HTMLImageElement>,
-    VariantProps<typeof brandIconVariants> {
+export interface BrandIconProps extends React.ImgHTMLAttributes<SVGSVGElement>, VariantProps<typeof brandIconVariants> {
   width?: number;
   height?: number;
-  priority?: boolean;
-  loading?: "eager" | "lazy";
-  fetchPriority?: "auto" | "high" | "low";
 }
 
-const LogoImage = React.forwardRef<HTMLImageElement, BrandIconProps>(
-  ({ variant, size, width, height, priority, loading, fetchPriority, ...props }, ref) => {
-    const imageWidth = width ?? 96;
-    const imageHeight = height ?? width ?? 96;
-    return (
-      <Image
-        ref={ref}
-        className={cn("w-auto", brandIconVariants({ variant, size }))}
-        src={siteConfig.logo}
-        alt={`${siteConfig.name} logo`}
-        width={imageWidth}
-        height={imageHeight}
-        loading={loading ?? "eager"}
-        fetchPriority={fetchPriority ?? "auto"}
-        priority={priority ?? true}
-        {...props}
-      />
-    );
-  },
-);
+const LogoImage = React.forwardRef<SVGSVGElement, BrandIconProps>(({ variant, size, width, height, ...props }, ref) => {
+  const imageWidth = width ?? 96;
+  const imageHeight = height ?? width ?? 96;
+  return (
+    <AppLogoSVG
+      ref={ref}
+      className={cn("w-auto", brandIconVariants({ variant, size }))}
+      alt={`${siteConfig.name} logo`}
+      width={imageWidth}
+      height={imageHeight}
+      {...props}
+    />
+  );
+});
 LogoImage.displayName = "LogoImage";
 
-export { LogoImage, brandIconVariants };
+export { brandIconVariants, LogoImage };
