@@ -18,7 +18,7 @@ export default async function MainLayout({ user, className, children }: Readonly
   return (
     <>
       <SiteHeader user={user} />
-      <main className={cn("my-auto min-h-screen", classNameMain.padding.y, className)}>{children}</main>
+      <main className={cn("my-auto min-h-screen", paddingScale.y, className)}>{children}</main>
       <SiteFooter />
     </>
   );
@@ -27,30 +27,36 @@ export default async function MainLayout({ user, className, children }: Readonly
 // Define screen sizes for responsive design
 const screenSizes = ["sm", "md", "lg", "xl"];
 
-// Define space factor per screensize
+// Define space factor per screen size
 const spaceScale = [4, 6, 8, 12, 16];
 
-type SpaceType = "margin" | "padding";
-const spaceTypePrefix = { margin: "m", padding: "p" };
+// Define space scales for margin (prefix `m`) and padding (prefix `p`)
+type SpaceType = "m" | "p";
+// Define space scales for horizontal (prefix `x`), vertical (prefix `y`),
+// top (prefix `t`) and bottom (prefix `b`)
 type SpaceDirection = "x" | "y" | "t" | "b";
 type ClassNameMainType = Record<SpaceType, Record<SpaceDirection, string>>;
-// Function to generate padding class strings
-const generateSpaceScale = (spaceType: SpaceType, paddingArray: number[]): ClassNameMainType[typeof spaceType] => {
+
+// Function to generate space class strings
+const generateSpaceScale = (spaceType: SpaceType): ClassNameMainType[typeof spaceType] => {
   const createClassString = (direction: string) =>
-    paddingArray
-      .map((size, index) => `${index === 0 ? "" : screenSizes[index - 1] + ":"}${direction}-${size}`)
+    spaceScale
+      .map((size, index) => `${index === 0 ? "" : screenSizes[index - 1] + ":"}${spaceType}${direction}-${size}`)
       .join(" ");
 
   return {
-    x: createClassString(spaceTypePrefix[spaceType] + "x"),
-    y: createClassString(spaceTypePrefix[spaceType] + "y"),
-    t: createClassString(spaceTypePrefix[spaceType] + "t"),
-    b: createClassString(spaceTypePrefix[spaceType] + "b"),
+    x: createClassString("x"),
+    y: createClassString("y"),
+    t: createClassString("t"),
+    b: createClassString("b"),
   };
 };
 
 // Generate the classNameMain object
 export const classNameMain: ClassNameMainType = {
-  margin: generateSpaceScale("margin", spaceScale),
-  padding: generateSpaceScale("padding", spaceScale),
+  m: generateSpaceScale("m"),
+  p: generateSpaceScale("p"),
 };
+
+export const paddingScale = generateSpaceScale("p");
+export const marginScale = generateSpaceScale("m");
