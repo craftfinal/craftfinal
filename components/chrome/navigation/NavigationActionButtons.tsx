@@ -1,8 +1,9 @@
 import AppSettingsSheet from "@/components/appSettings/AppSettingsSheet";
 import { DarkModeToggle } from "@/components/custom/DarkModeToggle";
-import { NavbarProps } from "./Navbar";
+import { NavbarProps, menuClassName } from "./Navbar";
 import { SignupNavigation } from "./SignupNavigation";
 import { UserProfileNavigation } from "./UserProfileNavigation";
+import { cn } from "@/lib/utils";
 
 interface NavigationActionButtonsProps extends NavbarProps {}
 
@@ -16,7 +17,17 @@ export default async function NavigationActionButtons(props: NavigationActionBut
           <AppSettingsSheet />
         </div>
       )}
-      <UserProfileNavigation {...props} className="flex items-center" />
+      <UserProfileNavigation
+        {...props}
+        className={cn(
+          menuClassName.item.container,
+          menuClassName.item.text,
+          menuClassName.topLevel.text,
+          menuClassName.topLevel.textColor,
+          menuClassName.topLevel.container,
+          "flex items-center",
+        )}
+      />
     </div>
   );
 }

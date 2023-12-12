@@ -19,11 +19,11 @@ A similar challenge arises when people apply for jobs, where each resume and par
 
 Also in the situation of the job seeker, the process of applying is tedious and error-prone.
 
-Craft Final addresses this category of problems, as follows.
+CraftFinal addresses this category of problems, as follows.
 
 First, the user uses a template and adapts it to the final version of their document. This is straightforward in the case of a resume or cover letter given both past versions of these documents and the job description. It is significantly more involved for a consultancy that answers to a specific Request for Proposals (RFP) of a potential client. But also in the latter case, a lot of content can be re-used and tailored automatically.
 
-Second, the user pre-populates the template by ingesting all relevant prior documents. Craft Final uses a large language model to combine the collected wisdom from all these documents to prepare an initial version of the completed template.
+Second, the user pre-populates the template by ingesting all relevant prior documents. CraftFinal uses a large language model to combine the collected wisdom from all these documents to prepare an initial version of the completed template.
 
 Third, CraftFinal provides a score to the contents of the current version and makes suggestions, which parts to focus on when improving. It is this third step where CraftFinal really sets itself apart, based on three key aspects of how the user proceeds.
 

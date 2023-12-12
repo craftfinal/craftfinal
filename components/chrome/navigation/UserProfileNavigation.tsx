@@ -32,10 +32,12 @@ const UserProfileButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttr
 UserProfileButton.displayName = "UserProfileButton";
 
 const SigninButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttributes<HTMLAnchorElement>>(
-  ({ ...props }, ref) => {
+  ({ className, ...props }, ref) => {
     return (
       <Link href="/sign-in" ref={ref} {...props}>
-        <Button variant="secondary">Sign in</Button>
+        <Button className={className} variant="secondary">
+          Sign in
+        </Button>
       </Link>
     );
   },

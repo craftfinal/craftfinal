@@ -11,6 +11,7 @@ export interface MainLayoutChildrenProps {
 
 export interface MainLayoutProps extends PropsWithChildren {
   user?: PrismaUser | null;
+  className?: string;
 }
 export default async function MainLayout({ user, children }: Readonly<MainLayoutProps>) {
   return (

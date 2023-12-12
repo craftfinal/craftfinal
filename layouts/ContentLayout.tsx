@@ -11,5 +11,9 @@ export interface ContentLayoutChildrenProps {
 interface ContentLayoutProps extends PropsWithChildren {}
 export default async function ContentLayout({ children }: Readonly<ContentLayoutProps>) {
   const user = undefined;
-  return <MainArticleLayoutMDX user={user}>{children}</MainArticleLayoutMDX>;
+  return (
+    <MainArticleLayoutMDX user={user} className="container">
+      {children}
+    </MainArticleLayoutMDX>
+  );
 }

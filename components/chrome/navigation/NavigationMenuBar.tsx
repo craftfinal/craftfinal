@@ -13,10 +13,11 @@ import { cn } from "@/lib/utils";
 import { MainNavItem } from "@/types";
 import Link from "next/link";
 import React from "react";
+import { menuClassName } from "./Navbar";
 
 export function NavigationMenuBar() {
   return (
-    <NavigationMenu>
+    <NavigationMenu className="w-full">
       <NavigationMenuList className="space-x-2 sm:space-x-4 md:space-x-8">
         {mainNavigationKeys.map((key) => {
           if (typeof key === "string") {
@@ -91,12 +92,6 @@ export function NavigationMenuBar() {
   );
 }
 
-const menuClassName = {
-  item: "select-none rounded-md p-3 leading-none no-underline outline-none transition-colors md:p-4 lg:p-6",
-  topLevel:
-    "text-base font-medium  sm:leading-none md:text-lg md:leading-none text-muted-foreground hover:text-foreground",
-};
-
 const MainNavMenuWithChildrenItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a"> & { keyWithChildren: NestedMenuKeyType }
@@ -106,11 +101,19 @@ const MainNavMenuWithChildrenItem = React.forwardRef<
   const subItems = [nestedItem.item, ...nestedItem.children];
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger className={cn(menuClassName.item, menuClassName.topLevel)}>
+      <NavigationMenuTrigger
+        className={cn(
+          menuClassName.item.container,
+          menuClassName.item.text,
+          menuClassName.topLevel.text,
+          menuClassName.topLevel.textColor,
+          menuClassName.topLevel.container,
+        )}
+      >
         {navItem.menuTitle}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
-        <ul className="grid w-[12rem] gap-3 p-3 sm:w-[24rem] md:w-[24rem] md:p-4 lg:w-[36rem] lg:grid-cols-[.75fr_1fr] lg:p-6">
+        <ul className="grid w-[16rem] gap-3 p-3 sm:w-[24rem] md:w-[24rem] md:p-4 lg:w-[36rem] lg:grid-cols-[.75fr_1fr] lg:p-6">
           {subItems.map((subKey, index) => {
             const navItem = siteNavigation[subKey];
             return (
@@ -144,8 +147,10 @@ const MainNavMenuItem = React.forwardRef<
         <NavigationMenuLink>
           <p
             className={cn(
-              menuClassName.item,
-              menuClassName.topLevel,
+              menuClassName.item.container,
+              menuClassName.item.text,
+              menuClassName.topLevel.text,
+              menuClassName.topLevel.textColor,
               "block space-y-1 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
               className,
               "line-clamp-2",
@@ -171,7 +176,9 @@ const SubMenuItem = React.forwardRef<
           href={navItem.href}
           ref={ref}
           className={cn(
-            menuClassName.item,
+            menuClassName.item.container,
+            menuClassName.item.text,
+            menuClassName.subItem.container,
             "transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
             {
               "flex h-full w-full flex-col justify-end bg-gradient-to-b from-muted/50 to-muted focus:shadow-md":
