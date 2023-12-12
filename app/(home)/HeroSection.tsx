@@ -1,7 +1,7 @@
 // @/app/(marketing)/(home)/HeroSection.tsx
 
 import EnterPlaygroundButton from "@/components/chrome/buttons/EnterPlaygroundButton";
-import { ContentLayoutChildrenProps } from "../../../layouts/ContentLayout";
+import { ContentLayoutChildrenProps } from "../../layouts/ContentLayout";
 
 import Image from "next/image";
 

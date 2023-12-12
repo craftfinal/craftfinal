@@ -1,87 +1,104 @@
-import { Icons } from "@/components/custom/Icons";
-import { siteConfig } from "@/config/site";
 import { siteNavigation } from "@/config/navigation";
+import { siteConfig } from "@/config/site";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { SiteLogo } from "./SiteLogo";
 
 export function SiteFooter() {
+  const footerClassName = {
+    text: "text-slate-800 dark:text-slate-400",
+    textMuted: "text-slate-600 dark:text-slate-400",
+    link: "text-indigo-950 dark:text-indigo-200 hover:text-foreground focus:text-foreground font-medium focus:underline underline-offset-4 decoration-indigo-900 hover:decoration-indigo-100",
+    heading: "text-sm font-semibold uppercase text-slate-500 dark:text-slate-400 ",
+  };
   return (
-    <footer className="p-4 sm:p-6">
-      <hr className="my-6 border-gray-200 dark:border-gray-700 sm:mx-auto lg:my-8" />
+    <footer className={cn(footerClassName.text, "bg-slate-100 p-4 dark:bg-slate-900 sm:p-6")}>
       <div className="mx-auto max-w-screen-xl">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
-            <Link href={siteNavigation.home.href} className="flex items-center">
+            <Link
+              href={siteNavigation.home.href}
+              className={cn(footerClassName.text, footerClassName.link, "flex items-center")}
+            >
               <SiteLogo />
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 sm:gap-6">
             <div>
-              <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Resources</h2>
-              <ul className="text-gray-600 dark:text-gray-400">
+              <h2 className={cn(footerClassName.heading, "mb-6")}>Resources</h2>
+              <ul>
                 <li className="mb-4">
-                  <Link href={siteNavigation.about.href} className="hover:underline">
+                  <Link href={siteNavigation.about.href} className={cn(footerClassName.text, footerClassName.link)}>
                     {siteNavigation.about.title}
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Follow us</h2>
-              <ul className="text-gray-600 dark:text-gray-400">
+              <h2 className={cn(footerClassName.heading, "mb-6")}>Follow us</h2>
+              <ul>
                 <li className="mb-4">
-                  <a href="https://github.com/craftfinal/craftfinal" className="hover:underline ">
-                    Github
-                  </a>
+                  <Link
+                    href={siteNavigation.sourceRepo.href}
+                    className={cn(footerClassName.text, footerClassName.link)}
+                  >
+                    {siteNavigation.sourceRepo.menuTitle}
+                  </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h2 className="mb-6 text-sm font-semibold uppercase text-gray-900 dark:text-white">Legal</h2>
-              <ul className="text-gray-600 dark:text-gray-400">
+              <h2 className={cn(footerClassName.heading, "mb-6")}>Legal</h2>
+              <ul>
                 <li className="mb-4">
-                  <Link href="/privacy" className="hover:underline">
-                    Privacy policy
+                  <Link
+                    href={siteNavigation.privacyPolicy.href}
+                    className={cn(footerClassName.text, footerClassName.link)}
+                  >
+                    {siteNavigation.privacyPolicy.menuTitle}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="hover:underline">
-                    Terms &amp; conditions
+                  <Link
+                    href={siteNavigation.termsOfUse.href}
+                    className={cn(footerClassName.text, footerClassName.link)}
+                  >
+                    {siteNavigation.termsOfUse.menuTitle}
                   </Link>
                 </li>
               </ul>
             </div>
           </div>
         </div>
-        <hr className="my-6  sm:mx-auto lg:my-8" />
-        <div className="sm:flex sm:justify-between">
-          <div className="flex flex-col items-center justify-center gap-4 align-baseline sm:flex-row sm:justify-between">
-            {siteConfig.platforms && (
-              <div className="text-sm md:text-left" dangerouslySetInnerHTML={{ __html: siteConfig.platforms }} />
-            )}
-            {/* <div className="flex items-center space-x-2 text-sm">
-                <span className="uppercase text-muted-foreground">Dark mode</span>
-                <DarkModeMenu />
-              </div> */}
-          </div>
-          <div className="md:min-h-8 flex w-full flex-col items-start justify-center gap-4 sm:items-end sm:justify-between">
-            <div className="flex items-center justify-end gap-4 p-0">
-              <Icons.logo />
-              <p className="text-sm leading-loose md:text-left">
-                Built by{" "}
-                <a
-                  href={siteConfig.author.links.professionalWebsite}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-medium underline underline-offset-4"
-                >
-                  {siteConfig.author.name}
-                </a>
-                .
-              </p>
+        {/* <hr className="my-6  sm:mx-auto lg:my-8" /> */}
+        <hr className="my-6 border-gray-200 dark:border-gray-700 sm:mx-auto lg:my-8" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+          {!siteConfig.platforms ? null : (
+            <div className="md:text-left  md:leading-none">
+              <h2 className={cn(footerClassName.heading, "mb-2")}>Supported platforms</h2>
+              <p className="text-sm">{siteConfig.platforms}</p>
             </div>
+          )}
+
+          <div className="flex-col sm:flex sm:justify-between">
+            <h2 className={cn(footerClassName.heading, "mb-2 md:text-left")}>Built by</h2>
+            <p className="text-sm">
+              <Link
+                href={siteConfig.author.links.professionalWebsite}
+                className={cn(footerClassName.text, footerClassName.link, "text-sm md:text-left md:leading-none")}
+              >
+                {siteConfig.author.name}
+              </Link>
+            </p>
           </div>
-          {/* <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
+        </div>
+        {/* <div className="flex items-center space-x-2 text-sm">
+              <span className="uppercase text-muted-foreground">Dark mode</span>
+              <DarkModeMenu />
+            </div>
+              // <div className="text-sm md:text-left" dangerouslySetInnerHTML={{ __html: siteConfig.platforms }} />
+            */}
+        {/* <div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
               <a href="#" className="text-gray-500 hover:text-gray-900 dark:hover:text-white">
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path
@@ -124,12 +141,11 @@ export function SiteFooter() {
                 </svg>
               </a>
             </div> */}
-        </div>
       </div>
       <div className="mt-4 flex items-center justify-center gap-4 p-0">
         <p className="text-sm leading-loose md:text-left">
           © 2023{" "}
-          <Link href={siteNavigation.home.href} className="hover:underline">
+          <Link href={siteNavigation.home.href} className={cn(footerClassName.text, footerClassName.link)}>
             CraftFinal™
           </Link>
           . All Rights Reserved.

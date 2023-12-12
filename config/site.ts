@@ -31,7 +31,7 @@ export const siteConfig: SiteConfig = {
       personalWebsite: "https://simi.sh",
     },
   },
-  platforms: `<span class="uppercase text-muted-foreground">Supported browsers:</span> latest version of Google Chrome on Windows and macOS.`,
+  platforms: `latest version of Google Chrome on Windows and macOS.`,
 };
 
 export type SiteConfig = {

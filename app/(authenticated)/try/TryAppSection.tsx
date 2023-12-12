@@ -1,7 +1,7 @@
 // @/app/(marketing)/(home)/WelcomeMessage.tsx
 
 import { getCurrentUserOrNull } from "@/actions/user";
-import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
+import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
 import TryAppButton from "@/components/chrome/buttons/TryAppButton";
 import { siteConfig } from "@/config/site";
 

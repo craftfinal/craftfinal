@@ -1,6 +1,6 @@
 import { SiteLogo } from "@/components/chrome/SiteLogo";
 import Link from "next/link";
-import { AuthenticatedContentLayoutChildrenProps } from "../../../app/(authenticated)/AuthenticatedContentLayout";
+import { AuthenticatedContentLayoutChildrenProps } from "../../../layouts/AuthenticatedContentLayout";
 import NavigationActionButtons from "./NavigationActionButtons";
 import { NavigationMenuBar } from "./NavigationMenuBar";
 
@@ -22,12 +22,12 @@ export default function Navbar({ user }: NavbarProps) {
 export const menuClassName = {
   item: {
     text: "select-none leading-none no-underline outline-none transition-colors",
-    container: "rounded-md p-2 sm:p-3",
+    container: "rounded-md px-2 lg:px-3",
   },
   topLevel: {
-    text: "text-base font-medium sm:leading-none md:text-lg md:leading-none",
+    text: "text-base font-medium sm:leading-none lg:text-lg lg:leading-none",
     textColor: "text-muted-foreground hover:text-foreground",
-    container: "h-9 sm:h-10 lg:h-12",
+    container: "h-9 lg:h-10 xl:h-12",
   },
-  subItem: { container: "p-1 sm:p-2 md:p-3 lg:p-4" },
+  subItem: { container: "p-1 sm:p-2 lg:p-3 xl:p-4" },
 };

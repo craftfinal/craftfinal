@@ -17,7 +17,7 @@ export default async function MainLayout({ user, children }: Readonly<MainLayout
   return (
     <>
       <SiteHeader user={user} />
-      <main className="container my-auto min-h-screen">{children}</main>
+      <main className="my-auto min-h-screen">{children}</main>
       <SiteFooter />
     </>
   );

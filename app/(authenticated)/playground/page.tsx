@@ -4,7 +4,7 @@ import ArticleLayoutMDX from "@/layouts/ArticleLayoutMDX";
 
 export default function PlaygroundPage() {
   return (
-    <ArticleLayoutMDX>
+    <ArticleLayoutMDX className="container">
       <h1>{siteConfig.name} playground</h1>
       <p>This is an evolving demonstration of the the core features of CraftFinal.</p>
       <CurrentUser />

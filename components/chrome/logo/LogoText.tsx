@@ -18,7 +18,7 @@ const brandTextVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-9 text-xl sm:h-12 sm:text-2xl md:h-15 md:text-3xl lg:h-18 lg:text-3xl xl:text-4xl",
+        default: "h-9 text-xl sm:h-12 sm:text-2xl lg:h-15 lg:text-3xl xl:h-18 xl:text-3xl",
         sm: "h-8 text-xs",
         lg: "h-10",
         icon: "h-9 w-9",

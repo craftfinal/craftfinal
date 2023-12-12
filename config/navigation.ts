@@ -113,6 +113,11 @@ const siteNavigationUntyped /*: SiteNavigationMapType */ = {
     href: "/item",
     authenticated: true,
   },
+  sourceRepo: {
+    title: `GitHub repository`,
+    menuTitle: `GitHub`,
+    href: "https://github.com/craftfinal/craftfinal",
+  },
 };
 
 // Infer SiteNavigationKeys from siteNavigation

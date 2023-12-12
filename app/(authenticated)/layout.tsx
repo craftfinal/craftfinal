@@ -1,6 +1,6 @@
 // @/app/(authenticated)/layout.tsx
 
-import AuthenticatedContentLayout from "@/app/(authenticated)/AuthenticatedContentLayout";
+import AuthenticatedContentLayout from "@/layouts/AuthenticatedContentLayout";
 import { Toaster } from "@/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
 import React from "react";

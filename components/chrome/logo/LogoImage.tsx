@@ -15,10 +15,10 @@ const brandIconVariants = cva("font-bold text-foreground", {
       link: "",
     },
     size: {
-      default: "h-6 w-6 md:h-8 md:w-8 md:h-9 md:w-9 xl:h-10 xl:w-10",
-      sm: "h-6 w-6",
-      lg: "h-10 w-10",
-      icon: "h-9 w-9",
+      default: "h-5 sm:h-6 lg:h-8 xl:h-10",
+      sm: "h-6",
+      lg: "h-10",
+      icon: "h-9",
     },
   },
   defaultVariants: {
@@ -44,7 +44,7 @@ const LogoImage = React.forwardRef<HTMLImageElement, BrandIconProps>(
     return (
       <Image
         ref={ref}
-        className={cn(brandIconVariants({ variant, size }))}
+        className={cn("w-auto", brandIconVariants({ variant, size }))}
         src={siteConfig.logo}
         alt={`${siteConfig.name} logo`}
         width={imageWidth}

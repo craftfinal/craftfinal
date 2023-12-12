@@ -5,5 +5,5 @@ export type AppRoutes = {
 
 export const appRoutes = {
   publicRoutes: ["/(about|try|playground)(/.*)?"],
-  ignoredRoutes: ["/", "/(terms|privacy)(/.*)?"],
+  ignoredRoutes: ["/", "/(terms|privacy|technology|use-cases)(/.*)?"],
 };

@@ -18,7 +18,7 @@ import { menuClassName } from "./Navbar";
 export function NavigationMenuBar() {
   return (
     <NavigationMenu className="w-full">
-      <NavigationMenuList className="space-x-2 sm:space-x-4 md:space-x-8">
+      <NavigationMenuList className="space-x-2 sm:space-x-4 md:space-x-6 lg:space-x-8">
         {mainNavigationKeys.map((key) => {
           if (typeof key === "string") {
             const navItem = siteNavigation[key];
@@ -103,6 +103,7 @@ const MainNavMenuWithChildrenItem = React.forwardRef<
     <NavigationMenuItem>
       <NavigationMenuTrigger
         className={cn(
+          "bg-transparent",
           menuClassName.item.container,
           menuClassName.item.text,
           menuClassName.topLevel.text,
@@ -132,7 +133,7 @@ MainNavMenuWithChildrenItem.displayName = "MainNavMenuWithChildrenItem";
 const MainNavMenuItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a"> & { navItem: MainNavItem }
->(({ navItem, className, children, ...props }, ref) => {
+>(({ navItem, children, ...props }, ref) => {
   return (
     <NavigationMenuItem>
       <Link
@@ -151,9 +152,9 @@ const MainNavMenuItem = React.forwardRef<
               menuClassName.item.text,
               menuClassName.topLevel.text,
               menuClassName.topLevel.textColor,
-              "block space-y-1 hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-              className,
-              "line-clamp-2",
+              menuClassName.topLevel.container,
+              "flex items-center hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+              // "hover:line-clamp-2", // overrides `display: flex`
             )}
           >
             {children ?? navItem.menuTitle ?? navItem.title}

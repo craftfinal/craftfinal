@@ -1,6 +1,6 @@
 // @/app/(marketing)/(home)/WelcomeMessage.tsx
 
-import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
+import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
 import EnterPlaygroundButton from "@/components/chrome/buttons/EnterPlaygroundButton";
 import { siteConfig } from "@/config/site";
 
