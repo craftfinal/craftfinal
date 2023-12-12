@@ -10,6 +10,7 @@ export type NavItem = {
 
 export type MainNavItem = NavItem & {
   menuTitle?: string;
+  menuContent?: string;
   hidden?: boolean;
   authenticated?: boolean;
 };

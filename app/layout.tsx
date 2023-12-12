@@ -5,7 +5,7 @@ import siteMetadata from "@/data/siteMetadata";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import React, { Suspense } from "react";
-import { AppThemeProvider } from "../components/layout/AppThemeProvider";
+import { AppThemeProvider } from "../components/chrome/AppThemeProvider";
 // import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
 // import { headers } from "next/headers";
 // import ClerkAuthProvider from "@/auth/clerk/ClerkAuthProvider";

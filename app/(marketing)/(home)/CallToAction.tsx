@@ -1,7 +1,7 @@
 // @/app/(marketing)/(home)/CallToAction.tsx
 
-import { ContentLayoutChildrenProps } from "@/components/layout/ContentLayout";
-import EnterPlaygroundButton from "@/components/layout/buttons/EnterPlaygroundButton";
+import { ContentLayoutChildrenProps } from "@/layouts/ContentLayout";
+import EnterPlaygroundButton from "@/components/chrome/buttons/EnterPlaygroundButton";
 
 export interface CallToActionProps extends ContentLayoutChildrenProps {}
 

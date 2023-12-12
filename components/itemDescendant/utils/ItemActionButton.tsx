@@ -1,7 +1,7 @@
 // @/components/itemDescendant/utils/ItemActionButton.tsx
 
 "use client";
-import { getItemActionURLMap } from "@/components/layout/navigation/breadcrumbs/ItemActionMenu";
+import { getItemActionURLMap } from "@/components/chrome/navigation/breadcrumbs/ItemActionMenu";
 import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
 import { ResumeActionType, resumeActionButtonIcons } from "@/types/resume";
 import Link from "next/link";

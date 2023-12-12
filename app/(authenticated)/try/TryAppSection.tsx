@@ -2,7 +2,7 @@
 
 import { getCurrentUserOrNull } from "@/actions/user";
 import { AuthenticatedContentLayoutChildrenProps } from "@/app/(authenticated)/AuthenticatedContentLayout";
-import TryAppButton from "@/components/layout/buttons/TryAppButton";
+import TryAppButton from "@/components/chrome/buttons/TryAppButton";
 import { siteConfig } from "@/config/site";
 
 export interface TryAppSectionProps extends AuthenticatedContentLayoutChildrenProps {}

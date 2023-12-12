@@ -1,6 +1,6 @@
 import { Icons } from "@/components/custom/Icons";
 import { siteConfig } from "@/config/site";
-import { siteNavigation } from "@/config/siteNavigation";
+import { siteNavigation } from "@/config/navigation";
 import Link from "next/link";
 import { SiteLogo } from "./SiteLogo";
 

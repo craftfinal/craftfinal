@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { getCurrentUserOrNull } from "@/actions/user";
 import { BellRing, Check } from "lucide-react";
 import Link from "next/link";
-import { siteNavigation } from "@/config/siteNavigation";
+import { siteNavigation } from "@/config/navigation";
 
 type CardProps = React.ComponentProps<typeof Card>;
 

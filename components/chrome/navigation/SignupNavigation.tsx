@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { siteNavigation } from "@/config/siteNavigation";
+import { siteNavigation } from "@/config/navigation";
 import { User as PrismaUser } from "@prisma/client";
 import Link from "next/link";
 import { ReactNode } from "react";

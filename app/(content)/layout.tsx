@@ -1,6 +1,6 @@
 // @/app/(content)/layout.tsx
 
-import ContentLayout from "@/components/layout/ContentLayout";
+import ContentLayout from "@/layouts/ContentLayout";
 
 export default function ContentRootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <ContentLayout>{children}</ContentLayout>;

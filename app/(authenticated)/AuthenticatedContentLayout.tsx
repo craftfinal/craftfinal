@@ -1,11 +1,10 @@
 // @/components/layout/AuthenticatedContentLayout.tsx
 
 import { getCurrentUserOrNull } from "@/actions/user";
-import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { SiteHeader } from "@/components/chrome/SiteHeader";
 import { User as PrismaUser } from "@prisma/client";
 import { ReactNode } from "react";
-import Breadcrumbs from "../../components/layout/navigation/breadcrumbs/Breadcrumbs";
-import Navbar from "../../components/layout/navigation/Navbar";
 
 export interface AuthenticatedContentLayoutChildrenProps {
   user: PrismaUser | null | undefined;
@@ -15,10 +14,7 @@ export default async function AuthenticatedContentLayout({ children }: Readonly<
   const user = await getCurrentUserOrNull();
   return (
     <>
-      <header className="container">
-        <Navbar user={user} />
-        <Breadcrumbs />
-      </header>
+      <SiteHeader user={user} />
       <main className="container my-auto min-h-screen">{children}</main>
       <SiteFooter />
     </>
