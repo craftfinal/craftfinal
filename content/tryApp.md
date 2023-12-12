@@ -5,7 +5,7 @@ date: 2021-12-24
 
 ## Try app
 
-Try my **CraftFinal** _now_.
+Try **CraftFinal** _now_.
 
 CraftFinal is a web application that helps individuals and organizations to collaborate and iterate on the core of the documents that make or break their business. Let me give you a few examples.
 

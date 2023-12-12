@@ -11,5 +11,9 @@ export interface AuthenticatedContentLayoutChildrenProps {
 
 export default async function AuthenticatedContentLayout({ children }: Readonly<{ children: ReactNode }>) {
   const user = await getCurrentUserOrNull();
-  return <MainLayout user={user}>{children}</MainLayout>;
+  return (
+    <MainLayout user={user} className="container">
+      {children}
+    </MainLayout>
+  );
 }

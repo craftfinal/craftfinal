@@ -18,7 +18,7 @@ const siteNavigationUntyped /*: SiteNavigationMapType */ = {
   howItWorks: {
     title: `How ${siteConfig.name} works`,
     menuTitle: `How it works`,
-    href: "/technology",
+    href: "/how-it-works",
   },
   useCases: {
     title: `Key use cases of ${siteConfig.name}`,

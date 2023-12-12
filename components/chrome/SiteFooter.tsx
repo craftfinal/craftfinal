@@ -1,5 +1,6 @@
 import { siteNavigation } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
+import { classNameMain } from "@/layouts/MainLayout";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { SiteLogo } from "./SiteLogo";
@@ -12,7 +13,7 @@ export function SiteFooter() {
     heading: "text-sm font-semibold uppercase text-slate-500 dark:text-slate-400 ",
   };
   return (
-    <footer className={cn(footerClassName.text, "bg-slate-100 p-4 dark:bg-slate-900 sm:p-6")}>
+    <footer className={cn(classNameMain.padding.t, footerClassName.text, "bg-slate-100 p-4 dark:bg-slate-900 sm:p-6")}>
       <div className="mx-auto max-w-screen-xl">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
@@ -71,7 +72,7 @@ export function SiteFooter() {
           </div>
         </div>
         {/* <hr className="my-6  sm:mx-auto lg:my-8" /> */}
-        <hr className="my-6 border-gray-200 dark:border-gray-700 sm:mx-auto lg:my-8" />
+        <hr className={cn(classNameMain.margin.y, "border-gray-200 dark:border-gray-700 sm:mx-auto")} />
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
           {!siteConfig.platforms ? null : (
             <div className="md:text-left  md:leading-none">

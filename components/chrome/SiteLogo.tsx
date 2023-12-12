@@ -14,7 +14,7 @@ const SiteLogo = React.forwardRef<HTMLDivElement, SiteLogoProps>(({ className, a
   const Comp = asChild ? Slot : "div";
   return (
     <Comp className={cn("flex items-center gap-x-2 hover:cursor-pointer lg:gap-x-3", className)} ref={ref}>
-      <LogoImage {...(props as BrandIconProps)} fetchPriority="high" />
+      <LogoImage {...(props as BrandIconProps)} />
       <LogoText {...(props as BrandTextProps)}>{siteConfig.name}</LogoText>
     </Comp>
   );
