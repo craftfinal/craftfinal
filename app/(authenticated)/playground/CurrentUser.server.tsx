@@ -11,6 +11,7 @@ import { getCurrentUserOrNull } from "@/actions/user";
 import { BellRing, Check } from "lucide-react";
 import Link from "next/link";
 import { siteNavigation } from "@/config/navigation";
+import TemporaryUserId from "@/components/auth/TemporaryUserId";
 
 type CardProps = React.ComponentProps<typeof Card>;
 
@@ -26,7 +27,10 @@ export default async function CurrentUser({ className, ...props }: CurrentUserPr
         <CardTitle>Your account</CardTitle>
         {currentUser ? (
           <CardDescription className="text-sm font-medium leading-none">
-            You are authenticated with the user account: {currentUser.firstName} {currentUser.lastName}
+            {currentUser ? <p>You are authenticated with the user id: {currentUser.id}</p> : <TemporaryUserId />}
+            <p>
+              Name: {currentUser.firstName} {currentUser.lastName}
+            </p>
           </CardDescription>
         ) : (
           <CardDescription className="text-sm font-medium leading-none">
