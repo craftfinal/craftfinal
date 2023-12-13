@@ -1,10 +1,12 @@
 "use server";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getAuthenticatedUser as getClerkAuthenticatedUser } from "@/auth/clerk/userActions";
-import { getAuthenticatedUser as getTemporaryAuthenticatedUser } from "@/auth/temporary/userActions";
+import { getRegisteredUserOrNull } from "@/actions/registeredUserActions";
+import { getTemporaryUserOrNull } from "@/actions/temporaryUserActions";
 import { siteConfig } from "@/config/site";
 import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
+import registeredUserMiddleware from "@/middlewares/withRegisteredUser";
+import temporaryUserMiddleware from "@/middlewares/withTemporaryUser";
 import { prisma } from "@/prisma/client";
 import { IdSchemaType } from "@/schemas/id";
 import { ItemDataUntypedType } from "@/schemas/item";
@@ -18,9 +20,9 @@ export const getCurrentUserOrNull = async (): Promise<PrismaUser | null> => {
   try {
     return await getCurrentUser();
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.log(`actions/user:getCurrentUserOrNull(): exception in getCurrentUser(): `, error);
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(`actions/user:getCurrentUserOrNull(): exception in getCurrentUser(): `, error);
+    // }
   }
   return null;
 };
@@ -31,9 +33,9 @@ export const getCurrentUserIdOrNull = async (): Promise<IdSchemaType | null> => 
     const currentUser = await getCurrentUser();
     currentUserId = currentUser?.id;
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.log(`actions/user:getCurrentUserIdOrNull(): exception in getCurrentUser(): `, error);
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(`actions/user:getCurrentUserIdOrNull(): exception in getCurrentUser(): `, error);
+    // }
   }
   return currentUserId;
 };
@@ -55,13 +57,15 @@ export async function getCurrentUser(): Promise<PrismaUser> {
   const authMiddlewareIds = getExecutedMiddlewareIds(headers());
   // console.log(`getCurrentUser: middlewares=${authMiddlewareIds}`);
 
-  if (authMiddlewareIds.includes("clerkauth")) {
+  if (authMiddlewareIds.includes(registeredUserMiddleware.id)) {
     // Option 1: try to authenticate user basd on Clerk Auth
-    authUser = getClerkAuthenticatedUser();
+    authUser = await getRegisteredUserOrNull();
   }
   if (!authUser) {
-    // Option 2: Try to authenticate a temporary user based on a cookie
-    authUser = getTemporaryAuthenticatedUser();
+    if (authMiddlewareIds.includes(temporaryUserMiddleware.id)) {
+      // Option 2: Try to authenticate a temporary user based on a cookie
+      authUser = await getTemporaryUserOrNull();
+    }
   }
 
   if (!authUser) {

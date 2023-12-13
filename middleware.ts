@@ -5,26 +5,10 @@ export const config = {
 };
 
 import executeMiddleware, { MiddlewareEntry } from "@/middlewares/executeMiddleware";
-import withClerkAuth from "@/middlewares/withClerkAuth";
-import withPathname from "@/middlewares/withPathname";
-import withTemporaryAccount from "./middlewares/withTemporaryAccount";
+import pathnameMiddleware from "@/middlewares/withPathname";
+import registeredUserMiddleware from "@/middlewares/withRegisteredUser";
+import temporaryUserMiddleware from "./middlewares/withTemporaryUser";
 
-const middlewares: Array<MiddlewareEntry> = [
-  {
-    id: "pathname",
-    fn: withPathname,
-    // disabled: true,
-  },
-  {
-    id: "clerkauth",
-    fn: withClerkAuth,
-    // disabled: true,
-  },
-  {
-    id: "temporaryaccount",
-    fn: withTemporaryAccount,
-    // disabled: true,
-  },
-];
+const middlewares: Array<MiddlewareEntry> = [pathnameMiddleware, registeredUserMiddleware, temporaryUserMiddleware];
 
 export default executeMiddleware(middlewares);

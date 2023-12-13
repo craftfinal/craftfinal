@@ -3,7 +3,7 @@
 "use client";
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { getAuthenticatedUser } from "./userActions";
+import { getTemporaryUser } from "../actions/temporaryUserActions";
 
 import type { User as PrismaUser } from "@prisma/client";
 
@@ -13,12 +13,12 @@ type TemporaryAuthProviderProps = {
   children: ReactNode;
 };
 
-export function TemporaryAuthProvider({ children }: TemporaryAuthProviderProps): JSX.Element {
+export function TemporaryUserProvider({ children }: TemporaryAuthProviderProps): JSX.Element {
   const [temporaryUser, setTemporaryUser] = useState<PrismaUser | null | undefined>(undefined);
 
   useEffect(() => {
     async function initializeAuthUser() {
-      const authUser = await getAuthenticatedUser();
+      const authUser = await getTemporaryUser();
       setTemporaryUser(authUser);
     }
     if (temporaryUser === undefined) {

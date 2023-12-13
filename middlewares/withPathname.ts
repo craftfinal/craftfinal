@@ -1,5 +1,5 @@
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
-import { MiddlewareFactory } from "./executeMiddleware";
+import { MiddlewareEntry, MiddlewareFactory } from "./executeMiddleware";
 
 const withPathname: MiddlewareFactory = (nextMiddlewareHandler) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
@@ -21,4 +21,10 @@ const withPathname: MiddlewareFactory = (nextMiddlewareHandler) => {
   };
 };
 
-export default withPathname;
+const pathnameMiddleware: MiddlewareEntry = {
+  id: "pathname",
+  fn: withPathname,
+  // disabled: true,
+};
+
+export default pathnameMiddleware;

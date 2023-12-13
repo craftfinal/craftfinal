@@ -1,9 +1,9 @@
-import { siteConfig } from "@/config/site";
-import { IdSchemaType, getAuthProviderId } from "@/schemas/id";
+import { getAuthProviderId } from "@/schemas/id";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
-import { MiddlewareFactory } from "./executeMiddleware";
+import { MiddlewareEntry, MiddlewareFactory } from "./executeMiddleware";
+import { getAuthProviderIdCookieName } from "./getAuthProviderIdCookieName";
 
-const withTemporaryAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
+const withTemporaryUser: MiddlewareFactory = (nextMiddlewareHandler) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
     const response = await nextMiddlewareHandler(request, event);
 
@@ -24,11 +24,10 @@ const withTemporaryAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
   };
 };
 
-export default withTemporaryAccount;
+const temporaryUserMiddleware: MiddlewareEntry = {
+  id: "temporaryuser",
+  fn: withTemporaryUser,
+  // disabled: true,
+};
 
-export function getAuthProviderIdCookieName(): IdSchemaType {
-  const cookieNameSuffix =
-    process.env.NODE_ENV === "development" ? `devel.${siteConfig.canonicalDomainName}` : siteConfig.canonicalDomainName;
-  const userIdCookieName = `userId.` + cookieNameSuffix;
-  return userIdCookieName;
-}
+export default temporaryUserMiddleware;

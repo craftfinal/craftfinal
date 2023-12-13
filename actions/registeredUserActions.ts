@@ -2,8 +2,33 @@ import { InvalidAuthUserErr, UserUpsertFailedErr } from "@/types/user";
 import { prisma } from "@/prisma/client";
 import { User as ClerkAuthUser, currentUser } from "@clerk/nextjs/server";
 import type { User as PrismaUser } from "@prisma/client";
+import { IdSchemaType } from "@/schemas/id";
 
-export async function getAuthenticatedUser(): Promise<PrismaUser> {
+export const getRegisteredUserOrNull = async (): Promise<PrismaUser | null> => {
+  try {
+    return await getRegisteredUser();
+  } catch (error) {
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(`actions/user:getRegisteredUserOrNull(): exception in getRegisteredUser(): `, error);
+    // }
+  }
+  return null;
+};
+
+export const getRegisteredUserIdOrNull = async (): Promise<IdSchemaType | null> => {
+  let currentUserId = null;
+  try {
+    const currentUser = await getRegisteredUser();
+    currentUserId = currentUser?.id;
+  } catch (error) {
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(`actions/user:getRegisteredUserIdOrNull(): exception in getRegisteredUser(): `, error);
+    // }
+  }
+  return currentUserId;
+};
+
+export async function getRegisteredUser(): Promise<PrismaUser> {
   let authUser = null;
 
   authUser = await currentUser();
