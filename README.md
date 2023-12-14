@@ -1,42 +1,70 @@
-# CraftFinal: Professional Resume Web App
+# CraftFinal
 
-Welcome to _CraftFinal_, a web-based application designed for professionals to craft and manage their resumes.
+CraftFinal is designed to bring the iterative development of **pitch documents** for individuals and organizations into the 21st century.
+
+## What is CraftFinal?
+
+More than a document creation tool, CraftFinal is a journey towards enhancing the **craft of pitching**. It's designed to make the iterative process not just easier, but also more engaging and rewarding.
+
+## Objective
+
+Our aim is to transform pitch development into a productive and enjoyable experience.
+
+### Who Can Benefit from CraftFinal?
+
+- **Consultants and B2B Sales Professionals**: Tailor pitches to each client's unique situation.
+- **Legal Professionals**: Draft and revise legal documents efficiently.
+- **Educators and Trainers**: Create personalized educational materials.
+- ...and many others in various fields.
+
+## How is CraftFinal Unique?
+
+CraftFinal stands out by offering:
+
+- **Guard Rails**: Utilize templates derived from existing documents to guide your creation process.
+- **Complete History**: Gain access to every iteration for inspiration and content reuse.
+- **Control**: You have the power to decide where and how your document evolves.
 
 ## Features
 
-- **Resume Manager**: Build new resumes or modify existing ones from your personal collection of past applications.
-- **Resume Editor**: Work on shaping up your resume, one at a time, with a user-friendly interface.
+CraftFinal offers several key features:
 
-## Technical Stack
+### Template Adaptation
 
-- Built using Next.JS 14.
-- Server-side state management with Prisma.
-- Client-side state management via Zustand, enhanced with persist and immer middleware.
+- Start with a versatile template for resumes, cover letters, or RFP responses.
+- Templates are adaptable to meet specific user requirements and incorporate past document versions.
 
-## Data Organization
+### Pre-population with Prior Documents
 
-CraftFinal is structured around a hierarchy of five primary data types. Each type is part of a nested relationship and is managed by a `ParentItemList` object.
+- Import and utilize content from previous documents.
+- An advanced language model generates initial drafts from this collective content.
 
-### Structure of Data Types
+### Iterative Enhancement
 
-#### Core Element: `ParentItemList`
+- View a comprehensive history of document versions for reference.
+- Receive real-time feedback and scoring predictions to guide improvements.
+- Get personalized suggestions based on specific requirements and user history.
 
-This is a TypeScript example showing the structure of data types used in CraftFinal:
+## Application Scope
 
-- **Item Disposition**: Enum to track the status of items (New, Modified, Deleted, Synced).
-- **Basic Item Type**: Represents an item with properties like ID, parent ID, creation, and modification timestamps.
-- **Various Item Types**: Different types for creating, sending, and managing items in the app and on the server.
-- **Parent Item List Type**: A generic type capturing a list of items, their parent ID, and the last modification time.
+CraftFinal is applicable in a variety of fields, including:
 
-### Hierarchy of Types
+- **Consulting and B2B Sales**: Customize pitches for each client's specific needs.
+- **Legal Services**: Streamline the drafting and revision of legal documents.
+- **Education and Training**: Develop tailored educational materials.
+- **Financial Services**: Adapt financial reports and strategies.
+- **Software and Technology Development**: Enhance proposal and documentation efficiency.
 
-- **User**: Represents a user with one or more resumes.
-- **Resume**: A user's resume, encompassing various organizations.
-- **Role**: Roles within an organization, detailed with achievements and timeframes.
-- **Achievement**: Specific accomplishments within a role, orderable through drag-and-drop.
+## Join Us in Building CraftFinal
 
-For managing these components, the app utilizes distinct stores for each hierarchy level: `resumeStore`, `organizationStore`, `roleStore`, and `achievementStore`. These stores are synchronized with the server for real-time updates and management.
+We invite you to explore CraftFinal and provide feedback during its development. No registration or email address is required to test the current version.
 
-## Running the App
+Visit [CraftFinal.com](https://craftfinal.com) to see our progress and how CraftFinal is shaping the future of document creation.
 
-For instructions on setting up and running the development version of CraftFinal, please refer to the [Development Guide](./DEVELOPMENT.md).
+## Contribution
+
+Your input is invaluable. Explore the application, suggest improvements, and contribute to making CraftFinal a tool that truly meets user needs. Contributions are welcome from both developers and users.
+
+---
+
+_CraftFinal is a work in progress. Features and functionalities are subject to change._
