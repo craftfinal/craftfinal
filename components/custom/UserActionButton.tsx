@@ -1,11 +1,11 @@
 // @/app/(marketing)/(home)/EnterActionButton.tsx
 
 import { NavItem } from "@/types";
-import { User as PrismaUser } from "@prisma/client";
+import { UserAccountOrNullOrUndefined } from "@/types/user";
 import MainActionButton from "./MainActionButton";
 
 interface UserActionButtonProps {
-  user?: PrismaUser | null;
+  user?: UserAccountOrNullOrUndefined;
   signedIn: NavItem;
   signedOut: NavItem;
 }

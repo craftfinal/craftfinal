@@ -10,7 +10,7 @@ import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schema
 import { ItemDescendantClientStateType, ItemDescendantServerStateType } from "@/schemas/itemDescendant";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ClientIdType } from "@/types/item";
-import { ItemDescendantModelNameType, getDescendantModel, getParentModel } from "@/types/itemDescendant";
+import { ItemDescendantModelNameType, getDescendantModel } from "@/types/itemDescendant";
 import { ResumeActionType } from "@/types/resume";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import Item from "./Item";
@@ -182,8 +182,8 @@ export interface ItemDescendantListContextProps {
 export default function ItemDescendantListContext(props: ItemDescendantListContextProps) {
   const { serverState, rootItemModel: itemModel, resumeAction } = props;
 
-  const parentClientId = getClientId(getParentModel(itemModel));
-  const clientId = getClientId(itemModel!);
+  const parentClientId = getClientId();
+  const clientId = getClientId();
   const parentId = serverState.parentId;
   const id = serverState.id;
   const storeVersion = 1; // FIXME: add logic to determine the version from the serverUpdate

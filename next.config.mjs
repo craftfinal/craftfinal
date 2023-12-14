@@ -7,6 +7,10 @@ import createMDX from "@next/mdx";
 const nextConfig = {
   pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
   /*reactStrictMode: true,*/ /*swcMinify: true,*/
+  // https://nextjs.org/docs/pages/api-reference/next-config-js/webVitalsAttribution
+  // experimental: {
+  //   webVitalsAttribution: ["CLS", "LCP"],
+  // },
 };
 
 const withMDX = createMDX({

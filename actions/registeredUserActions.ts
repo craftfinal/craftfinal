@@ -1,12 +1,13 @@
-import { InvalidAuthUserErr, UserUpsertFailedErr } from "@/types/user";
-import { prisma } from "@/prisma/client";
+import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
+import { prismaClient } from "@/prisma/client";
+import { InvalidAuthUserErr, UserAccountOrNull, UserAccountOrNullOrUndefined, UserUpsertFailedErr } from "@/types/user";
 import { User as ClerkAuthUser, currentUser } from "@clerk/nextjs/server";
-import type { User as PrismaUser } from "@prisma/client";
-import { IdSchemaType } from "@/schemas/id";
 
-export const getRegisteredUserOrNull = async (): Promise<PrismaUser | null> => {
+export const getRegisteredUserOrNull = async (
+  availableProviderAccount?: ClerkAuthUser,
+): Promise<UserAccountOrNullOrUndefined> => {
   try {
-    return await getRegisteredUser();
+    return await getRegisteredUser(availableProviderAccount);
   } catch (error) {
     // if (process.env.NODE_ENV === "development") {
     //   console.log(`actions/user:getRegisteredUserOrNull(): exception in getRegisteredUser(): `, error);
@@ -15,57 +16,87 @@ export const getRegisteredUserOrNull = async (): Promise<PrismaUser | null> => {
   return null;
 };
 
-export const getRegisteredUserIdOrNull = async (): Promise<IdSchemaType | null> => {
-  let currentUserId = null;
-  try {
-    const currentUser = await getRegisteredUser();
-    currentUserId = currentUser?.id;
-  } catch (error) {
-    // if (process.env.NODE_ENV === "development") {
-    //   console.log(`actions/user:getRegisteredUserIdOrNull(): exception in getRegisteredUser(): `, error);
-    // }
-  }
-  return currentUserId;
-};
-
-export async function getRegisteredUser(): Promise<PrismaUser> {
-  let authUser = null;
-
-  authUser = await currentUser();
-  if (!authUser) {
-    throw new InvalidAuthUserErr(`Invalid authUser:` + authUser);
+export async function getRegisteredUser(
+  availableProviderAccount?: ClerkAuthUser,
+): Promise<UserAccountOrNullOrUndefined> {
+  const providerAccount = availableProviderAccount ?? (await currentUser());
+  if (!providerAccount) {
+    throw new InvalidAuthUserErr(`Invalid providerAccount: ${providerAccount}`);
   }
 
-  const authProviderId = authUser.id;
-  if (!authUser?.primaryEmailAddressId) {
-    throw new InvalidAuthUserErr(`Invalid authUser.primaryEmailAddressId=${authUser.primaryEmailAddressId}`);
-  }
+  const providerAccountId = providerAccount.id;
+  const provider = registeredAccountMiddleware.id;
 
-  const primaryEmail = getPrimaryEmailAddress(authUser);
-  if (!primaryEmail) {
-    throw new InvalidAuthUserErr(
-      `Invalid authUser.primaryEmail=${primaryEmail} from authUser.primaryEmailAddressId=${authUser.primaryEmailAddressId}`,
-    );
-  }
-
-  // Create or update user with the current data from the authentication provider, Clerk Auth
-  const userData = {
-    authProviderId: authUser.id,
-    email: primaryEmail,
-    firstName: authUser.firstName,
-    lastName: authUser.lastName,
-  };
-
-  const user = await prisma.user.upsert({
-    where: { authProviderId },
-    update: userData,
-    create: userData,
+  const account = await prismaClient.account.findUnique({
+    where: {
+      provider_providerAccountId: {
+        provider,
+        providerAccountId,
+      },
+    },
+    include: { user: true },
   });
-  if (!user) {
+
+  if (!account || !account.user) {
     throw new UserUpsertFailedErr();
   }
 
-  return user;
+  return { ...account.user, account };
+}
+
+export async function getOrCreateRegisteredUser(): Promise<UserAccountOrNull> {
+  const providerAccount = await currentUser();
+  if (!providerAccount) {
+    throw new InvalidAuthUserErr(`Could not get providerAccount from Clerk Auth`);
+  }
+  let userAccount = await getRegisteredUser(providerAccount);
+  if (!userAccount) {
+    userAccount = await createRegisteredUser(providerAccount);
+  }
+  return userAccount;
+}
+
+export async function createRegisteredUser(providerAccount: ClerkAuthUser): Promise<UserAccountOrNull> {
+  const providerAccountId = providerAccount.id;
+  const provider = registeredAccountMiddleware.id;
+  const type = provider; // For the time being identical to provider
+  const primaryEmail = getPrimaryEmailAddress(providerAccount);
+  if (!primaryEmail) {
+    throw new InvalidAuthUserErr(`Invalid primary email for providerAccount: ${providerAccount.id}`);
+  }
+
+  // Dreate or update the Account
+  const account = await prismaClient.account.upsert({
+    where: {
+      provider_providerAccountId: {
+        provider,
+        providerAccountId,
+      },
+    },
+    update: {
+      user: {
+        update: {
+          email: primaryEmail,
+          firstName: providerAccount.firstName,
+          lastName: providerAccount.lastName,
+        },
+      },
+    },
+    create: {
+      provider,
+      providerAccountId,
+      type,
+      user: {
+        create: {
+          email: primaryEmail,
+          firstName: providerAccount.firstName,
+          lastName: providerAccount.lastName,
+        },
+      },
+    },
+    include: { user: true },
+  });
+  return { ...account.user, account };
 }
 
 const getPrimaryEmailAddress = (authUser: ClerkAuthUser) => {

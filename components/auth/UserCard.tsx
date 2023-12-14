@@ -2,78 +2,51 @@
 
 "use server";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { siteNavigation } from "@/config/navigation";
+import AccountId from "@/components/custom/AccountId";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { AuthenticatedUser } from "@/types/user";
-import { Check, CoffeeIcon, MartiniIcon } from "lucide-react";
-import Link from "next/link";
+import { CoffeeIcon, MartiniIcon } from "lucide-react";
+
+import { UserAccountOrNull, UserAccountOrNullOrUndefined } from "@/types/user";
+import AccountTable from "./AccountTable";
 
 export interface AuthenticatedUserCardProps extends React.ComponentProps<typeof Card> {
-  user?: AuthenticatedUser;
+  user?: UserAccountOrNull;
 }
 
 export interface UserCardProps extends React.ComponentProps<typeof Card> {
-  user: AuthenticatedUser;
-  authSource: string;
+  user: UserAccountOrNullOrUndefined;
+  provider?: string;
 }
-export default async function UserCard({ user, authSource, className, ...props }: UserCardProps) {
+
+export default async function UserCard({ user, provider, className, ...props }: UserCardProps) {
+  const accountProvider = provider ?? user?.account.provider;
   return (
     <Card className={cn(className)} {...props}>
       <CardHeader>
-        <CardTitle>{authSource}</CardTitle>
+        <CardTitle>
+          <span className="font-normal text-muted-foreground">Account provider: </span>
+          <span className="font-mono">{accountProvider}</span>
+        </CardTitle>
         {user ? (
           <CardDescription className="flex items-center justify-between text-sm leading-none">
-            <span>Authenticated with {user.authProviderName} user</span>
-            <span className="font-mono text-sm font-medium">{user.authProviderId}</span>.{" "}
+            <span>
+              Authenticated with provider <span className="font-xs font-mono">{user.account.provider}</span> with id{" "}
+              <AccountId id={user.account.providerAccountId} />.
+            </span>
             <MartiniIcon className="mr-2 h-4 w-4" />
           </CardDescription>
         ) : (
           <CardDescription className="text-sm leading-none">
             <CoffeeIcon className="mr-2 hidden h-4 w-4" />
-            <span className="font-mono text-sm font-medium">Not recognized as {authSource} user</span>.
+            <span>Not recognized as {accountProvider} user</span>.
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="grid gap-4">
-        <Table>
-          <TableBody className="text-xs">
-            <TableRow>
-              <TableHead className="font-medium">User ID</TableHead>
-              <TableCell>
-                <span className="font-mono text-sm">{user?.id}</span>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableHead className="font-medium">Auth provider ID</TableHead>
-              <TableCell>
-                <span className="font-mono text-sm">{user?.authProviderId}</span>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableHead className="font-medium">Email</TableHead>
-              <TableCell>{user?.email}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableHead className="font-medium">First name</TableHead>
-              <TableCell>{user?.firstName}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableHead className="font-medium">Last name</TableHead>
-              <TableCell>{user?.lastName}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      <CardContent>
+        {!user || !accountProvider ? null : <AccountTable user={user} provider={accountProvider} />}
       </CardContent>
-      <CardFooter>
-        <Link href={siteNavigation.inPlayground.href} title={siteNavigation.inPlayground.title}>
-          <Button className="w-full">
-            <Check className="mr-2 h-4 w-4" /> {siteNavigation.inPlayground.title}
-          </Button>
-        </Link>
-      </CardFooter>
+      {/* <CardFooter></CardFooter> */}
     </Card>
   );
 }

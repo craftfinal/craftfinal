@@ -2,11 +2,12 @@
 
 "use client";
 
-import { TemporaryUser, useTemporaryUser } from "@/auth/TemporaryUserProvider";
+import { useTemporaryUser } from "@/auth/TemporaryUserProvider";
+import { UserAccountOrNullOrUndefined } from "@/types/user";
 import { ReactNode } from "react";
 
 export function TemporaryUserId(): ReactNode {
-  const temporaryUser: TemporaryUser = useTemporaryUser();
+  const temporaryUser: UserAccountOrNullOrUndefined = useTemporaryUser();
 
   return <span>{temporaryUser?.id ?? ""}</span>;
 }

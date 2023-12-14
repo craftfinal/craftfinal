@@ -13,9 +13,9 @@ import TemporaryUserCard from "./TemporaryUserCard";
 
 type CardProps = React.ComponentProps<typeof Card>;
 
-export interface CurrentUserProps extends CardProps {}
+export interface AllUserCardsProps extends CardProps {}
 
-export default async function CurrentUser(props: CurrentUserProps) {
+export default async function AllUserCards(props: AllUserCardsProps) {
   const currentUser = await getCurrentUserOrNull();
   const temporaryUser = await getTemporaryUserOrNull();
   const registeredUser = await getRegisteredUserOrNull();

@@ -3,7 +3,7 @@
 "use server";
 
 import { dateToISOLocal } from "@/lib/utils/formatDate";
-import { prisma } from "@/prisma/client";
+import { prismaClient } from "@/prisma/client";
 import { IdSchemaType, idDefault } from "@/schemas/id";
 import {
   ItemClientStateType,
@@ -52,7 +52,7 @@ export async function handleNestedItemDescendantListFromClient(
     response = await processClientItemDescendant(clientItem, currentTimestamp);
   } else {
     // Process the entire update in a transaction and capture the result to respond to the client
-    response = await prisma.$transaction(async (prismaTransaction) => {
+    response = await prismaClient.$transaction(async (prismaTransaction) => {
       return processClientItemDescendant(clientItem, currentTimestamp, prismaTransaction as PrismaClient);
     });
   }
@@ -67,7 +67,7 @@ export async function handleNestedItemDescendantListFromClient(
 async function processClientItemDescendant(
   clientItem: ItemDescendantClientStateType,
   currentTimestamp: Date,
-  prismaTransaction: PrismaClient = prisma,
+  prismaTransaction: PrismaClient = prismaClient,
 ): Promise<ItemDescendantServerStateType> {
   const { itemModel, descendantModel } = clientItem;
   const prismaItemModelInstance = getModelAccessor(itemModel, prismaTransaction);

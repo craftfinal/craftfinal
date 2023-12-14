@@ -1,22 +1,23 @@
+// @/actions/user.ts
+
 "use server";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getRegisteredUserOrNull } from "@/actions/registeredUserActions";
-import { getTemporaryUserOrNull } from "@/actions/temporaryUserActions";
+import { getOrCreateRegisteredUser } from "@/actions/registeredUserActions";
+import { getOrCreateTemporaryUser } from "@/actions/temporaryUserActions";
 import { siteConfig } from "@/config/site";
 import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
-import registeredUserMiddleware from "@/middlewares/withRegisteredUser";
-import temporaryUserMiddleware from "@/middlewares/withTemporaryUser";
-import { prisma } from "@/prisma/client";
+import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
+import temporaryAccountMiddleware from "@/middlewares/withTemporaryAccount";
+import { prismaClient } from "@/prisma/client";
 import { IdSchemaType } from "@/schemas/id";
 import { ItemDataUntypedType } from "@/schemas/item";
 import { ModificationTimestampType } from "@/types/timestamp";
-import type { User as PrismaUser, User } from "@prisma/client";
 import Chance from "chance";
 import { headers } from "next/headers";
-import { InvalidAuthUserErr } from "../types/user";
+import { InvalidAuthUserErr, UserAccountOrNull } from "../types/user";
 
-export const getCurrentUserOrNull = async (): Promise<PrismaUser | null> => {
+export const getCurrentUserOrNull = async (): Promise<UserAccountOrNull> => {
   try {
     return await getCurrentUser();
   } catch (error) {
@@ -31,7 +32,7 @@ export const getCurrentUserIdOrNull = async (): Promise<IdSchemaType | null> => 
   let currentUserId = null;
   try {
     const currentUser = await getCurrentUser();
-    currentUserId = currentUser?.id;
+    currentUserId = currentUser?.id ?? null;
   } catch (error) {
     // if (process.env.NODE_ENV === "development") {
     //   console.log(`actions/user:getCurrentUserIdOrNull(): exception in getCurrentUser(): `, error);
@@ -51,20 +52,28 @@ export const getCurrentUserIdOrNull = async (): Promise<IdSchemaType | null> => 
  * @returns Promise<PrismaUser>
  */
 
-export async function getCurrentUser(): Promise<PrismaUser> {
+export async function getCurrentUser(): Promise<UserAccountOrNull> {
   let authUser = null;
   // Determine which middleware has been executed
   const authMiddlewareIds = getExecutedMiddlewareIds(headers());
   // console.log(`getCurrentUser: middlewares=${authMiddlewareIds}`);
 
-  if (authMiddlewareIds.includes(registeredUserMiddleware.id)) {
+  if (authMiddlewareIds.includes(registeredAccountMiddleware.id)) {
     // Option 1: try to authenticate user basd on Clerk Auth
-    authUser = await getRegisteredUserOrNull();
+    try {
+      authUser = await getOrCreateRegisteredUser();
+    } catch (exc) {
+      // console.log(`getCurrentUser: Exception in getOrCreateRegisteredUser:`, exc);
+    }
   }
   if (!authUser) {
-    if (authMiddlewareIds.includes(temporaryUserMiddleware.id)) {
+    if (authMiddlewareIds.includes(temporaryAccountMiddleware.id)) {
       // Option 2: Try to authenticate a temporary user based on a cookie
-      authUser = await getTemporaryUserOrNull();
+      try {
+        authUser = await getOrCreateTemporaryUser();
+      } catch (exc) {
+        console.log(`getCurrentUser: Exception in getOrCreateTemporaryUser:`, exc);
+      }
     }
   }
 
@@ -75,22 +84,32 @@ export async function getCurrentUser(): Promise<PrismaUser> {
   return authUser;
 }
 
-export const getUserByAuthProviderId = async (authProviderId: string): Promise<User | undefined> => {
-  const user = await prisma.user.findUnique({
-    where: { authProviderId: authProviderId },
+export const getUserByAccount = async (provider: string, providerAccountId: string): Promise<UserAccountOrNull> => {
+  // Find the account and include the related user
+  const account = await prismaClient.account.findUnique({
+    where: {
+      provider_providerAccountId: {
+        provider: provider,
+        providerAccountId: providerAccountId,
+      },
+    },
+    include: { user: true },
   });
-  if (!user) {
-    throw Error(`No user with authProviderId=${authProviderId.substring(0, authProviderId.length / 4)} found`);
+
+  if (!account) {
+    throw Error(
+      `No user with providerAccountId=${providerAccountId.substring(0, providerAccountId.length / 4)}... found`,
+    );
   }
 
-  return user;
+  return { ...account.user, account };
 };
 
 export async function getUserById(id: IdSchemaType) {
   if (!id) {
     throw Error;
   }
-  return await prisma.user.findUnique({
+  return await prismaClient.user.findUnique({
     where: {
       id,
     },

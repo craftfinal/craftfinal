@@ -57,3 +57,11 @@ export function stripToType<OriginalT extends object, KeyOfOriginalT extends key
 export function sentenceCase(s: string): string {
   return s.substring(0, 1).toUpperCase() + s.substring(1);
 }
+export function findKeyByValue(map: object, value: string): string | undefined {
+  for (const [key, val] of Object.entries(map)) {
+    if (val === value) {
+      return key;
+    }
+  }
+  return undefined;
+}

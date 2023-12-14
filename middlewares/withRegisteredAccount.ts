@@ -3,7 +3,7 @@ import { authMiddleware } from "@clerk/nextjs";
 import { NextFetchEvent, NextRequest } from "next/server";
 import { MiddlewareEntry, MiddlewareFactory } from "./executeMiddleware";
 
-const withRegisteredUser: MiddlewareFactory = (nextMiddlewareHandler) => {
+const withRegisteredAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
     const authMiddlewareImpl = authMiddleware({
       beforeAuth: (req, evt) => nextMiddlewareHandler(req, evt),
@@ -15,10 +15,10 @@ const withRegisteredUser: MiddlewareFactory = (nextMiddlewareHandler) => {
   };
 };
 
-const registeredUserMiddleware: MiddlewareEntry = {
-  id: "registereduser",
-  fn: withRegisteredUser,
+const registeredAccountMiddleware: MiddlewareEntry = {
+  id: "registeredaccount",
+  fn: withRegisteredAccount,
   // disabled: true,
 };
 
-export default registeredUserMiddleware;
+export default registeredAccountMiddleware;

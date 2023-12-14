@@ -10,7 +10,7 @@ import {
   ItemDescendantServerStateType,
 } from "@/schemas/itemDescendant";
 import { ClientIdType, ItemDisposition } from "@/types/item";
-import { getDescendantModel, getItemOrderFunction, getParentModel } from "@/types/itemDescendant";
+import { getDescendantModel, getItemOrderFunction } from "@/types/itemDescendant";
 import { ModificationTimestampType } from "@/types/timestamp";
 import { getItemDescendantStoreStateForServer } from "@/types/utils/itemDescendant";
 import { Draft } from "immer";
@@ -407,8 +407,8 @@ export function augmentToItemDescendantClientState(
     itemModel,
     descendantModel,
   };
-  const parentClientId = providedParentClientId ?? getClientId(getParentModel(itemModel));
-  const clientId = getClientId(itemModel);
+  const parentClientId = providedParentClientId ?? getClientId();
+  const clientId = getClientId();
 
   const clientDescendants = serverItem.descendants.map((serverDescendant) => {
     const newDescendant = augmentToItemDescendantClientState(serverDescendant, clientId, disposition);

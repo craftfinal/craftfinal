@@ -1,15 +1,18 @@
+// @/actions/temporaryUserAction.ts
+
 "use server";
 
 import { getAuthProviderIdCookieName } from "@/middlewares/getAuthProviderIdCookieName";
-import { prisma } from "@/prisma/client";
+import temporaryAccountMiddleware from "@/middlewares/withTemporaryAccount";
+import { prismaClient } from "@/prisma/client";
 import { IdSchemaType } from "@/schemas/id";
-import { InvalidAuthUserErr } from "@/types/user";
-import type { User as PrismaUser } from "@prisma/client";
+import { InvalidAuthUserErr, UserAccount, UserAccountOrNull } from "@/types/user";
 import { cookies } from "next/headers";
+import { getUserByAccount } from "./user";
 
-export const getTemporaryUserOrNull = async (): Promise<PrismaUser | null> => {
+export const getTemporaryUserOrNull = async (providerAccountId?: string): Promise<UserAccountOrNull> => {
   try {
-    return await getTemporaryUser();
+    return await getTemporaryUser(providerAccountId);
   } catch (error) {
     // if (process.env.NODE_ENV === "development") {
     //   console.log(`actions/user:getTemporaryUserOrNull(): exception in getTemporaryUser(): `, error);
@@ -18,35 +21,101 @@ export const getTemporaryUserOrNull = async (): Promise<PrismaUser | null> => {
   return null;
 };
 
-export const getTemporaryUserIdOrNull = async (): Promise<IdSchemaType | null> => {
-  let currentUserId = null;
+export async function getTemporaryUser(providerAccountId?: string): Promise<UserAccountOrNull> {
+  const provider = temporaryAccountMiddleware.id;
+  const accountId = getTemporaryAccountIdFromCookie(providerAccountId);
+
+  if (!accountId) {
+    throw new InvalidAuthUserErr(`Invalid providerAccountId:` + accountId);
+  }
+
+  let authUser = null;
   try {
-    const currentUser = await getTemporaryUser();
-    currentUserId = currentUser?.id;
-  } catch (error) {
-    // if (process.env.NODE_ENV === "development") {
-    //   console.log(`actions/user:getTemporaryUserIdOrNull(): exception in getTemporaryUser(): `, error);
-    // }
+    // If the user exists, fetch data from database
+    authUser = await getUserByAccount(provider, accountId);
+  } catch (exc) {
+    resetTemporaryUser();
+    throw new InvalidAuthUserErr(
+      `Exception when looking up user with provider=${provider} providerAccountId=${accountId}`,
+    );
   }
-  return currentUserId;
-};
-
-export async function getTemporaryUser(): Promise<PrismaUser> {
-  const userCookies = cookies(); // Get all cookies
-  const authProviderId = userCookies.get(getAuthProviderIdCookieName())?.value; // Retrieve specific cookie by name
-
-  if (!authProviderId) {
-    throw new InvalidAuthUserErr(`Invalid authProviderId:` + authProviderId);
-  }
-
-  // If the user exists, fetch data from database
-  const authUser = await prisma.user.findUnique({
-    where: { authProviderId },
-  });
-
-  if (!authUser) {
-    throw new InvalidAuthUserErr(`Invalid authUser=${authUser} from authProviderId=${authProviderId}`);
-  }
-
   return authUser;
+}
+
+export async function getOrCreateTemporaryUser(providerAccountId?: string): Promise<UserAccountOrNull> {
+  let authUser = null;
+  const accountId = providerAccountId ?? getTemporaryAccountIdFromCookie();
+  try {
+    authUser = await getTemporaryUser(accountId);
+    if (authUser) {
+      return authUser;
+    }
+  } catch (exc) {
+    console.log(`getOrCreateTemporaryUser: Exception in getTemporaryUser:`, exc);
+  }
+  // If an accountId cookie is available, create the corresponding `User` and `Account`
+  if (accountId) {
+    // Create account
+    authUser = await createTemporaryUser(accountId);
+    console.log(`getOrCreateTemporaryUser: created newTemporaryUser from accountId=${accountId}:`, authUser);
+  }
+  return authUser;
+}
+
+export async function createTemporaryUser(providerAccountId: string): Promise<UserAccount> {
+  // Create user
+  const email = "temporary@example.com";
+  const firstName = "Temporary";
+  const lastName = "User";
+  const provider = temporaryAccountMiddleware.id;
+  try {
+    const newUser = await prismaClient.user.create({
+      data: {
+        email,
+        firstName,
+        lastName,
+      },
+    });
+
+    const newAccount = await prismaClient.account.create({
+      data: {
+        userId: newUser.id,
+        provider,
+        type: provider,
+        providerAccountId: providerAccountId,
+        // Include any other necessary fields
+      },
+    });
+    const newAccountUser = { ...newUser, account: newAccount };
+    return newAccountUser;
+  } catch (error) {
+    console.error(`Error creating temporary user account: ${error}`);
+    // Handle any errors appropriately
+    throw error;
+  }
+}
+
+export async function resetTemporaryUser(): Promise<void> {
+  const authProviderIdCookieName = getAuthProviderIdCookieName();
+  // Delete the cookie as their are no corresponding `Account` and `User` records in the database
+  console.log(`resetTemporaryUser: request cookie "${authProviderIdCookieName}" to be deleted if it exists`);
+  cookies().delete(authProviderIdCookieName);
+}
+
+function getTemporaryAccountIdFromCookie(providerAccountId?: string): IdSchemaType | undefined {
+  if (providerAccountId) {
+    return providerAccountId;
+  }
+  const authProviderIdCookieName = getAuthProviderIdCookieName();
+  const accountId = cookies().get(authProviderIdCookieName)?.value; // Retrieve specific cookie by name
+  // console.log(
+  //   `getTemporaryAccountIdFromCookie: accountId=${accountId}`,
+  //   "\nheaders().getSetCookie():",
+  //   headers().getSetCookie(),
+  //   "\nheaders().get('x-temporaryuser-create-id')\n",
+  //   headers().get("x-temporaryuser-create-id"),
+  //   "\ncookies().getAll()\n",
+  //   cookies().getAll(),
+  // );
+  return accountId;
 }

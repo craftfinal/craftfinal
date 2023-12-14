@@ -1,11 +1,11 @@
 // @/components/layout/MarketingContentLayout.tsx
 
 import MainArticleLayoutMDX from "@/layouts/MainArticleLayoutMDX";
-import { User as PrismaUser } from "@prisma/client";
+import { UserAccountOrNullOrUndefined } from "@/types/user";
 import { PropsWithChildren } from "react";
 
 export interface ContentLayoutChildrenProps {
-  user: PrismaUser | null;
+  user: UserAccountOrNullOrUndefined;
 }
 
 interface ContentLayoutProps extends PropsWithChildren {}

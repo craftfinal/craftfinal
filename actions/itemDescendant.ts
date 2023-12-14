@@ -2,7 +2,7 @@
 
 "use server";
 
-import { prisma } from "@/prisma/client";
+import { prismaClient } from "@/prisma/client";
 import { IdSchemaType, idDefault, isValidItemId } from "@/schemas/id";
 import { ItemDescendantServerOutputType, ItemDescendantServerStateListType } from "@/schemas/itemDescendant";
 import {
@@ -14,8 +14,8 @@ import {
 import { PrismaClient } from "@prisma/client";
 
 export async function getItem(model: ItemDescendantModelNameType, id: IdSchemaType, prismaTransaction?: PrismaClient) {
-  const prismaClient = prismaTransaction ?? prisma;
-  const prismaModelInstance = getModelAccessor(model, prismaClient);
+  const transactionClient = prismaTransaction ?? prismaClient;
+  const prismaModelInstance = getModelAccessor(model, transactionClient);
   let item = await prismaModelInstance.findUnique({
     where: { id },
   });
@@ -32,8 +32,8 @@ export async function getItemLastModified(
   id: IdSchemaType,
   prismaTransaction?: PrismaClient,
 ): Promise<Date | undefined> {
-  const prismaClient = prismaTransaction ?? prisma;
-  const prismaModelInstance = getModelAccessor(model, prismaClient);
+  const transactionClient = prismaTransaction ?? prismaClient;
+  const prismaModelInstance = getModelAccessor(model, transactionClient);
   const item = await prismaModelInstance.findUnique({
     where: { id },
     select: { lastModified: true },
@@ -46,8 +46,8 @@ export async function getItemsByParentId(
   parentId: IdSchemaType,
   prismaTransaction?: PrismaClient,
 ): Promise<ItemDescendantServerStateListType> {
-  const prismaClient = prismaTransaction ?? prisma;
-  const prismaItemModelInstance = getModelAccessor(model, prismaClient);
+  const transactionClient = prismaTransaction ?? prismaClient;
+  const prismaItemModelInstance = getModelAccessor(model, transactionClient);
   // Retrieve the items
   const items = await prismaItemModelInstance.findMany({
     where: { parentId },
@@ -67,7 +67,7 @@ export async function getItemDescendantList(
     if (!isValidItemId(itemId)) {
       throw Error(logPrefix + `: for ${itemModel} the provided itemId="${itemId}" is not valid`);
     }
-    let item = await getItem(itemModel, itemId, prisma);
+    let item = await getItem(itemModel, itemId, prismaClient);
     if (!item) {
       throw Error(logPrefix + `: no ${itemModel} instance with id=${itemId} found`);
     }
@@ -111,7 +111,7 @@ export async function getItemDescendantList(
   // Use provided transaction or create a new one
   return prismaTransaction
     ? executeLogic(prismaTransaction)
-    : prisma.$transaction(async (prismaClient) => executeLogic(prismaClient as unknown as PrismaClient));
+    : prismaClient.$transaction(async (prismaClient) => executeLogic(prismaClient as unknown as PrismaClient));
 }
 
 // Recursive function to soft delete an item and all its descendants
@@ -148,7 +148,7 @@ export async function softDeleteAndCascadeItem(
   if (prismaTransaction) {
     await executeLogic(prismaTransaction);
   } else {
-    await prisma.$transaction(async (prismaClient) => {
+    await prismaClient.$transaction(async (prismaClient) => {
       await executeLogic(prismaClient as unknown as PrismaClient);
     });
   }

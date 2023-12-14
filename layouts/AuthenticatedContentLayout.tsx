@@ -2,11 +2,11 @@
 
 import { getCurrentUserOrNull } from "@/actions/user";
 import MainLayout from "@/layouts/MainLayout";
-import { User as PrismaUser } from "@prisma/client";
+import { UserAccountOrNullOrUndefined } from "@/types/user";
 import { ReactNode } from "react";
 
 export interface AuthenticatedContentLayoutChildrenProps {
-  user: PrismaUser | null | undefined;
+  user: UserAccountOrNullOrUndefined;
 }
 
 export default async function AuthenticatedContentLayout({ children }: Readonly<{ children: ReactNode }>) {

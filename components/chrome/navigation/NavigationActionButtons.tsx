@@ -11,7 +11,17 @@ export default async function NavigationActionButtons(props: NavigationActionBut
   return (
     <div className="flex gap-4">
       <DarkModeToggle className="flex items-center" />
-      <SignupNavigation {...props} />
+      <SignupNavigation
+        {...props}
+        className={cn(
+          menuClassName.item.container,
+          menuClassName.item.text,
+          menuClassName.topLevel.text,
+          // menuClassName.topLevel.textColor,
+          menuClassName.topLevel.container,
+          "flex items-center",
+        )}
+      />
       {!props.user ? null : (
         <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
           <AppSettingsSheet />
@@ -23,7 +33,7 @@ export default async function NavigationActionButtons(props: NavigationActionBut
           menuClassName.item.container,
           menuClassName.item.text,
           menuClassName.topLevel.text,
-          menuClassName.topLevel.textColor,
+          // menuClassName.topLevel.textColor,
           menuClassName.topLevel.container,
           "flex items-center",
         )}

@@ -9,8 +9,8 @@
   "scripts": {
     "dev": "next dev",
     "dev-local": "sudo ifconfig lo0 alias devel.craftfinal.local up && next dev --hostname devel.craftfinal.local -p 3000",
-    "prisma-migrate": "(set -a; source .env.local && npx prisma format && npx prisma migrate dev)",
-    "prisma-studio": "(set -a; source .env.local && npx prisma studio)",
+    "prisma-migrate": "(set -a; [ -f .env ] && source .env; [ -f .env.local ] && source .env.local; npx prisma format && npx prisma migrate dev)",
+    "prisma-studio": "(set -a; [ -f .env ] && source .env; [ -f .env.local ] && source .env.local; npx prisma studio)",
     "build": "next build",
     "start": "next start",
     "start-local": "next start --hostname devel.craftfinal.local -p 3000",
@@ -59,6 +59,7 @@
     "@radix-ui/react-toggle": "^1.0.3",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@react-email/components": "^0.0.9",
+    "bs58check": "^3.0.1",
     "chance": "^1.1.11",
     "cmdk": "^0.2.0",
     "image-size": "^1.0.2",

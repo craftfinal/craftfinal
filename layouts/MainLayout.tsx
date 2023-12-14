@@ -3,15 +3,15 @@
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { SiteHeader } from "@/components/chrome/SiteHeader";
 import { cn } from "@/lib/utils";
-import { User as PrismaUser } from "@prisma/client";
+import { UserAccountOrNullOrUndefined } from "@/types/user";
 import { PropsWithChildren } from "react";
 
 export interface MainLayoutChildrenProps {
-  user?: PrismaUser | null;
+  user?: UserAccountOrNullOrUndefined;
 }
 
 export interface MainLayoutProps extends PropsWithChildren {
-  user?: PrismaUser | null;
+  user?: UserAccountOrNullOrUndefined;
   className?: string;
 }
 export default async function MainLayout({ user, className, children }: Readonly<MainLayoutProps>) {

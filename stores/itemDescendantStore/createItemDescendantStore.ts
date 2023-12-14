@@ -283,7 +283,7 @@ export const createItemDescendantStore = ({
             const descendantOfDescendantModel = ancestorState.descendantModel
               ? getDescendantModel(ancestorState.descendantModel)
               : null;
-            const descendantClientId = getClientId(ancestorState.descendantModel);
+            const descendantClientId = getClientId();
 
             if (!ancestorState.descendantModel) {
               throw Error(

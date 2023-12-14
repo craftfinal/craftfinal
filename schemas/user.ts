@@ -1,3 +1,5 @@
+// @/schemas/user.ts
+
 import { itemSchema } from "@/schemas/item";
 import { z } from "zod";
 import { idSchema } from "./id";
@@ -11,7 +13,6 @@ export const userFormSchema = z.object({
 
 export const userPersistServerSchema = z.object({
   id: idSchema,
-  authProviderId: z.string(),
 });
 
 export const userSchema = {

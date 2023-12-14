@@ -1,33 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { siteNavigation } from "@/config/navigation";
-import { User as PrismaUser } from "@prisma/client";
+import { UserAccountOrNullOrUndefined } from "@/types/user";
 import Link from "next/link";
-import { ReactNode } from "react";
+import React from "react";
 
-export function SignupNavigation({ user, signedInChildren, children }: SignupNavigationProps) {
-  if (user === undefined) {
-    return null;
-  }
-  return user ? (
-    <SignupNavigationWithUser signedInChildren={signedInChildren} />
-  ) : (
-    <SignupNavigationWithoutUser>{children}</SignupNavigationWithoutUser>
-  );
-}
-function SignupNavigationWithUser({ signedInChildren }: { signedInChildren?: ReactNode }) {
-  return signedInChildren ? <Link href={siteNavigation.antePlayground.href}>{signedInChildren}</Link> : null;
-}
-function SignupNavigationWithoutUser({ children }: { children?: ReactNode }) {
-  return children ? (
-    <Link href={siteNavigation.signUp.href}>{children}</Link>
-  ) : (
-    <Button variant="default">
-      <Link href={siteNavigation.signUp.href}>{siteNavigation.signUp.title}</Link>
-    </Button>
-  );
-}
-interface SignupNavigationProps {
-  user?: PrismaUser | null;
-  signedInChildren?: ReactNode;
-  children?: ReactNode;
-}
+export const SignupNavigation = React.forwardRef<
+  HTMLAnchorElement,
+  React.LinkHTMLAttributes<HTMLAnchorElement> & { user?: UserAccountOrNullOrUndefined }
+>(({ user = null, ...props }, ref) => {
+  return user ? null : <SignupButton ref={ref} {...props} />;
+});
+SignupNavigation.displayName = "SignupNavigation";
+
+const SignupButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttributes<HTMLAnchorElement>>(
+  ({ className, ...props }, ref) => {
+    return (
+      <Link href={siteNavigation.signUp.href} ref={ref} {...props}>
+        <Button className={className} variant="default">
+          {siteNavigation.signUp.menuTitle}
+        </Button>
+      </Link>
+    );
+  },
+);
+SignupButton.displayName = "SignupButton";
