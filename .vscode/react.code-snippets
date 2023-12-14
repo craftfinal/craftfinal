@@ -1,0 +1,7 @@
+{
+  "rust": {
+    "body": ["const [${1}, set${1/(.)(.*)/${1:/upcase}$2/}] = useState(${2});"],
+    "description": "TypeScript: useState hook",
+    "prefix": "rust"
+  }
+}
