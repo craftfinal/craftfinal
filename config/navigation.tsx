@@ -147,19 +147,19 @@ export type SiteNavigationMapType = Record<SiteNavigationKeyType, MainNavItem>;
 export const siteNavigation: SiteNavigationMapType = siteNavigationUntyped;
 
 export const mainNavigationKeys: NestedMenuKeyType[] = [
+  { item: "howItWorks", children: ["useCases"] },
+  { item: "about", children: ["privacyPolicy", "termsOfUse"] },
   {
     item: "antePlayground",
     as: () => {
       return (
-        <Button variant="outline" className={cn(menuClassName.topLevel.container, ...menuClassName.topLevel.text)}>
+        <Button variant="outline" className={cn(menuClassName.topLevel.container, menuClassName.topLevel.text)}>
           <ArrowRightIcon />
           <span className="p-1" /> {siteNavigation.antePlayground.menuTitle}
         </Button>
       );
     },
   },
-  { item: "howItWorks", children: ["useCases"] },
-  { item: "about", children: ["privacyPolicy", "termsOfUse"] },
 ];
 
 /** This function is not yet in use

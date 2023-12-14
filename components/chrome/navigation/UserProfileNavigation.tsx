@@ -2,6 +2,7 @@ import { AccountType } from "@/auth/account";
 import { Button } from "@/components/ui/button";
 import { siteNavigation } from "@/config/navigation";
 import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
+import { cn } from "@/lib/utils";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import React from "react";
@@ -16,9 +17,10 @@ export const UserProfileNavigation = React.forwardRef<
 UserProfileNavigation.displayName = "UserProfileNavigation";
 
 const UserProfileButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttributes<HTMLAnchorElement>>(
-  ({ ...props }, ref) => {
+  ({ className, ...props }, ref) => {
     return (
-      <Link href={siteNavigation.userProfile.href} {...props} ref={ref}>
+      <div className={cn(className)}>
+        {/* <Link href={siteNavigation.userProfile.href} {...props} ref={ref}> */}
         <div className={"relative h-[32px] w-[32px] rounded-full bg-muted-foreground"}>
           <div className="absolute left-0 top-0">
             <UserButton
@@ -28,7 +30,8 @@ const UserProfileButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttr
             />
           </div>
         </div>
-      </Link>
+        {/* </Link> */}
+      </div>
     );
   },
 );

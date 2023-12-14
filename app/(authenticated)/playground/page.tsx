@@ -5,16 +5,17 @@
 import CurrentUserCard from "@/components/auth/CurrentUserCard";
 import { Button } from "@/components/ui/button";
 import { siteNavigation } from "@/config/navigation";
+import WrapMDX from "@/layouts/mdx/WrapMDX";
 import { CheckIcon } from "lucide-react";
 import Link from "next/link";
 
 export default async function PlaygroundPage() {
   return (
     <div className="flex flex-col gap-y-8">
-      <div className="prose">
+      <WrapMDX className="prose">
         <h1>Playground</h1>
         <p>This is an evolving demonstration of the core features of CraftFinal.</p>
-      </div>
+      </WrapMDX>
       <div className="flex flex-wrap gap-4">
         <CurrentUserCard />
         <Link href={siteNavigation.inPlayground.href} title={siteNavigation.inPlayground.title}>
@@ -23,7 +24,7 @@ export default async function PlaygroundPage() {
           </Button>
         </Link>
       </div>
-      <div className="prose">
+      <WrapMDX>
         <h2>What you will eperience</h2>
         <p>As of December 2023, you can experience the following:</p>
         <ul>
@@ -36,7 +37,7 @@ export default async function PlaygroundPage() {
         <ul>
           <li>Complete end-to-end demonstration of the envisioned user experience at the example of a resume.</li>
         </ul>
-      </div>
+      </WrapMDX>
     </div>
   );
 }
