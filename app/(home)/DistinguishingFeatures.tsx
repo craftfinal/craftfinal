@@ -5,7 +5,7 @@ export default async function DistinguishingFeatures() {
     <div className="mx-auto max-w-screen-xl px-4 py-8 sm:py-16 lg:px-6">
       <div className="mb-8 max-w-screen-md lg:mb-16">
         <h2 className="mb-8 text-3xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white md:text-4xl lg:mb-16">
-          How is CraftFinal different from ChatGPT, Notion.ai and Microsoft Office?
+          How is CraftFinal different from ChatGPT, Notion.io and Microsoft Office?
         </h2>
         <p className="text-gray-500 dark:text-gray-400 sm:text-xl">
           It lets you avoid <span className="font-bold text-foreground">repeating yourself.</span>

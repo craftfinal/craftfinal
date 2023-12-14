@@ -2,6 +2,7 @@
 
 import { ContentLayoutChildrenProps } from "@/layouts/ContentLayout";
 import EnterPlaygroundButton from "@/components/chrome/buttons/EnterPlaygroundButton";
+import { siteConfig } from "@/config/site";
 
 export interface CallToActionProps extends ContentLayoutChildrenProps {}
 
@@ -10,10 +11,10 @@ export default async function CallToAction({ user }: CallToActionProps) {
     <div className="mx-auto max-w-screen-xl px-4 py-8 sm:py-16 lg:px-6">
       <div className="mx-auto max-w-screen-sm text-center">
         <h2 className="mb-4 text-4xl font-extrabold leading-tight text-gray-900 dark:text-white">
-          Start your free trial today
+          Explore {siteConfig.name} and provide feedback while we build it
         </h2>
         <p className="mb-6 font-light text-gray-500 dark:text-gray-400 md:text-lg">
-          Try CraftFinal for 30 days. No email address or credit card required
+          No registration or email address required
         </p>
         <EnterPlaygroundButton user={user} />
       </div>

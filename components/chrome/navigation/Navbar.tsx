@@ -7,7 +7,7 @@ import { NavigationMenuBar } from "./NavigationMenuBar";
 export interface NavbarProps extends AuthenticatedContentLayoutChildrenProps {}
 export default function Navbar({ user }: NavbarProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-2 align-baseline">
+    <div className="flex flex-wrap items-center justify-between gap-2 align-baseline">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
         <Link href="/">
           <SiteLogo />
