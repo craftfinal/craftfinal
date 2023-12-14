@@ -63,7 +63,7 @@ export async function getOrCreateRegisteredUser(): Promise<UserAccountOrNull> {
   // const providerAccount = await currentUser();
   const { userId: providerAccountId } = auth();
   if (!providerAccountId) {
-    // throw new InvalidAuthUserErr(`Could not get providerAccountId from Clerk Auth`);
+    throw new InvalidAuthUserErr(`Could not get providerAccountId from Clerk Auth`);
   }
   let userAccount;
   try {
