@@ -2,9 +2,10 @@
 
 "use server";
 
+import { AccountType } from "@/auth/account";
 import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
 import { prismaClient } from "@/prisma/client";
-import { InvalidAuthUserErr, UserAccountOrNull, UserUpsertFailedErr } from "@/types/user";
+import { InvalidAuthUserErr, UserAccountOrNull } from "@/types/user";
 import { User as ClerkAuthUser, auth, currentUser } from "@clerk/nextjs/server";
 
 function getProviderAccountId(availableProviderAccountId?: string): string | null {
@@ -62,13 +63,13 @@ export async function getOrCreateRegisteredUser(): Promise<UserAccountOrNull> {
   // const providerAccount = await currentUser();
   const { userId: providerAccountId } = auth();
   if (!providerAccountId) {
-    throw new InvalidAuthUserErr(`Could not get providerAccountId from Clerk Auth`);
+    // throw new InvalidAuthUserErr(`Could not get providerAccountId from Clerk Auth`);
   }
   let userAccount;
   try {
     userAccount = await getRegisteredUser(providerAccountId);
   } catch (exc) {
-    console.log(`getOrCreateRegisteredUser: exception from getRegisteredUser`, exc);
+    // console.log(`getOrCreateRegisteredUser: exception from getRegisteredUser`, exc);
   }
   if (!userAccount) {
     userAccount = await createRegisteredUser(providerAccountId);
@@ -78,7 +79,7 @@ export async function getOrCreateRegisteredUser(): Promise<UserAccountOrNull> {
 
 async function createRegisteredUser(providerAccountId: string): Promise<UserAccountOrNull> {
   const provider = registeredAccountMiddleware.id;
-  const type = provider; // For the time being identical to provider
+  const type = AccountType.Registered;
   const providerAccount = auth();
   if (!providerAccount) {
     throw new InvalidAuthUserErr(`Invalid providerAccount: ${JSON.stringify(providerAccount)}`);

@@ -12,17 +12,22 @@ datasource db {
   url      = env("POSTGRES_URL") // may use connection pooling
 }
 
+enum AccountType {
+  Temporary
+  Registered
+}
+
 model Account {
   // id             String    @id @default(dbgenerated("concat('aup-', gen_random_uuid())"))
-  id                String    @id @default(uuid())
+  id                String      @id @default(uuid())
   userId            String
-  type              String
+  type              AccountType
   provider          String // Name of the authentication provider, e.g., "clerk", "temporary" @map("name")
   providerAccountId String // Unique ID from the authentication provider @map("providerId")
-  createdAt         DateTime  @default(now())
-  lastModified      DateTime  @default(now()) @updatedAt
+  createdAt         DateTime    @default(now())
+  lastModified      DateTime    @default(now()) @updatedAt
   deletedAt         DateTime? // Field to track soft deletion
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId]) // Ensure uniqueness for each provider and provider ID combination
   @@index([userId])

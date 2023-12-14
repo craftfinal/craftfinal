@@ -22,11 +22,7 @@ export default async function NavigationActionButtons({ ...props }: NavigationAc
           "flex items-center",
         )}
       />
-      {!props.user ? null : (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
-          <AppSettingsSheet />
-        </div>
-      )}
+      <AppSettingsSheet {...props} />
       <UserProfileNavigation
         {...props}
         className={cn(

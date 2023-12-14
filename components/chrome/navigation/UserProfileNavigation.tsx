@@ -1,3 +1,4 @@
+import { AccountType } from "@/auth/account";
 import { Button } from "@/components/ui/button";
 import { siteNavigation } from "@/config/navigation";
 import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
@@ -9,7 +10,7 @@ export const UserProfileNavigation = React.forwardRef<
   HTMLAnchorElement,
   React.LinkHTMLAttributes<HTMLAnchorElement> & AuthenticatedContentLayoutChildrenProps
 >(({ user = null, ...props }, ref) => {
-  const Comp = user ? UserProfileButton : SigninButton;
+  const Comp = user?.account.type === AccountType.Registered ? UserProfileButton : SigninButton;
   return <Comp ref={ref} {...props} />;
 });
 UserProfileNavigation.displayName = "UserProfileNavigation";

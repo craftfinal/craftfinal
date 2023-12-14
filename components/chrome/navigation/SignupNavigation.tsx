@@ -1,3 +1,4 @@
+import { AccountType } from "@/auth/account";
 import { Button } from "@/components/ui/button";
 import { siteNavigation } from "@/config/navigation";
 import { UserAccountOrNullOrUndefined } from "@/types/user";
@@ -8,7 +9,7 @@ export const SignupNavigation = React.forwardRef<
   HTMLAnchorElement,
   React.LinkHTMLAttributes<HTMLAnchorElement> & { user?: UserAccountOrNullOrUndefined }
 >(({ user = null, ...props }, ref) => {
-  return user ? null : <SignupButton ref={ref} {...props} />;
+  return user?.account.type === AccountType.Registered ? null : <SignupButton ref={ref} {...props} />;
 });
 SignupNavigation.displayName = "SignupNavigation";
 

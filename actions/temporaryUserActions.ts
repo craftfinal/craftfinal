@@ -2,6 +2,7 @@
 
 "use server";
 
+import { AccountType } from "@/auth/account";
 import { getAuthProviderIdCookieName } from "@/middlewares/getAuthProviderIdCookieName";
 import temporaryAccountMiddleware from "@/middlewares/withTemporaryAccount";
 import { prismaClient } from "@/prisma/client";
@@ -67,6 +68,7 @@ export async function createTemporaryUser(providerAccountId: string): Promise<Us
   const firstName = "Temporary";
   const lastName = "User";
   const provider = temporaryAccountMiddleware.id;
+  const type = AccountType.Temporary;
   try {
     const newUser = await prismaClient.user.create({
       data: {
@@ -80,7 +82,7 @@ export async function createTemporaryUser(providerAccountId: string): Promise<Us
       data: {
         userId: newUser.id,
         provider,
-        type: provider,
+        type,
         providerAccountId: providerAccountId,
         // Include any other necessary fields
       },
