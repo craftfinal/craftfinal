@@ -44,7 +44,7 @@ function renderBreadcrumbs(
 
   const breadcrumbsProps: BreadcrumbsProps = {
     transformLabel: transformLabel,
-    containerClassName: "flex py-1 text-xs md:text-sm lg:text-base mb-4 text-muted-foreground",
+    containerClassName: "flex py-1 lg:text-base mb-4 text-muted-foreground",
     listClassName: "inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse",
     inactiveItemClassName: "inline-flex items-center",
     activeItemClassName: "inline-flex items-center",

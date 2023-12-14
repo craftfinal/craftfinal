@@ -25,19 +25,17 @@ import AppSettingsForm from "./AppSettingsForm";
 
 export default function AppSettingsSheet({ user }: { user?: UserAccountOrNullOrUndefined }) {
   return !(user?.account.type === AccountType.Registered) ? null : (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
-      <Sheet>
-        <SheetTrigger name="App settings toggle" aria-label="Show settings">
-          {<Settings2Icon />}
-        </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Configure {siteConfig.name}</SheetTitle>
-            <SheetDescription className="py-4"></SheetDescription>
-          </SheetHeader>
-          <AppSettingsForm />
-        </SheetContent>
-      </Sheet>
-    </div>
+    <Sheet>
+      <SheetTrigger name="App settings toggle" aria-label="Show settings" className="flex flex-wrap items-center px-2">
+        {<Settings2Icon />}
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Configure {siteConfig.name}</SheetTitle>
+          <SheetDescription className="py-4"></SheetDescription>
+        </SheetHeader>
+        <AppSettingsForm />
+      </SheetContent>
+    </Sheet>
   );
 }

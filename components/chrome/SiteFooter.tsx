@@ -10,7 +10,7 @@ export function SiteFooter() {
     text: "text-slate-800 dark:text-slate-400",
     textMuted: "text-slate-600 dark:text-slate-400",
     link: "text-indigo-800 dark:text-indigo-200 hover:text-foreground focus:text-foreground font-medium hover:underline focus:underline underline-offset-[25%] decoration-indigo-900 hover:decoration-indigo-200  dark:hover:decoration-indigo-600",
-    heading: "text-sm font-semibold uppercase text-slate-500 dark:text-slate-400 ",
+    heading: "text-sm font-semibold uppercase text-slate-600 dark:text-slate-400 ",
   };
   return (
     <footer className={cn(paddingScale.t, footerClassName.text, "bg-slate-100 p-4 dark:bg-slate-900 sm:p-6")}>
