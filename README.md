@@ -1,14 +1,14 @@
 # CraftFinal
 
-CraftFinal is designed to bring the iterative development of **pitch documents** for individuals and organizations into the 21st century.
+CraftFinal takes the iterative development of **pitch documents** into the 21st century.
 
 ## What is CraftFinal?
 
-More than a document creation tool, CraftFinal is a journey towards enhancing the **craft of pitching**. It's designed to make the iterative process not just easier, but also more engaging and rewarding.
+As opposed to a a universal tool like a spreadsheet, CraftFinal is uniquely designed to facilitate the **craft of preparing pitch documents**. It strives to make iteration not just faster and more targeted, but also more engaging and rewarding.
 
-## Objective
+## Mission
 
-Our aim is to transform pitch development into a productive and enjoyable experience.
+We aim to transform pitch development into a rewarding and fulfilling experience.
 
 ### Who Can Benefit from CraftFinal?
 
