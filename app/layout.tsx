@@ -85,12 +85,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <html lang={siteMetadata.language} suppressHydrationWarning>
-      <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />
-      <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/favicon-32x32.png" />
-      <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png" />
-      <link rel="manifest" href="/static/favicons/site.webmanifest" />
-      <link rel="mask-icon" href="/static/favicons/safari-pinned-tab.svg" color="#5bbad5" />
-      <meta name="msapplication-TileColor" content="#000000" />
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
@@ -105,7 +99,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             {/* <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} /> */}
             <div className="relative bg-background">
               <div className="relative z-10 flex min-w-full flex-col justify-between">{children}</div>
-              {/* <div className="z-5 fixed left-0 top-0 h-screen w-full bg-gradient-to-br from-neutral-300 to-indigo-300 opacity-50 blur-3xl filter dark:from-neutral-600 dark:to-indigo-900"></div> */}
               <div className="z-5 fixed left-0 top-0 h-screen w-full filter dark:bg-gradient-to-br dark:from-neutral-600 dark:to-slate-950 dark:opacity-90 dark:blur-3xl"></div>
             </div>
             <Toaster />

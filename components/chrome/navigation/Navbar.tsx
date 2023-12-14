@@ -29,5 +29,5 @@ export const menuClassName = {
     textColor: "text-muted-foreground hover:text-foreground",
     container: "min-h-[2rem] lg:min-h-[2.5rem] xl:min-h-[3rem]",
   },
-  subItem: { container: "p-1 sm:p-2 lg:p-3 xl:p-4" },
+  subItem: { container: "p-2 sm:p-4" },
 };

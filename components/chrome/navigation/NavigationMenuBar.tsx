@@ -18,7 +18,7 @@ import { menuClassName } from "./Navbar";
 export function NavigationMenuBar() {
   return (
     <NavigationMenu className="w-full">
-      <NavigationMenuList className="space-x-2 sm:space-x-4 md:space-x-6 lg:space-x-8">
+      <NavigationMenuList className="space-x-1 sm:space-x-2 md:space-x-4">
         {mainNavigationKeys.map((key) => {
           if (typeof key === "string") {
             const navItem = siteNavigation[key];
@@ -114,11 +114,18 @@ const MainNavMenuWithChildrenItem = React.forwardRef<
         {navItem.menuTitle}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
-        <ul className="grid w-[16rem] gap-3 p-3 sm:w-[24rem] md:w-[24rem] md:p-4 lg:w-[36rem] lg:grid-cols-[.75fr_1fr] lg:p-6">
+        <ul className="grid gap-2 p-0 md:w-[24rem] md:gap-4  md:p-3 lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
           {subItems.map((subKey, index) => {
             const navItem = siteNavigation[subKey];
             return (
-              <SubMenuItem key={navItem.menuTitle} index={index} navItem={navItem} {...props} ref={ref}>
+              <SubMenuItem
+                key={navItem.menuTitle}
+                index={index}
+                navItem={navItem}
+                numItems={subItems.length}
+                {...props}
+                ref={ref}
+              >
                 {navItem.menuContent ?? navItem.title}
               </SubMenuItem>
             );
@@ -168,10 +175,18 @@ MainNavMenuItem.displayName = "MainNavMenuItem";
 
 const SubMenuItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { index?: number; navItem: MainNavItem }
->(({ navItem, index = 1, children, className, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<"a"> & { index?: number; numItems: number; navItem: MainNavItem }
+>(({ navItem, index = 1, numItems, children, className, ...props }, ref) => {
   return (
-    <li className={cn({ "row-span-3": index === 0 })}>
+    <li
+      className={cn({
+        "row-span-1": index === 0 && numItems <= 2,
+        "row-span-2": index === 0 && numItems === 3,
+        "row-span-3": index === 0 && numItems === 4,
+        "row-span-4": index === 0 && numItems === 5,
+        "row-span-5": index === 0 && numItems === 6,
+      })}
+    >
       <NavigationMenuLink asChild>
         <Link
           href={navItem.href}
@@ -194,8 +209,10 @@ const SubMenuItem = React.forwardRef<
             className={cn("font-medium sm:text-base md:text-lg", {
               "mb-2 mt-4 text-lg": index === 0,
               "text-sm leading-none": index > 0,
+              "flex flex-col gap-2 md:gap-4": navItem.menuContentIcon,
             })}
           >
+            {navItem.menuContentIcon ?? null}
             {navItem.menuTitle}
           </div>
           <p

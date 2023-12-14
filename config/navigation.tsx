@@ -1,5 +1,6 @@
 import { MainNavItem } from "@/types";
 import { siteConfig } from "./site";
+import { SiteLogo } from "@/components/chrome/SiteLogo";
 
 // Note: avoid defining the type of the siteNavigationUntyped object
 // to let TypeScript infer it as restrictively as possible
@@ -13,6 +14,8 @@ const siteNavigationUntyped /*: SiteNavigationMapType */ = {
   about: {
     title: `About ${siteConfig.name}`,
     menuTitle: `About`,
+    menuContent: `Learn more about ${siteConfig.name} and the people behind the product`,
+    menuContentIcon: <SiteLogo />,
     href: "/about",
   },
   howItWorks: {

@@ -11,6 +11,7 @@ export type NavItem = {
 export type MainNavItem = NavItem & {
   menuTitle?: string;
   menuContent?: string;
+  menuContentIcon?: ReactNode;
   hidden?: boolean;
   authenticated?: boolean;
 };

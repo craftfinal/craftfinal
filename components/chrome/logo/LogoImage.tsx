@@ -15,7 +15,7 @@ const brandIconVariants = cva("font-bold text-foreground", {
       link: "",
     },
     size: {
-      default: "h-5 sm:h-6 lg:h-8 xl:h-10",
+      default: "h-6 sm:h-8 lg:h-10 xl:h-12",
       sm: "h-6",
       lg: "h-10",
       icon: "h-9",

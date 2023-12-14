@@ -20,7 +20,11 @@ const UserProfileButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttr
       <Link href={siteNavigation.userProfile.href} {...props} ref={ref}>
         <div className={"relative h-[32px] w-[32px] rounded-full bg-muted-foreground"}>
           <div className="absolute left-0 top-0">
-            <UserButton userProfileMode="navigation" afterSignOutUrl="/" />
+            <UserButton
+              userProfileMode="navigation"
+              afterSignOutUrl="/"
+              userProfileUrl={siteNavigation.userProfile.href}
+            />
           </div>
         </div>
       </Link>
