@@ -19,18 +19,22 @@ UserProfileNavigation.displayName = "UserProfileNavigation";
 const UserProfileButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttributes<HTMLAnchorElement>>(
   ({ className, ...props }, ref) => {
     return (
-      <div className={cn(className)}>
-        {/* <Link href={siteNavigation.userProfile.href} {...props} ref={ref}> */}
-        <div className={"relative h-[32px] w-[32px] rounded-full bg-muted-foreground"}>
-          <div className="absolute left-0 top-0">
-            <UserButton
-              userProfileMode="navigation"
-              afterSignOutUrl="/"
-              userProfileUrl={siteNavigation.userProfile.href}
-            />
-          </div>
+      <div className={cn(className, "relative")}>
+        <a
+          href={siteNavigation.userProfile.href}
+          className={cn("h-[32px] w-[32px] rounded-full p-0")}
+          ref={ref}
+          {...props}
+        >
+          <div className={"absolute left-0 top-0 h-[32px] w-[32px] rounded-full bg-muted-foreground p-0"}></div>
+        </a>
+        <div className="absolute left-0 top-0 h-[32px] w-[32px] rounded-full p-0">
+          <UserButton
+            userProfileMode="navigation"
+            afterSignOutUrl="/"
+            userProfileUrl={siteNavigation.userProfile.href}
+          />
         </div>
-        {/* </Link> */}
       </div>
     );
   },

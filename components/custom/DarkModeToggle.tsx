@@ -76,7 +76,7 @@ export function DarkModeToggle({ className }: { className: string }) {
         name="Dark mode toggle"
         aria-label="Toggle between dark mode, light mode and system-defined"
         size="sm"
-        className="group relative z-10 h-8 w-8 px-0 "
+        className="z-5 group relative h-8 w-8 px-0 "
       >
         <div className="absolute -bottom-10 -top-2 hidden rounded-md bg-background/90 px-4 text-transparent blur-sm group-hover:block dark:bg-background/80">
           {currentTheme.label}
