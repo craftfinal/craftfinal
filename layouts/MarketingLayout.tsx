@@ -1,20 +1,15 @@
 // @/layouts/MarketingLayout.tsx
 
-import MainArticleLayoutMDX, { ArticleLayoutChildrenProps } from "@/layouts/mdx/MainArticleLayoutMDX";
 import { MainLayoutProps } from "@/layouts/MainLayout";
+import AuthenticatedMainArticleLayoutMDX from "@/layouts/mdx/AuthenticatedMainArticleLayoutMDX";
+import { ArticleLayoutChildrenProps } from "./mdx/MainArticleLayoutMDX";
 
 export interface MarketingLayoutChildrenProps extends ArticleLayoutChildrenProps {}
-
 interface MarketingLayoutProps extends MainLayoutProps {}
 export default async function MarketingLayout({ user, children }: Readonly<MarketingLayoutProps>) {
   return (
-    <MainArticleLayoutMDX user={user} className="container">
+    <AuthenticatedMainArticleLayoutMDX user={user} className="container">
       {children}
-    </MainArticleLayoutMDX>
+    </AuthenticatedMainArticleLayoutMDX>
   );
-  // return (
-  //   <AuthenticatedMainArticleLayoutMDX user={user} className="container">
-  //     {children}
-  //   </AuthenticatedMainArticleLayoutMDX>
-  // );
 }

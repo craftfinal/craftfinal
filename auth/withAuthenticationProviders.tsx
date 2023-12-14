@@ -2,6 +2,7 @@
 
 import { getCurrentUserOrNull } from "@/actions/user";
 import { RegisteredUserProvider } from "@/auth/RegisteredUserProvider";
+import { ClerkProvider } from "@clerk/nextjs";
 import React from "react";
 import { TemporaryUserProvider } from "./TemporaryUserProvider";
 
@@ -11,11 +12,13 @@ const withAuthenticationProviders = (Component: React.ComponentType<any>) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return function WithAuthenticationProviders(props: any) {
     return (
-      <RegisteredUserProvider>
-        <TemporaryUserProvider>
-          <Component user={currentUser} {...props} />
-        </TemporaryUserProvider>
-      </RegisteredUserProvider>
+      <ClerkProvider>
+        <RegisteredUserProvider>
+          <TemporaryUserProvider>
+            <Component user={currentUser} {...props} />
+          </TemporaryUserProvider>
+        </RegisteredUserProvider>
+      </ClerkProvider>
     );
   };
 };
