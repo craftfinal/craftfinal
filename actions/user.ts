@@ -63,7 +63,7 @@ export async function getCurrentUser(): Promise<UserAccountOrNull> {
     try {
       authUser = await getOrCreateRegisteredUser();
     } catch (exc) {
-      // console.log(`getCurrentUser: Exception in getOrCreateRegisteredUser:`, exc);
+      console.log(`getCurrentUser: Exception in getOrCreateRegisteredUser:`, exc);
     }
   }
   if (!authUser) {

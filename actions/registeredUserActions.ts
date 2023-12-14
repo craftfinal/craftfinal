@@ -1,30 +1,42 @@
+// @/actions/registeredUserActions.ts
+
+"use server";
+
 import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
 import { prismaClient } from "@/prisma/client";
-import { InvalidAuthUserErr, UserAccountOrNull, UserAccountOrNullOrUndefined, UserUpsertFailedErr } from "@/types/user";
-import { User as ClerkAuthUser, currentUser } from "@clerk/nextjs/server";
+import { InvalidAuthUserErr, UserAccountOrNull, UserUpsertFailedErr } from "@/types/user";
+import { User as ClerkAuthUser, auth, currentUser } from "@clerk/nextjs/server";
 
-export const getRegisteredUserOrNull = async (
-  availableProviderAccount?: ClerkAuthUser,
-): Promise<UserAccountOrNullOrUndefined> => {
+function getProviderAccountId(availableProviderAccountId?: string): string | null {
+  if (availableProviderAccountId) {
+    return availableProviderAccountId;
+  }
+  // const providerAccount = await currentUser();
+  // const providerAccountId = providerAccount?.user;
+  const { userId: providerAccountId } = auth();
+  return providerAccountId;
+}
+
+export async function getRegisteredUserOrNull(): Promise<UserAccountOrNull> {
   try {
-    return await getRegisteredUser(availableProviderAccount);
+    return await getRegisteredUser();
   } catch (error) {
     // if (process.env.NODE_ENV === "development") {
     //   console.log(`actions/user:getRegisteredUserOrNull(): exception in getRegisteredUser(): `, error);
     // }
   }
   return null;
-};
+}
 
-export async function getRegisteredUser(
-  availableProviderAccount?: ClerkAuthUser,
-): Promise<UserAccountOrNullOrUndefined> {
-  const providerAccount = availableProviderAccount ?? (await currentUser());
-  if (!providerAccount) {
-    throw new InvalidAuthUserErr(`Invalid providerAccount: ${providerAccount}`);
+async function getRegisteredUser(
+  // availableProviderAccountId?: string,
+  availableProviderAccountId?: string,
+): Promise<UserAccountOrNull> {
+  const providerAccountId = getProviderAccountId(availableProviderAccountId);
+  if (!providerAccountId) {
+    throw new InvalidAuthUserErr(`Invalid providerAccountId: ${providerAccountId}`);
   }
 
-  const providerAccountId = providerAccount.id;
   const provider = registeredAccountMiddleware.id;
 
   const account = await prismaClient.account.findUnique({
@@ -38,31 +50,47 @@ export async function getRegisteredUser(
   });
 
   if (!account || !account.user) {
-    throw new UserUpsertFailedErr();
+    throw new InvalidAuthUserErr(
+      `getRegisteredUser: prisma.account.findUnique("${provider}", "${providerAccountId}") returned ${account}`,
+    );
   }
 
   return { ...account.user, account };
 }
 
 export async function getOrCreateRegisteredUser(): Promise<UserAccountOrNull> {
-  const providerAccount = await currentUser();
-  if (!providerAccount) {
-    throw new InvalidAuthUserErr(`Could not get providerAccount from Clerk Auth`);
+  // const providerAccount = await currentUser();
+  const { userId: providerAccountId } = auth();
+  if (!providerAccountId) {
+    throw new InvalidAuthUserErr(`Could not get providerAccountId from Clerk Auth`);
   }
-  let userAccount = await getRegisteredUser(providerAccount);
+  let userAccount;
+  try {
+    userAccount = await getRegisteredUser(providerAccountId);
+  } catch (exc) {
+    console.log(`getOrCreateRegisteredUser: exception from getRegisteredUser`, exc);
+  }
   if (!userAccount) {
-    userAccount = await createRegisteredUser(providerAccount);
+    userAccount = await createRegisteredUser(providerAccountId);
   }
   return userAccount;
 }
 
-export async function createRegisteredUser(providerAccount: ClerkAuthUser): Promise<UserAccountOrNull> {
-  const providerAccountId = providerAccount.id;
+async function createRegisteredUser(providerAccountId: string): Promise<UserAccountOrNull> {
   const provider = registeredAccountMiddleware.id;
   const type = provider; // For the time being identical to provider
-  const primaryEmail = getPrimaryEmailAddress(providerAccount);
+  const providerAccount = auth();
+  if (!providerAccount) {
+    throw new InvalidAuthUserErr(`Invalid providerAccount: ${JSON.stringify(providerAccount)}`);
+  }
+  const providerUser = await currentUser();
+  if (!providerUser) {
+    throw new InvalidAuthUserErr(`Invalid providerUser: ${JSON.stringify(providerUser)}`);
+  }
+
+  const primaryEmail = getPrimaryEmailAddress(providerUser);
   if (!primaryEmail) {
-    throw new InvalidAuthUserErr(`Invalid primary email for providerAccount: ${providerAccount.id}`);
+    throw new InvalidAuthUserErr(`Invalid primary email for providerAccount: ${JSON.stringify(providerAccount)}`);
   }
 
   // Dreate or update the Account
@@ -77,8 +105,8 @@ export async function createRegisteredUser(providerAccount: ClerkAuthUser): Prom
       user: {
         update: {
           email: primaryEmail,
-          firstName: providerAccount.firstName,
-          lastName: providerAccount.lastName,
+          firstName: providerUser.firstName,
+          lastName: providerUser.lastName,
         },
       },
     },
@@ -89,8 +117,8 @@ export async function createRegisteredUser(providerAccount: ClerkAuthUser): Prom
       user: {
         create: {
           email: primaryEmail,
-          firstName: providerAccount.firstName,
-          lastName: providerAccount.lastName,
+          firstName: providerUser.firstName,
+          lastName: providerUser.lastName,
         },
       },
     },
@@ -99,7 +127,7 @@ export async function createRegisteredUser(providerAccount: ClerkAuthUser): Prom
   return { ...account.user, account };
 }
 
-const getPrimaryEmailAddress = (authUser: ClerkAuthUser) => {
+function getPrimaryEmailAddress(authUser: ClerkAuthUser) {
   const emailAddresses = authUser.emailAddresses;
   const primaryEmailAddressId = authUser.primaryEmailAddressId;
 
@@ -110,4 +138,4 @@ const getPrimaryEmailAddress = (authUser: ClerkAuthUser) => {
     }
   }
   return undefined;
-};
+}

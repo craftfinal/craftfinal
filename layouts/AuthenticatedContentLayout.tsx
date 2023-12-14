@@ -1,19 +1,17 @@
 // @/components/layout/AuthenticatedContentLayout.tsx
 
-import { getCurrentUserOrNull } from "@/actions/user";
-import MainLayout from "@/layouts/MainLayout";
-import { UserAccountOrNullOrUndefined } from "@/types/user";
+import { UserAccountOrNull } from "@/types/user";
 import { ReactNode } from "react";
 
-export interface AuthenticatedContentLayoutChildrenProps {
-  user: UserAccountOrNullOrUndefined;
+import AuthenticatedMainLayout from "./AuthenticatedMainLayout";
+export default async function AuthenticatedContentLayout({ children, ...props }: Readonly<{ children: ReactNode }>) {
+  return (
+    <AuthenticatedMainLayout className="container" {...props}>
+      {children}
+    </AuthenticatedMainLayout>
+  );
 }
 
-export default async function AuthenticatedContentLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const user = await getCurrentUserOrNull();
-  return (
-    <MainLayout user={user} className="container">
-      {children}
-    </MainLayout>
-  );
+export interface AuthenticatedContentLayoutChildrenProps {
+  user?: UserAccountOrNull;
 }

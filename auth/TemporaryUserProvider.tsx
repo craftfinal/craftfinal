@@ -1,9 +1,9 @@
-// @/auth/temporary/TemporaryAuthProvider.tsx
+// @/auth/temporary/TemporaryUserProvider.tsx
 
 "use client";
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { getTemporaryUserOrNull } from "../actions/temporaryUserActions";
+import { getOrResetTemporaryUser } from "../actions/temporaryUserActions";
 
 import { UserAccountOrNullOrUndefined } from "@/types/user";
 
@@ -13,16 +13,20 @@ type TemporaryUserProviderProps = {
 
 export function TemporaryUserProvider({ children }: TemporaryUserProviderProps): JSX.Element {
   const [temporaryUser, setTemporaryUser] = useState<UserAccountOrNullOrUndefined>(undefined);
-
   useEffect(() => {
-    async function initializeAuthUser() {
-      const authUser = await getTemporaryUserOrNull();
-      setTemporaryUser(authUser);
-    }
     if (temporaryUser === undefined) {
-      initializeAuthUser();
+      const initializeTemporaryUser = async () => {
+        // Fetch current user by calling a server action
+        try {
+          const user = await getOrResetTemporaryUser();
+          setTemporaryUser(user);
+        } catch (exc) {
+          console.log(`TemporaryUserProvider: exception in getOrResetTemporaryUser:`, exc);
+        }
+      };
+      initializeTemporaryUser();
     }
-  }, [temporaryUser]);
+  }, []); // Empty dependency array to run only once after component mounts
 
   return <TemporaryUserContext.Provider value={temporaryUser}>{children}</TemporaryUserContext.Provider>;
 }

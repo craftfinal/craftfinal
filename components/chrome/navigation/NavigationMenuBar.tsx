@@ -114,7 +114,7 @@ const MainNavMenuWithChildrenItem = React.forwardRef<
         {navItem.menuTitle}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
-        <ul className="grid gap-2 p-0 md:w-[24rem] md:gap-4  md:p-3 lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
+        <ul className="grid gap-2 p-0 sm:p-2 md:w-[24rem] md:gap-4 md:p-3 lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
           {subItems.map((subKey, index) => {
             const navItem = siteNavigation[subKey];
             return (

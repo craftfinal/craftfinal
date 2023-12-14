@@ -34,7 +34,6 @@ export async function getTemporaryUser(providerAccountId?: string): Promise<User
     // If the user exists, fetch data from database
     authUser = await getUserByAccount(provider, accountId);
   } catch (exc) {
-    resetTemporaryUser();
     throw new InvalidAuthUserErr(
       `Exception when looking up user with provider=${provider} providerAccountId=${accountId}`,
     );
@@ -51,7 +50,7 @@ export async function getOrCreateTemporaryUser(providerAccountId?: string): Prom
       return authUser;
     }
   } catch (exc) {
-    console.log(`getOrCreateTemporaryUser: Exception in getTemporaryUser:`, exc);
+    console.log(`getOrCreateTemporaryUser: exception in getTemporaryUser:`, exc);
   }
   // If an accountId cookie is available, create the corresponding `User` and `Account`
   if (accountId) {
@@ -93,6 +92,28 @@ export async function createTemporaryUser(providerAccountId: string): Promise<Us
     // Handle any errors appropriately
     throw error;
   }
+}
+
+// To be called from client compmonents exclusively to enable possibly deleting the cookie
+export async function getOrResetTemporaryUser(providerAccountId?: string): Promise<UserAccountOrNull> {
+  let authUser = null;
+  const accountId = providerAccountId ?? getTemporaryAccountIdFromCookie();
+  try {
+    authUser = await getTemporaryUser(accountId);
+    if (authUser) {
+      return authUser;
+    }
+  } catch (exc) {
+    console.log(`getOrResetTemporaryUser: calling resetTemporaryUser due to exception in getTemporaryUser:`, exc);
+    resetTemporaryUser();
+  }
+  // // If an accountId cookie is available, create the corresponding `User` and `Account`
+  // if (accountId) {
+  //   // Create account
+  //   authUser = await createTemporaryUser(accountId);
+  //   console.log(`getOrResetTemporaryUser: created newTemporaryUser from accountId=${accountId}:`, authUser);
+  // }
+  return authUser;
 }
 
 export async function resetTemporaryUser(): Promise<void> {

@@ -3,7 +3,10 @@ export type AppRoutes = {
   ignoredRoutes: string[] | string;
 };
 
+const contentRoutes = ["/(about|terms|privacy)(/.*)?"];
+const marketingRoutes = ["/(how-it-works|use-cases)(/.*)?"];
+const authenticatedRoutes = ["/(try|playground)(/.*)?"];
 export const appRoutes = {
-  publicRoutes: ["/(about|try|playground)(/.*)?"],
-  ignoredRoutes: ["/", "/(terms|privacy|how-it-works|use-cases)(/.*)?"],
+  publicRoutes: [...authenticatedRoutes, ...marketingRoutes, ...contentRoutes],
+  ignoredRoutes: ["/"],
 };

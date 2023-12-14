@@ -19,9 +19,9 @@ const withTemporaryAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
       const providerAccountCookie = request.cookies.get(authProviderIdCookieName);
       const providerAccountId = providerAccountCookie?.value;
       if (providerAccountId && isValidTemporaryAccountId(providerAccountId)) {
-        console.log(
-          `withTemporaryUser: cookie "${authProviderIdCookieName}" contains valid accountId "${providerAccountId}"`,
-        );
+        // console.log(
+        //   `withTemporaryUser: cookie "${authProviderIdCookieName}" contains valid accountId "${providerAccountId}"`,
+        // );
       } else {
         // We cannot run Prisma here in midleware
         // Set the cookie on the response, which will later on lead to the creation of a user and account in Prisma
