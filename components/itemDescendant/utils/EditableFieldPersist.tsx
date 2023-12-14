@@ -18,6 +18,7 @@ export default function EditableFieldPersist({
 }: EditableInputFieldProps) {
   return (
     <EdiText
+      data-1p-ignore
       type="text"
       {...EditableFieldEdiTextProps.rootProps}
       inputProps={{

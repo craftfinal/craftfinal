@@ -38,6 +38,7 @@ export const EditableFieldEdiTextProps = {
 export default function EditableField({ fieldName, value, onSave, ...rest }: EditableFieldProps) {
   return (
     <EdiText
+      data-1p-ignore
       type="text"
       value={value}
       onSave={onSave}
