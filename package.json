@@ -16,6 +16,7 @@
     "start": "next start",
     "start-local": "next start --hostname devel.craftfinal.local -p 3000",
     "lint": "next lint",
+    "test": "vitest --coverage",
     "prettier-check": "prettier --check '**/*.ts' '**/*.tsx'",
     "prettier-format": "prettier --write '**/*.ts' '**/*.tsx'",
     "preview-email": "email dev -p 3030",
@@ -77,7 +78,6 @@
     "react-icons": "^4.11.0",
     "sharp": "^0.33.0",
     "strip-ansi": "7.1.0",
-    "typescript": "^5.3.3",
     "uuidv4": "^6.2.13",
     "zod": "^3.22.4",
     "zustand": "^4.4.6"
@@ -93,6 +93,8 @@
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/coverage-v8": "^1.0.4",
     "ansi-regex": "^6.0.1",
     "autoprefixer": "^10.4.16",
     "class-variance-authority": "^0.7.0",
@@ -111,6 +113,7 @@
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "husky": "^8.0.3",
+    "jsdom": "^23.0.1",
     "next-contentlayer": "^0.3.4",
     "postcss": "^8.4.32",
     "prettier": "^3.1.0",
@@ -136,7 +139,10 @@
     "tailwind-merge": "^2.1.0",
     "tailwindcss": "^3.3.6",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
     "unist-util-visit": "^5.0.0",
+    "vitest": "^1.0.4",
     "wrap-ansi-cjs": "^8.0.0"
   },
   "config": {

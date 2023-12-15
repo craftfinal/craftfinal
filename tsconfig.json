@@ -30,6 +30,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "tailwind.config.ts",
-    "app/(authenticated)/playground/page.mdx"
+    "app/(authenticated)/playground/page.mdx",
+    "vite.config.mts"
   ]
 }
