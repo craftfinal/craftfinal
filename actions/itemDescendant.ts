@@ -13,11 +13,7 @@ import {
   isValidStateId,
 } from "@/schemas/id";
 import { ItemClientStateType, ItemClientToServerType, ItemServerOutputType } from "@/schemas/item";
-import {
-  ItemDescendantServerOutputListType,
-  ItemDescendantServerOutputType,
-  ItemDescendantServerStateListType,
-} from "@/schemas/itemDescendant";
+import { ItemDescendantServerOutputListType, ItemDescendantServerOutputType } from "@/schemas/itemDescendant";
 import { UserOutputType } from "@/schemas/user";
 import {
   ItemDescendantModelNameType,

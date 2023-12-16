@@ -179,7 +179,7 @@ export const mainNavigationKeys: NavMenuItemType[] = [
           );
         },
         predicate: (account: Base58CheckAccountOrNullOrUndefined, pathname: string): boolean => {
-          return pathname != siteNavigation.antePlayground.href;
+          return !pathname.startsWith(siteNavigation.antePlayground.href);
         },
       } as MenuItemTypePredicateRenderFunctionType,
     ],
