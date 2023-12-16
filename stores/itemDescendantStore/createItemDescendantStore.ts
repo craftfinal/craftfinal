@@ -1,6 +1,6 @@
 // @/stores/itemDescendant/createItemDescendantStore.ts
 import { siteConfig } from "@/config/site";
-import { IdSchemaType, getClientId } from "@/schemas/id";
+import { StateIdSchemaType, generateClientId } from "@/schemas/id";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType, ItemOrderableClientStateType } from "@/schemas/item";
 import {
   ItemDescendantClientStateListType,
@@ -34,8 +34,8 @@ export type ItemClientState = {
   deletedAt: Date | null;
   parentClientId: ClientIdType;
   clientId: ClientIdType;
-  id?: IdSchemaType;
-  parentId?: IdSchemaType;
+  id?: StateIdSchemaType;
+  parentId?: StateIdSchemaType;
   disposition: ItemDisposition;
 };
 
@@ -102,8 +102,8 @@ export interface ItemDescendantStoreConfigType {
   parentClientId: ClientIdType;
   clientId: ClientIdType;
 
-  parentId: IdSchemaType | undefined;
-  id: IdSchemaType | undefined;
+  parentId: StateIdSchemaType | undefined;
+  id: StateIdSchemaType | undefined;
 
   storeVersion?: number;
   storeName?: string;
@@ -283,19 +283,19 @@ export const createItemDescendantStore = ({
             const descendantOfDescendantModel = ancestorState.descendantModel
               ? getDescendantModel(ancestorState.descendantModel)
               : null;
-            const descendantClientId = getClientId();
+            const descendantModel = ancestorState.descendantModel;
+            const descendantClientId = generateClientId(descendantModel ?? undefined);
 
             if (!ancestorState.descendantModel) {
               throw Error(
                 `commitDescendantDraft: ancestorState has invalid descendantModel: ${JSON.stringify(ancestorState)}`,
               );
             }
-            const descendantModel = ancestorState.descendantModel;
 
             // Create a copy of the draft
             const descendantData = {
               ...ancestorState.descendantDraft,
-              itemModel: descendantModel,
+              itemModel: descendantModel!,
               clientId: descendantClientId,
               parentClientId: ancestorState.clientId,
               parentId: ancestorState.id,
@@ -310,7 +310,7 @@ export const createItemDescendantStore = ({
 
             let newDescendant;
             // Add the `order` field if the model requires it
-            if (["achievement"].includes(descendantModel)) {
+            if (["achievement"].includes(descendantModel!)) {
               newDescendant = {
                 ...descendantData,
                 order: getOrderValueForAppending(

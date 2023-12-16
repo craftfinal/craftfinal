@@ -6,19 +6,20 @@ import { z } from "zod";
 import { uuidIdDefault } from "./uuidId";
 
 export enum ModelIndicator {
-  Default = 0, // Default value indicates a programmatically generated model
-  User = 32, // The user is at the center of our design philosophy :-)
-  Organization = 33, // Content models start at 32
-  Role = 34,
-  Achievement = 35,
-  Account = 128, // Auxiliary models start at 128
-  Invalid = 255, // Reserved to indicate an invalid model
+  default = 0, // Default value indicates a programmatically generated model
+  user = 32, // The user is at the center of our design philosophy :-)
+  resume = 33, // Content models start at 32
+  organization = 34, // Content models start at 32
+  role = 35,
+  achievement = 36,
+  account = 128, // Auxiliary models start at 128
+  invalid = 255, // Reserved to indicate an invalid model
 }
 
 export type ModelIndicatorType = ModelIndicator;
 export type ModelIndicatorNameType = keyof typeof ModelIndicator;
 
-export function getBase58CheckIdFromUuidAndModel(uuid: string, model = ModelIndicator.Default): string {
+export function getBase58CheckIdFromUuidAndModel(uuid: string, model = ModelIndicator.default): string {
   const buffer = Buffer.from([model, ...Buffer.from(uuid.replace(/-/g, ""), "hex")]);
   return bs58check.encode(buffer);
 }
@@ -41,7 +42,7 @@ export function getUuidAndModelFromBase58CheckId(id: string): { uuid: string; mo
   return { uuid, model };
 }
 
-export function generateBs58CheckId(model: ModelIndicatorType | ModelIndicatorNameType | undefined) {
+export function generateBase58CheckId(model: ModelIndicatorType | ModelIndicatorNameType | undefined) {
   const uuid = uuidv4();
   if (typeof model === "string") {
     return getBase58CheckIdFromUuidAndModel(uuid, ModelIndicator[model]);
@@ -49,8 +50,8 @@ export function generateBs58CheckId(model: ModelIndicatorType | ModelIndicatorNa
   return getBase58CheckIdFromUuidAndModel(uuid, model);
 }
 
-export function userFromUser(user: User): Base58CheckUser {
-  const base58CheckUserId = getBase58CheckIdFromUuidAndModel(user.id, ModelIndicator.User);
+export function stateUserFromDbUser(user: User): Base58CheckUser {
+  const base58CheckUserId = getBase58CheckIdFromUuidAndModel(user.id, ModelIndicator.user);
 
   const transformedUser: Base58CheckUser = {
     ...user,
@@ -60,10 +61,10 @@ export function userFromUser(user: User): Base58CheckUser {
   return transformedUser;
 }
 
-export function userAccountFromAccount(account: AccountWithUser) {
-  const base58CheckAccountId = getBase58CheckIdFromUuidAndModel(account.id, ModelIndicator.Account);
+export function stateAccountFromDbAccount(account: AccountWithUser) {
+  const base58CheckAccountId = getBase58CheckIdFromUuidAndModel(account.id, ModelIndicator.account);
 
-  const transformedUser: Base58CheckUser = userFromUser(account.user);
+  const transformedUser: Base58CheckUser = stateUserFromDbUser(account.user);
 
   const transformedAccount: Base58CheckAccount = {
     ...account,
@@ -75,12 +76,17 @@ export function userAccountFromAccount(account: AccountWithUser) {
 }
 
 // Regex for base58check encoded strings
-export const bs58CheckIdRegex = /^[1-9A-HJ-NP-Za-km-z]+$/;
+// uuidIdDefault, model: "default" base58Check-encoded: `1111111111111111129Cs8b` (23 characters)
+// uuidIdDefault, model: "user"    base58Check-encoded: `2y8ShWp5uBa1jbLNKCF5yorW3t98J` (29 characters)
+export const base58CheckIdRegex = /^[1-9A-HJ-NP-Za-km-z]{23,29}$/;
 
 // Zod schema for base58check encoded ID validation
-export const bs58CheckIdSchema = z.string().regex(bs58CheckIdRegex);
+export const base58CheckIdSchema = z.string().regex(base58CheckIdRegex);
 
-export type Bs58CheckIdSchemaType = z.infer<typeof bs58CheckIdSchema>;
+export type Base58CheckIdSchemaType = z.infer<typeof base58CheckIdSchema>;
+
+// Generate default base58check identifier using the default UUIDv4 and default Model Indicator
+export const base58CheckIdDefault = getBase58CheckIdFromUuidAndModel(uuidIdDefault, ModelIndicator.default);
 
 export function isValidBs58CheckId(id: string | null | undefined): boolean {
   try {
@@ -90,31 +96,25 @@ export function isValidBs58CheckId(id: string | null | undefined): boolean {
   }
 }
 
-// Generate default base58check identifier using the default UUIDv4 and default Model Indicator
-export const bs58CheckIdDefault = getBase58CheckIdFromUuidAndModel(uuidIdDefault, ModelIndicator.Default);
-
-export function getItemModelFromBase58CheckId(id: string | null | undefined): string | undefined {
-  if (!id) return undefined;
+export function getItemModelFromBase58CheckId(id: string): string {
   if (isValidBs58CheckId(id)) {
     const uuidAndModel = getUuidAndModelFromBase58CheckId(id);
     return uuidAndModel.model;
   }
-  return undefined;
+  throw Error(`getItemModelFromBase58CheckId(id=${id}): invalid base58CheckId`);
 }
 
-export function getDbIdFromBase58CheckId(id: string | null | undefined): string | undefined {
-  if (!id) return undefined;
+export function getDbIdFromBase58CheckId(id: string): string {
   if (isValidBs58CheckId(id)) {
     const uuidAndModel = getUuidAndModelFromBase58CheckId(id);
     return uuidAndModel.uuid;
   }
-  return undefined;
+  throw Error(`getItemModelFromBase58CheckId(id=${id}): invalid base58CheckId`);
 }
 
-export function getPrefixFromBase58CheckId(id: string | null | undefined, length: number = 4): string | undefined {
-  if (!id) return undefined;
+export function getPrefixFromBase58CheckId(id: string, length: number = 4): string {
   if (isValidBs58CheckId(id)) {
     return getDbIdFromBase58CheckId(id)?.substring(4, 4 + length);
   }
-  return undefined;
+  throw Error(`getItemModelFromBase58CheckId(id=${id}): invalid base58CheckId`);
 }

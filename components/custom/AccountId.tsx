@@ -2,11 +2,11 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { IdSchemaType } from "@/schemas/id";
+import { StateIdSchemaType } from "@/schemas/id";
 
 // Extending React.HTMLProps to include standard span element props
 type AccountIdProps = React.HTMLProps<HTMLSpanElement> & {
-  id: IdSchemaType;
+  id: StateIdSchemaType;
 };
 
 export const AccountId = React.forwardRef<HTMLSpanElement, AccountIdProps>(({ id, className, ...props }, ref) => {

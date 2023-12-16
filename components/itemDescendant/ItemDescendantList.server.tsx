@@ -2,7 +2,7 @@
 
 import { getItemDescendantList, getItemsByParentId } from "@/actions/itemDescendant";
 import { getCurrentUserIdOrNull } from "@/actions/user";
-import { IdSchemaType } from "@/schemas/id";
+import { StateIdSchemaType } from "@/schemas/id";
 import {
   ItemDescendantModelNameType,
   getDescendantModel,
@@ -16,7 +16,7 @@ import { notFound } from "next/navigation";
 
 export interface ItemDescendantListProps {
   itemModel: ItemDescendantModelNameType;
-  itemId?: IdSchemaType;
+  itemId?: StateIdSchemaType;
   resumeAction?: ResumeActionType;
 }
 
@@ -61,9 +61,11 @@ export default async function ItemDescendantList({ itemModel, itemId, ...props }
       // direct descendants, which are currently using the model "resume"
       if (itemModel === itemDescendantModelHierarchy[0]) {
         leafItemModel = getDescendantModel(itemModel)!;
-        console.log(`itemModel=${itemModel}   itemId=${itemId} itemModel=${itemModel} itemId=${itemId}`);
+        console.log(
+          `ItemDescendantList: itemModel=${itemModel} itemId=${itemId}: ${itemModel} is root of hierarchy; set leafItemModel=${leafItemModel}`,
+        );
         serverOutput = await getItemDescendantList(itemModel, itemId);
-        console.log(`ItemDescendantServerComponent: serverOutput:`, serverOutput);
+        console.log(`ItemDescendantList: serverOutput:`, serverOutput);
       } else {
         serverOutput = await getItemDescendantList(itemModel, itemId);
       }
@@ -73,7 +75,7 @@ export default async function ItemDescendantList({ itemModel, itemId, ...props }
       // - For any other itemModel, we try to descend the hierarchy along the least
       // recently created item of the given itemModel
       const targetItemModel = itemModel;
-      let derivedItemId: IdSchemaType = userId;
+      let derivedItemId: StateIdSchemaType = userId;
 
       // Start with a list of resumes owned by the current user
       let derivedItemModel: ItemDescendantModelNameType = itemDescendantModelHierarchy[0];

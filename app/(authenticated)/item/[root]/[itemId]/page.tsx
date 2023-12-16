@@ -2,20 +2,20 @@
 
 import ItemDescendantList from "@/components/itemDescendant/ItemDescendantList.server";
 import { Skeleton } from "@/components/ui/skeleton";
-import { IdSchemaType, isValidItemId } from "@/schemas/id";
+import { StateIdSchemaType, isValidStateId } from "@/schemas/id";
 import { ItemDescendantModelNameType } from "@/types/itemDescendant";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 export interface ItemDescendantActionPageProps {
-  params: { root: ItemDescendantModelNameType; itemId: IdSchemaType };
+  params: { root: ItemDescendantModelNameType; itemId: StateIdSchemaType };
 }
 
 export default async function ItemDescendantActionPage({ params: { root, itemId } }: ItemDescendantActionPageProps) {
   const itemModel = root;
   const resumeAction = "view";
 
-  const validId = isValidItemId(itemId);
+  const validId = isValidStateId(itemId);
   return !itemId || !validId ? (
     notFound()
   ) : (

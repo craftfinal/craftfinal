@@ -1,6 +1,6 @@
 // @/app/(marketing)/(home)/HeroSection.tsx
 
-import EnterPlaygroundButton from "@/components/chrome/buttons/EnterPlaygroundButton";
+import EnterPlaygroundButton from "@/components/chrome/buttons/ToPlaygroundButton";
 import { ContentLayoutChildrenProps } from "../../layouts/ContentLayout";
 
 import Image from "next/image";
@@ -8,7 +8,7 @@ import Image from "next/image";
 import meanderingRoad from "./(assets)/pexels-eberhard-grossgasteiger-1612462.jpg";
 
 export interface HeroSectionProps extends ContentLayoutChildrenProps {}
-export default async function HeroSection({ user }: HeroSectionProps) {
+export default async function HeroSection({ account }: HeroSectionProps) {
   return (
     <div className="grid max-w-screen-xl py-8 lg:grid-cols-12 lg:gap-8 lg:py-16 xl:gap-0">
       <div className="mr-auto place-self-center lg:col-span-7">
@@ -19,7 +19,7 @@ export default async function HeroSection({ user }: HeroSectionProps) {
           Have you ever felt like you were iterating on a document forever?
         </p>
         <h1 className="mb-4 flex flex-wrap items-baseline gap-4 text-2xl font-bold dark:text-white md:text-4xl xl:mb-8 xl:text-5xl">
-          <EnterPlaygroundButton user={user} />
+          <EnterPlaygroundButton account={account} />
           <div className="mt-4 text-xl font-normal md:text-2xl lg:text-4xl">
             {" "}
             to see, how CraftFinal helps creating the final version

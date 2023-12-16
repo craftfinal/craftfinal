@@ -2,7 +2,7 @@
 
 "use client";
 
-import { getItemModelFromId, getPrefixFromId } from "@/schemas/id";
+import { getItemModelOrNullFromStateId, renderClientIdPrefix } from "@/schemas/id";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
@@ -35,9 +35,9 @@ function renderBreadcrumbs(
 ) {
   const transformLabel = (title: string) => {
     let prettyTitle = title;
-    const itemModel = getItemModelFromId(title);
+    const itemModel = getItemModelOrNullFromStateId(title);
     if (itemModel) {
-      prettyTitle = itemModel + " " + getPrefixFromId(title);
+      prettyTitle = itemModel + " " + renderClientIdPrefix(title);
     }
     return prettyTitle.charAt(0).toUpperCase() + prettyTitle.slice(1);
   };
@@ -265,11 +265,13 @@ function renderBreadcrumbsWithParams(
   });
 
   const lastItemTitle = breadcrumbs ? breadcrumbs[breadcrumbs.length - 2]?.breadcrumb || undefined : undefined;
-  const itemModel = getItemModelFromId(lastItemTitle);
+  const itemModel = getItemModelOrNullFromStateId(lastItemTitle);
 
   let actionMenuTitle;
   if (itemModel) {
-    actionMenuTitle = `${transformLabel ? transformLabel(itemModel) : itemModel} ${getPrefixFromId(lastItemTitle)}`;
+    actionMenuTitle = `${transformLabel ? transformLabel(itemModel) : itemModel} ${renderClientIdPrefix(
+      lastItemTitle,
+    )}`;
   }
 
   const itemActionMenu = ItemActionMenu(pathname, actionMenuTitle);

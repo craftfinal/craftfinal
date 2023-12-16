@@ -1,13 +1,13 @@
 // @/types/item.ts
 
-import { IdSchemaType } from "@/schemas/id";
+import { ClientIdSchemaType } from "@/schemas/id";
 
 /**
  * Represents the type for client-generated IDs. This type is used to uniquely
  * identify items created on the client side before they are persisted to the server.
  * It is typically a string that conforms to a specific format.
  */
-export type ClientIdType = IdSchemaType;
+export type ClientIdType = ClientIdSchemaType;
 
 /**
  * Enum representing the state of an item in relation to its synchronization

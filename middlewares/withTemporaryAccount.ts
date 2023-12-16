@@ -1,4 +1,4 @@
-// @/middlewares/withTemporaryUser.ts
+// @/middlewares/withTemporaryAccount.ts
 
 import {
   generateTemporaryAccountId,
@@ -20,7 +20,7 @@ const withTemporaryAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
       const providerAccountId = providerAccountCookie?.value;
       if (providerAccountId && isValidTemporaryAccountId(providerAccountId)) {
         // console.log(
-        //   `withTemporaryUser: cookie "${authProviderIdCookieName}" contains valid accountId "${providerAccountId}"`,
+        //   `withTemporaryAccount: cookie "${authProviderIdCookieName}" contains valid accountId "${providerAccountId}"`,
         // );
       } else {
         // We cannot run Prisma here in midleware
@@ -30,7 +30,7 @@ const withTemporaryAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
 
         response.cookies.set(authProviderIdCookieName, newAuthProviderId, { maxAge: 60 * 60 * 24 * 30 }); // 30 days
         console.log(
-          `withTemporaryUser: set cookie "${authProviderIdCookieName}" with new accountId "${newAuthProviderId}"`,
+          `withTemporaryAccount: set cookie "${authProviderIdCookieName}" with new accountId "${newAuthProviderId}"`,
         );
       }
     }

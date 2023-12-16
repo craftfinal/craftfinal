@@ -1,5 +1,5 @@
 import { stripFields, stripToType } from "@/lib/utils/misc";
-import { IdSchemaType } from "@/schemas/id";
+import { StateIdSchemaType } from "@/schemas/id";
 import {
   ItemClientStateType,
   ItemClientToServerType,
@@ -36,7 +36,7 @@ const fieldsToExcludeFromCreate = [
   "descendantDraft",
 ];
 
-export function getItemDataForCreate<T extends ItemClientToServerType>(item: T, parentId: IdSchemaType) {
+export function getItemDataForCreate<T extends ItemClientToServerType>(item: T, parentId: StateIdSchemaType) {
   const fieldsToStrip = new Set<keyof T>([...fieldsToExcludeFromCreate] as Array<keyof T>);
 
   const itemData = stripFieldsForDatabase(item, fieldsToStrip);
@@ -195,9 +195,9 @@ export function augmentToItemDescendantServerState(
     itemModel,
     descendantModel,
   };
+
   // const parentClientId = providedParentClientId ? providedParentClientId : getClientId(getParentModel(itemModel!));
   // const clientId = getClientId(itemModel!);
-
   let descendants = serverOutput.descendants.map((serverDescendant) => {
     const newDescendant = augmentToItemDescendantServerState(serverDescendant, descendantModel!, disposition);
     return newDescendant;
@@ -220,6 +220,12 @@ export function augmentToItemDescendantServerState(
     ...dispositionProperty,
     descendants,
   } as ItemDescendantServerStateType;
+  console.log(
+    `augmentToItemDescendantServerState: serverOutput:`,
+    serverOutput,
+    "\nserverStateItemDescendant:",
+    serverStateItemDescendant,
+  );
   itemDescendantServerStateSchema.parse(serverStateItemDescendant);
 
   return serverStateItemDescendant;
@@ -275,6 +281,6 @@ export function createDateSafeLocalStorage(): PersistStorage<ItemDescendantStore
  * @returns The index of the descendant object in the array.
  */
 
-export const findItemIndexByClientId = (arr: Array<ItemClientStateType>, id: IdSchemaType): number => {
+export const findItemIndexByClientId = (arr: Array<ItemClientStateType>, id: StateIdSchemaType): number => {
   return arr.findIndex((descendant) => descendant.clientId === id);
 };

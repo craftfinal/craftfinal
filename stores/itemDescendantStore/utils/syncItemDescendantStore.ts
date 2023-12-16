@@ -3,14 +3,14 @@
 import { handleNestedItemDescendantListFromClient } from "@/actions/syncItemDescendant";
 import { toast } from "@/components/ui/use-toast";
 import { dateToISOLocal } from "@/lib/utils/formatDate";
-import { getClientId, isValidItemId } from "@/schemas/id";
+import { generateClientId, isValidDbId } from "@/schemas/id";
 import {
   ItemDescendantClientStateType,
   ItemDescendantOrderableClientStateListType,
   ItemDescendantServerStateType,
 } from "@/schemas/itemDescendant";
 import { ClientIdType, ItemDisposition } from "@/types/item";
-import { getDescendantModel, getItemOrderFunction } from "@/types/itemDescendant";
+import { getDescendantModel, getItemOrderFunction, getParentModel } from "@/types/itemDescendant";
 import { ModificationTimestampType } from "@/types/timestamp";
 import { getItemDescendantStoreStateForServer } from "@/types/utils/itemDescendant";
 import { Draft } from "immer";
@@ -407,8 +407,8 @@ export function augmentToItemDescendantClientState(
     itemModel,
     descendantModel,
   };
-  const parentClientId = providedParentClientId ?? getClientId();
-  const clientId = getClientId();
+  const parentClientId = providedParentClientId ?? generateClientId(getParentModel(itemModel) ?? undefined);
+  const clientId = generateClientId(itemModel);
 
   const clientDescendants = serverItem.descendants.map((serverDescendant) => {
     const newDescendant = augmentToItemDescendantClientState(serverDescendant, clientId, disposition);
@@ -443,14 +443,14 @@ function clientItemMatchesServerItem(
   if (clientItem.id === undefined) {
     // For items that have just been sent to the server and are now being returned,
     // matching is based on `clientId` and `parentClientId`
-    const newItemMatches = isValidItemId(clientItem.clientId) && clientItem.clientId === serverItem.clientId;
+    const newItemMatches = isValidDbId(clientItem.clientId) && clientItem.clientId === serverItem.clientId;
     return newItemMatches;
   } else {
     // Matching is based on `id` and `parentId` for items
     // that have already been persisted on the server
-    const existingItemMatches = isValidItemId(clientItem.id) && clientItem.id === serverItem.id;
+    const existingItemMatches = isValidDbId(clientItem.id) && clientItem.id === serverItem.id;
     if (existingItemMatches) {
-      if (!isValidItemId(clientItem.parentId) || clientItem.parentId !== serverItem.parentId) {
+      if (!isValidDbId(clientItem.parentId) || clientItem.parentId !== serverItem.parentId) {
         throw Error(`clientItemMatchesServerItem: matching ids but different or invalid parentId`);
       }
     }

@@ -5,8 +5,10 @@
 import { AccountType } from "@/auth/account";
 import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
 import { prismaClient } from "@/prisma/client";
-import { InvalidAuthUserErr, UserAccountOrNull } from "@/types/user";
+import { InvalidAccountErr, Base58CheckAccountOrNull } from "@/types/user";
 import { User as ClerkAuthUser, auth, currentUser } from "@clerk/nextjs/server";
+import { getAccountByProviderAccountId } from "./user";
+import { getDbIdFromBase58CheckId } from "@/types/utils/base58checkId";
 
 function getProviderAccountId(availableProviderAccountId?: string): string | null {
   if (availableProviderAccountId) {
@@ -18,81 +20,69 @@ function getProviderAccountId(availableProviderAccountId?: string): string | nul
   return providerAccountId;
 }
 
-export async function getRegisteredUserOrNull(): Promise<UserAccountOrNull> {
+export async function getRegisteredAccountOrNull(): Promise<Base58CheckAccountOrNull> {
   try {
-    return await getRegisteredUser();
+    return await getRegisteredAccount();
   } catch (error) {
     // if (process.env.NODE_ENV === "development") {
-    //   console.log(`actions/user:getRegisteredUserOrNull(): exception in getRegisteredUser(): `, error);
+    //   console.log(`actions/user:getRegisteredAccountOrNull(): exception in getRegisteredAccount(): `, error);
     // }
   }
   return null;
 }
 
-async function getRegisteredUser(
+async function getRegisteredAccount(
   // availableProviderAccountId?: string,
   availableProviderAccountId?: string,
-): Promise<UserAccountOrNull> {
+): Promise<Base58CheckAccountOrNull> {
   const providerAccountId = getProviderAccountId(availableProviderAccountId);
   if (!providerAccountId) {
-    throw new InvalidAuthUserErr(`Invalid providerAccountId: ${providerAccountId}`);
+    throw new InvalidAccountErr(`Invalid providerAccountId: ${providerAccountId}`);
   }
 
   const provider = registeredAccountMiddleware.id;
 
-  const account = await prismaClient.account.findUnique({
-    where: {
-      provider_providerAccountId: {
-        provider,
-        providerAccountId,
-      },
-    },
-    include: { user: true },
-  });
-
-  if (!account || !account.user) {
-    throw new InvalidAuthUserErr(
-      `getRegisteredUser: prisma.account.findUnique("${provider}", "${providerAccountId}") returned ${account}`,
-    );
-  }
-
-  return { ...account.user, account };
+  // If the user exists, fetch data from database
+  const authUser = await getAccountByProviderAccountId(provider, providerAccountId);
+  return authUser;
 }
 
-export async function getOrCreateRegisteredUser(): Promise<UserAccountOrNull> {
+export async function getOrCreateRegisteredAccount(): Promise<Base58CheckAccountOrNull> {
   // const providerAccount = await currentUser();
   const { userId: providerAccountId } = auth();
   if (!providerAccountId) {
-    throw new InvalidAuthUserErr(`Could not get providerAccountId from Clerk Auth`);
+    throw new InvalidAccountErr(`Could not get providerAccountId from Clerk Auth`);
   }
   let userAccount;
   try {
-    userAccount = await getRegisteredUser(providerAccountId);
+    userAccount = await getRegisteredAccount(providerAccountId);
   } catch (exc) {
-    // console.log(`getOrCreateRegisteredUser: exception from getRegisteredUser`, exc);
+    // console.log(`getOrCreateRegisteredAccount: exception from getRegisteredAccount`, exc);
   }
   if (!userAccount) {
-    userAccount = await createRegisteredUser(providerAccountId);
+    userAccount = await createOrUpdateRegisteredAccount(providerAccountId);
   }
   return userAccount;
 }
 
-async function createRegisteredUser(providerAccountId: string): Promise<UserAccountOrNull> {
+async function createOrUpdateRegisteredAccount(stateProviderAccountId: string): Promise<Base58CheckAccountOrNull> {
   const provider = registeredAccountMiddleware.id;
   const type = AccountType.Registered;
   const providerAccount = auth();
   if (!providerAccount) {
-    throw new InvalidAuthUserErr(`Invalid providerAccount: ${JSON.stringify(providerAccount)}`);
+    throw new InvalidAccountErr(`Invalid providerAccount: ${JSON.stringify(providerAccount)}`);
   }
   const providerUser = await currentUser();
   if (!providerUser) {
-    throw new InvalidAuthUserErr(`Invalid providerUser: ${JSON.stringify(providerUser)}`);
+    throw new InvalidAccountErr(`Invalid providerUser: ${JSON.stringify(providerUser)}`);
   }
 
   const primaryEmail = getPrimaryEmailAddress(providerUser);
   if (!primaryEmail) {
-    throw new InvalidAuthUserErr(`Invalid primary email for providerAccount: ${JSON.stringify(providerAccount)}`);
+    throw new InvalidAccountErr(`Invalid primary email for providerAccount: ${JSON.stringify(providerAccount)}`);
   }
+
+  const providerAccountId = getDbIdFromBase58CheckId(stateProviderAccountId);
 
   // Dreate or update the Account
   const account = await prismaClient.account.upsert({
@@ -125,7 +115,7 @@ async function createRegisteredUser(providerAccountId: string): Promise<UserAcco
     },
     include: { user: true },
   });
-  return { ...account.user, account };
+  return account;
 }
 
 function getPrimaryEmailAddress(authUser: ClerkAuthUser) {

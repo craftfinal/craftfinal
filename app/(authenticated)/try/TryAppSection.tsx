@@ -1,14 +1,14 @@
 // @/app/(marketing)/(home)/WelcomeMessage.tsx
 
-import { getCurrentUserOrNull } from "@/actions/user";
-import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
+import { getCurrentAccountOrNull } from "@/actions/user";
 import TryAppButton from "@/components/chrome/buttons/TryAppButton";
 import { siteConfig } from "@/config/site";
+import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
 
 export interface TryAppSectionProps extends AuthenticatedContentLayoutChildrenProps {}
 
-export default async function TryAppSection({ user }: TryAppSectionProps) {
-  const currentUser = user ?? (await getCurrentUserOrNull());
+export default async function TryAppSection({ account: account }: TryAppSectionProps) {
+  const currentAccount = account ?? (await getCurrentAccountOrNull());
 
   return (
     <section className="from gray-00 spacey-10 bg-gradient-to-r to-gray-200 py-10 md:py-20">
@@ -37,7 +37,7 @@ export default async function TryAppSection({ user }: TryAppSectionProps) {
           Create and revise resumes in the playground
         </p>
         <div className="flex justify-center gap-4 pt-10">
-          <TryAppButton user={currentUser}></TryAppButton>
+          <TryAppButton account={currentAccount}></TryAppButton>
         </div>
       </div>
     </section>

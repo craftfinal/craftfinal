@@ -1,8 +1,10 @@
 // @/app/(authenticated)/try/page.tsx
 
-import { getCurrentUserOrNull } from "@/actions/user";
+import { getCurrentAccountOrNull } from "@/actions/user";
 import TryAppSection from "./TryAppSection";
 
 export default async function TryAppPage() {
-  return <TryAppSection user={await getCurrentUserOrNull()} />;
+  const currentAccount = await getCurrentAccountOrNull();
+
+  return <TryAppSection account={currentAccount} />;
 }

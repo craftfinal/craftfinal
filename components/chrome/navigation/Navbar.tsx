@@ -3,18 +3,19 @@ import Link from "next/link";
 import { AuthenticatedContentLayoutChildrenProps } from "../../../layouts/AuthenticatedContentLayout";
 import NavigationActionButtons from "./NavigationActionButtons";
 import { NavigationMenuBar } from "./NavigationMenuBar";
+import { siteNavigation } from "@/config/navigation";
 
 export interface NavbarProps extends AuthenticatedContentLayoutChildrenProps {}
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar({ account }: NavbarProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 align-baseline">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-4">
-        <Link href="/">
+        <Link href={siteNavigation.home.href} title={siteNavigation.home.title} passHref>
           <SiteLogo />
         </Link>
         <NavigationMenuBar />
       </div>
-      <NavigationActionButtons user={user} />
+      <NavigationActionButtons account={account} />
     </div>
   );
 }

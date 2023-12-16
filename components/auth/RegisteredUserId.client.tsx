@@ -1,13 +1,13 @@
-// @/components/auth/RegisteredUserId.tsx
+// @/components/auth/RegisteredAccountId.tsx
 
 "use client";
 
-import { useRegisteredUser } from "@/auth/RegisteredUserProvider";
-import { UserAccountOrNullOrUndefined } from "@/types/user";
+import { useRegisteredAccount } from "@/auth/RegisteredAccountProvider";
+import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { ReactNode } from "react";
 
-export function RegisteredUserId(): ReactNode {
-  const registeredUser: UserAccountOrNullOrUndefined = useRegisteredUser();
+export function RegisteredAccountId(): ReactNode {
+  const registeredUser: Base58CheckAccountOrNullOrUndefined = useRegisteredAccount();
 
   return <span>{registeredUser?.id ?? ""}</span>;
 }

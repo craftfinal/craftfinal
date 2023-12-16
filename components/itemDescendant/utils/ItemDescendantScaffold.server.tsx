@@ -2,7 +2,7 @@
 
 import { getItemDescendantList, getItemsByParentId } from "@/actions/itemDescendant";
 import { getCurrentUserIdOrNull } from "@/actions/user";
-import { IdSchemaType } from "@/schemas/id";
+import { StateIdSchemaType } from "@/schemas/id";
 import {
   ItemDescendantModelNameType,
   getDescendantModel,
@@ -15,7 +15,7 @@ import ItemDescendantScaffoldClientComponent from "./ItemDescendantScaffold.clie
 
 export interface ItemDescendantScaffoldServerComponentProps {
   itemModel: ItemDescendantModelNameType;
-  id?: IdSchemaType;
+  id?: StateIdSchemaType;
   resumeAction?: ResumeActionType;
 }
 
@@ -91,7 +91,7 @@ export default async function ItemDescendantScaffoldServerComponent({
   } else {
     // Otherwise we look for the latest item of the given itemModel
     const targetItemModel = itemModel;
-    let derivedItemId: IdSchemaType = userId;
+    let derivedItemId: StateIdSchemaType = userId;
 
     // Start with a list of resumes owned by the current user
     let derivedItemModel: ItemDescendantModelNameType | null = itemDescendantModelHierarchy[0];

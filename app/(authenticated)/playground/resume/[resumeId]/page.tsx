@@ -2,11 +2,11 @@
 
 import ItemDescendantList from "@/components/itemDescendant/ItemDescendantList.server";
 import { Skeleton } from "@/components/ui/skeleton";
-import { IdSchemaType } from "@/schemas/id";
+import { StateIdSchemaType } from "@/schemas/id";
 import { Suspense } from "react";
 
 export interface ItemDescendantActionPageProps {
-  params: { resumeId: IdSchemaType };
+  params: { resumeId: StateIdSchemaType };
 }
 
 export default async function ItemDescendantActionPage({ params: { resumeId } }: ItemDescendantActionPageProps) {

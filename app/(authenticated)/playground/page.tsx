@@ -2,7 +2,7 @@
 
 "use server;";
 
-import CurrentUserCard from "@/components/auth/CurrentUserCard";
+import CurrentUserCard from "@/components/auth/CurrentAccountCard";
 import { Button } from "@/components/ui/button";
 import { siteNavigation } from "@/config/navigation";
 import WrapMDX from "@/layouts/mdx/WrapMDX";

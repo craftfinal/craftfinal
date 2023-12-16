@@ -2,7 +2,7 @@
 
 import { itemSchema } from "@/schemas/item";
 import { z } from "zod";
-import { idSchema } from "./id";
+import { dbIdSchema } from "./id";
 import { itemClientStateSchema } from "./item";
 
 export const userFormSchema = z.object({
@@ -12,7 +12,7 @@ export const userFormSchema = z.object({
 });
 
 export const userPersistServerSchema = z.object({
-  id: idSchema,
+  id: dbIdSchema,
 });
 
 export const userSchema = {

@@ -1,12 +1,12 @@
 // @/app/(marketing)/(home)/WelcomeMessage.tsx
 
-import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
-import EnterPlaygroundButton from "@/components/chrome/buttons/EnterPlaygroundButton";
+import EnterPlaygroundButton from "@/components/chrome/buttons/ToPlaygroundButton";
 import { siteConfig } from "@/config/site";
+import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
 
 export interface WelcomeMessageProps extends AuthenticatedContentLayoutChildrenProps {}
 
-export default async function WelcomeMessage({ user }: WelcomeMessageProps) {
+export default async function WelcomeMessage({ account }: WelcomeMessageProps) {
   return (
     <div className="mx-auto text-center">
       <div
@@ -33,7 +33,7 @@ export default async function WelcomeMessage({ user }: WelcomeMessageProps) {
         Import your resume and tailor it with AI to get the job of your dreams!
       </p>
       <div className="flex justify-center gap-4 pt-10">
-        <EnterPlaygroundButton user={user}></EnterPlaygroundButton>
+        <EnterPlaygroundButton account={account}></EnterPlaygroundButton>
 
         {/* <button className="bg-gray-600 text-white px-10 py-4 rounded-md text-lg font-bold">
             Learn more

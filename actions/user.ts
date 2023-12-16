@@ -3,88 +3,27 @@
 "use server";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getOrCreateRegisteredUser } from "@/actions/registeredUserActions";
-import { getOrCreateTemporaryUser } from "@/actions/temporaryUserActions";
-import { siteConfig } from "@/config/site";
+import { getOrCreateRegisteredAccount } from "@/actions/registeredAccountActions";
+import { getOrCreateTemporaryAccount } from "@/actions/temporaryAccountActions";
 import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
 import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
 import temporaryAccountMiddleware from "@/middlewares/withTemporaryAccount";
 import { prismaClient } from "@/prisma/client";
-import { IdSchemaType } from "@/schemas/id";
-import { ItemDataUntypedType } from "@/schemas/item";
-import { ModificationTimestampType } from "@/types/timestamp";
-import Chance from "chance";
+import { StateIdSchemaType } from "@/schemas/id";
+import {
+  Base58CheckAccount,
+  Base58CheckAccountOrNull,
+  Base58CheckUser,
+  Base58CheckUserOrNull,
+  InvalidAccountErr,
+} from "@/types/user";
+import { stateAccountFromDbAccount, stateUserFromDbUser } from "@/types/utils/base58checkId";
 import { headers } from "next/headers";
-import { InvalidAuthUserErr, UserAccountOrNull } from "../types/user";
 
-export const getCurrentUserOrNull = async (): Promise<UserAccountOrNull> => {
-  try {
-    return await getCurrentUser();
-  } catch (error) {
-    // if (process.env.NODE_ENV === "development") {
-    //   console.log(`actions/user:getCurrentUserOrNull(): exception in getCurrentUser(): `, error);
-    // }
-  }
-  return null;
-};
-
-export const getCurrentUserIdOrNull = async (): Promise<IdSchemaType | null> => {
-  let currentUserId = null;
-  try {
-    const currentUser = await getCurrentUser();
-    currentUserId = currentUser?.id ?? null;
-  } catch (error) {
-    // if (process.env.NODE_ENV === "development") {
-    //   console.log(`actions/user:getCurrentUserIdOrNull(): exception in getCurrentUser(): `, error);
-    // }
-  }
-  return currentUserId;
-};
-
-/**
- * Ensure that a `User` exists in the database, persist its unique `userId`
- * as a cookie and return a promise of the `User` object
- * There are two ways to obtain the `userId`:
- * 1. If ClerkAuth middleware has been executed, a call to `currentUser()` will return
- *    the `AuthProviderId`, which allows us to either create a user or retrieve it
- * 2. Otherwise, if the user accepts cookies, a cookie may have been set and
- *    we can obtain the userId from the cookie
- * @returns Promise<PrismaUser>
- */
-
-export async function getCurrentUser(): Promise<UserAccountOrNull> {
-  let authUser = null;
-  // Determine which middleware has been executed
-  const authMiddlewareIds = getExecutedMiddlewareIds(headers());
-  // console.log(`getCurrentUser: middlewares=${authMiddlewareIds}`);
-
-  if (authMiddlewareIds.includes(registeredAccountMiddleware.id)) {
-    // Option 1: try to authenticate user basd on Clerk Auth
-    try {
-      authUser = await getOrCreateRegisteredUser();
-    } catch (exc) {
-      // console.log(`getCurrentUser: Exception in getOrCreateRegisteredUser:`, exc);
-    }
-  }
-  if (!authUser) {
-    if (authMiddlewareIds.includes(temporaryAccountMiddleware.id)) {
-      // Option 2: Try to authenticate a temporary user based on a cookie
-      try {
-        authUser = await getOrCreateTemporaryUser();
-      } catch (exc) {
-        console.log(`getCurrentUser: Exception in getOrCreateTemporaryUser:`, exc);
-      }
-    }
-  }
-
-  if (!authUser) {
-    throw new InvalidAuthUserErr(`Invalid authUser:` + authUser);
-  }
-
-  return authUser;
-}
-
-export const getUserByAccount = async (provider: string, providerAccountId: string): Promise<UserAccountOrNull> => {
+export async function getAccountByProviderAccountId(
+  provider: string,
+  providerAccountId: string,
+): Promise<Base58CheckAccount> {
   // Find the account and include the related user
   const account = await prismaClient.account.findUnique({
     where: {
@@ -102,9 +41,94 @@ export const getUserByAccount = async (provider: string, providerAccountId: stri
     );
   }
 
-  return { ...account.user, account };
-};
+  return stateAccountFromDbAccount(account);
+}
 
+export async function getCurrentAccountOrNull(): Promise<Base58CheckAccountOrNull> {
+  try {
+    return await getCurrentAccount();
+  } catch (error) {
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(`actions/user:getCurrentAccountOrNull(): exception in getCurrentAccount(): `, error);
+    // }
+  }
+  return null;
+}
+
+export async function getCurrentAccountIdOrNull(): Promise<StateIdSchemaType | null> {
+  let currentAccountId = null;
+  try {
+    const currentAccount = await getCurrentAccount();
+    currentAccountId = currentAccount?.id ?? null;
+  } catch (error) {
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log(`actions/user:getCurrentAccountIdOrNull(): exception in getCurrentAccount(): `, error);
+    // }
+  }
+  return currentAccountId;
+}
+
+export async function getCurrentAccount(): Promise<Base58CheckAccount> {
+  let existingAccount = null;
+  // Determine which middleware has been executed
+  const authMiddlewareIds = getExecutedMiddlewareIds(headers());
+  // console.log(`getCurrentAccount: middlewares=${authMiddlewareIds}`);
+
+  if (authMiddlewareIds.includes(registeredAccountMiddleware.id)) {
+    // Option 1: try to authenticate user basd on Clerk Auth
+    try {
+      existingAccount = await getOrCreateRegisteredAccount();
+    } catch (exc) {
+      // console.log(`getCurrentAccount: Exception in getOrCreateRegisteredAccount:`, exc);
+    }
+  }
+  if (!existingAccount) {
+    if (authMiddlewareIds.includes(temporaryAccountMiddleware.id)) {
+      // Option 2: Try to authenticate a temporary user based on a cookie
+      try {
+        existingAccount = await getOrCreateTemporaryAccount();
+      } catch (exc) {
+        console.log(`getCurrentAccount: Exception in getOrCreateTemporaryAccount:`, exc);
+      }
+    }
+  }
+
+  if (!existingAccount) {
+    throw new InvalidAccountErr(`Invalid existingAccount:` + existingAccount);
+  }
+
+  // Convert the user ID to base58check format
+  // return userAccountFromAccount(existingAccount);
+  return existingAccount;
+}
+
+export async function getCurrentUserOrNull(): Promise<Base58CheckUserOrNull> {
+  const currentAccount = await getCurrentAccountOrNull();
+  return currentAccount && stateUserFromDbUser(currentAccount.user);
+}
+
+export async function getCurrentUserIdOrNull(): Promise<StateIdSchemaType | null> {
+  const currentAccount = await getCurrentAccountOrNull();
+  return currentAccount?.user?.id ?? null;
+}
+
+/**
+ * Ensure that a `User` exists in the database, persist its unique `userId`
+ * as a cookie and return a promise of the `User` object
+ * There are two ways to obtain the `userId`:
+ * 1. If ClerkAuth middleware has been executed, a call to `currentUser()` will return
+ *    the `AuthProviderId`, which allows us to either create a user or retrieve it
+ * 2. Otherwise, if the user accepts cookies, a cookie may have been set and
+ *    we can obtain the userId from the cookie
+ * @returns Promise<PrismaUser>
+ */
+
+export async function getCurrentUser(): Promise<Base58CheckUser> {
+  const currentAccount = await getCurrentAccount();
+  return stateUserFromDbUser(currentAccount.user);
+}
+
+/* Unused function
 export async function getUserById(id: IdSchemaType) {
   if (!id) {
     throw Error;
@@ -115,7 +139,10 @@ export async function getUserById(id: IdSchemaType) {
     },
   });
 }
+ */
 
+/* Unused function
+import { ModificationTimestampType } from "@/types/timestamp";
 export async function getUserLastModifiedById(id: IdSchemaType): Promise<ModificationTimestampType> {
   if (!id) {
     throw Error;
@@ -123,7 +150,12 @@ export async function getUserLastModifiedById(id: IdSchemaType): Promise<Modific
   const user = await getUserById(id);
   return user?.lastModified as ModificationTimestampType;
 }
+ */
 
+/* Unused function
+import { siteConfig } from "@/config/site";
+import { ItemDataUntypedType } from "@/schemas/item";
+import Chance from "chance";
 export async function getRandomUserData(id: IdSchemaType): Promise<ItemDataUntypedType> {
   const chance = new Chance();
   const primaryEmail = chance.email({ domain: siteConfig.canonicalDomainName });
@@ -137,3 +169,4 @@ export async function getRandomUserData(id: IdSchemaType): Promise<ItemDataUntyp
   };
   return userData;
 }
+ */

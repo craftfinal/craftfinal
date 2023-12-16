@@ -6,9 +6,13 @@ import ArticleMDX from "./ArticleMDX";
 export interface ArticleLayoutChildrenProps extends MainLayoutChildrenProps {}
 
 interface ArticleLayoutProps extends MainLayoutProps {}
-export default async function MainArticleLayoutMDX({ user, className, children }: Readonly<ArticleLayoutProps>) {
+export default async function MainArticleLayoutMDX({
+  account: user,
+  className,
+  children,
+}: Readonly<ArticleLayoutProps>) {
   return (
-    <MainLayout user={user}>
+    <MainLayout account={user}>
       <ArticleMDX className={className}>{children}</ArticleMDX>
     </MainLayout>
   );

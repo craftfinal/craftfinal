@@ -3,21 +3,21 @@
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { SiteHeader } from "@/components/chrome/SiteHeader";
 import { cn } from "@/lib/utils";
-import { UserAccountOrNullOrUndefined } from "@/types/user";
+import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { PropsWithChildren } from "react";
 
 export interface MainLayoutChildrenProps {
-  user?: UserAccountOrNullOrUndefined;
+  account?: Base58CheckAccountOrNullOrUndefined;
 }
 
 export interface MainLayoutProps extends PropsWithChildren {
-  user?: UserAccountOrNullOrUndefined;
+  account?: Base58CheckAccountOrNullOrUndefined;
   className?: string;
 }
-export default async function MainLayout({ user, className, children }: Readonly<MainLayoutProps>) {
+export default async function MainLayout({ account: account, className, children }: Readonly<MainLayoutProps>) {
   return (
     <>
-      <SiteHeader user={user} />
+      <SiteHeader account={account} />
       <main className={cn("my-auto min-h-screen", paddingScale.y, className)}>{children}</main>
       <SiteFooter />
     </>

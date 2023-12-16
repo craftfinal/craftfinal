@@ -44,6 +44,8 @@ model User {
   lastName      String?
   authProviders Account[]
   items         Resume[]
+
+  @@unique([email]) // Ensure uniqueness for each email address
 }
 
 model Resume {

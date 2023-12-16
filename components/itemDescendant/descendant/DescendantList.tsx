@@ -7,6 +7,7 @@ import {
   ItemDescendantClientStateType,
   ItemDescendantOrderableClientStateListType,
   ItemDescendantOrderableClientStateType,
+  ItemDescendantOrderableStoreStateListType,
 } from "@/schemas/itemDescendant";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ClientIdType } from "@/types/item";
@@ -58,9 +59,9 @@ export default function DescendantList(props: DescendantListProps) {
   const setDescendantData = store((state) => state.setDescendantData);
   const markDescendantAsDeleted = store((state) => state.markDescendantAsDeleted);
 
-  const getItems = (): ItemDescendantOrderableClientStateListType => {
+  const getItems = (): ItemDescendantOrderableStoreStateListType => {
     // window.consoleLog(`DescendantInput:getItems(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
-    return getDescendants(ancestorClientIdChain) as ItemDescendantOrderableClientStateListType;
+    return getDescendants(ancestorClientIdChain) as ItemDescendantOrderableStoreStateListType;
   };
 
   const setItemData = (descendantData: ItemDataUntypedType, clientId: ClientIdType): void => {

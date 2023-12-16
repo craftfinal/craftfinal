@@ -5,7 +5,7 @@
 import { ItemDescendantStoreProvider, useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { ResumeActionProvider } from "@/contexts/ResumeActionContext";
 import { StoreNameProvider, useStoreName } from "@/contexts/StoreNameContext";
-import { getClientId } from "@/schemas/id";
+import { generateClientId } from "@/schemas/id";
 import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
 
 import { AchievementItemClientStateType } from "@/schemas/achievement";
@@ -13,6 +13,7 @@ import { OrganizationItemClientStateType } from "@/schemas/organization";
 import { ResumeItemClientStateType } from "@/schemas/resume";
 import { RoleItemClientStateType } from "@/schemas/role";
 import { UserItemClientStateType } from "@/schemas/user";
+import { getParentModel } from "@/types/itemDescendant";
 import { useEffect, useState } from "react";
 import { ItemDescendantListContextProps } from "../ItemDescendantList.client";
 
@@ -108,8 +109,8 @@ export default function ItemDescendantScaffoldClientComponent(props: ItemDescend
   const { serverState, resumeAction } = props;
 
   const itemModel = serverState.itemModel;
-  const parentClientId = getClientId();
-  const clientId = getClientId();
+  const parentClientId = generateClientId(getParentModel(itemModel) || undefined);
+  const clientId = generateClientId(itemModel);
 
   const parentId = serverState.parentId;
   const id = serverState.id;

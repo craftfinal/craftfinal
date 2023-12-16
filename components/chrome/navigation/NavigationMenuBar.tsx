@@ -1,5 +1,6 @@
 "use client";
 
+import { useTemporaryAccount } from "@/auth/TemporaryAccountProvider";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -8,14 +9,24 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { NestedMenuKeyType, SubMenuKeyType, mainNavigationKeys, siteNavigation } from "@/config/navigation";
+import {
+  CustomMenuItemType,
+  NavMenuItemWithChildrenType,
+  SiteNavigationKeyType,
+  mainNavigationKeys,
+  siteNavigation,
+} from "@/config/navigation";
 import { cn } from "@/lib/utils";
 import { MainNavItem } from "@/types";
+import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import Link from "next/link";
-import React from "react";
+import { usePathname } from "next/navigation";
+import React, { ReactNode } from "react";
 import { menuClassName } from "./Navbar";
 
 export function NavigationMenuBar() {
+  const account = useTemporaryAccount();
+  const pathname = usePathname();
   return (
     <NavigationMenu className="w-full">
       <NavigationMenuList className="space-x-1 sm:space-x-2 md:space-x-4">
@@ -27,121 +38,138 @@ export function NavigationMenuBar() {
                 {navItem.menuTitle}
               </MainNavMenuItem>
             );
+          } else if ("children" in key) {
+            // We need to distinguish whether it's simply a custom navigation item,
+            // which we can render as a HTMLAnchorElement, or an item with sub items,
+            // which requires state and is rendered as a button by RadixUI
+            const navItemWithChildrenProps: MainNavMenuItemWithChildrenType = {
+              navItemWithChildren: key,
+              account,
+              pathname,
+            };
+            return <MainNavMenuItemWithChildren key={key.item} navItemWithChildrenProps={navItemWithChildrenProps} />;
           } else {
-            return <MainNavMenuWithChildrenItem key={key.item} keyWithChildren={key} />;
+            const customItemProps: MainNavCustomItemType = {
+              customItem: key,
+              account,
+              pathname,
+            };
+            return <MainNavCustomItem key={key.item} customItemProps={customItemProps} />;
           }
         })}
-
-        {/* <NavigationMenuItem>
-          <NavigationMenuTrigger>About</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid gap-3 p-6 sm:w-[24rem] md:w-[24rem] lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
-              <li className="row-span-3">
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/"
-                  >
-                    <div className="mb-2 mt-4 text-lg font-medium">{siteConfig.name}</div>
-                    <p className="text-sm leading-tight text-muted-foreground">
-                      The last resume platform you will ever use.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
-              </li>
-              <ListItem href={siteNavigation.about.href} title="About">
-                Learn about the basics of {siteConfig.name}.
-              </ListItem>
-              <ListItem href={siteNavigation.tryApp.href} title="Try it yourself">
-                Experience, how you can import and tailor a resume in 60 seconds with {siteConfig.name}
-              </ListItem>
-              <ListItem title="Community">Join the community and get help or support.</ListItem>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem> */}
-        {/* <NavigationMenuItem>
-          <NavigationMenuTrigger>Templates</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-              {components.map((component) => (
-                <ListItem key={component.title} title={component.title}>
-                  {component.description}
-                </ListItem>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem> */}
-        {/* <NavigationMenuItem>
-          <Link href="/" legacyBehavior passHref>
-            <NavigationMenuLink className="font-medium">Documentation</NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-
-        <NavigationMenuItem>
-          <Link href="/" legacyBehavior passHref>
-            <NavigationMenuLink
-              className="
-              font-medium"
-            >
-              Pricing
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem> */}
       </NavigationMenuList>
     </NavigationMenu>
   );
 }
 
-const MainNavMenuWithChildrenItem = React.forwardRef<
+type MainNavCustomItemType = {
+  customItem: CustomMenuItemType;
+  account: Base58CheckAccountOrNullOrUndefined;
+  pathname: string;
+};
+const MainNavCustomItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { keyWithChildren: NestedMenuKeyType }
->(({ keyWithChildren, ...props }, ref) => {
-  const nestedItem = keyWithChildren as SubMenuKeyType;
-  const navItem = siteNavigation[nestedItem.item];
-  const subItems = nestedItem?.children?.length ? [nestedItem.item, ...nestedItem.children] : undefined;
+  React.ComponentPropsWithoutRef<"a"> & { customItemProps: MainNavCustomItemType }
+>(({ customItemProps, ...props }, ref) => {
+  return <NavigationMenuItem>{renderCustomMenuItem(customItemProps, props, ref)}</NavigationMenuItem>;
+});
+MainNavCustomItem.displayName = "MainNavCustomItem";
+
+function renderCustomMenuItem(
+  customItemProps: MainNavCustomItemType,
+  anchorProps: React.ComponentPropsWithoutRef<"a">,
+  ref: React.ForwardedRef<React.ElementRef<"a">>,
+): ReactNode {
+  const { customItem, account, pathname } = customItemProps;
+  const navItem = siteNavigation[customItem.item];
+  if (typeof customItem?.render === "function") {
+    const menuItemRenderFunction = customItem.render as () => ReactNode;
+    return (
+      <Link legacyBehavior passHref href={navItem.href} ref={ref} key={navItem.href} {...anchorProps}>
+        {menuItemRenderFunction()}
+      </Link>
+    );
+  } else if (typeof customItem?.render === "object") {
+    const menuItemPredicateArray = customItem.render;
+    return menuItemPredicateArray.map((item) => {
+      const menuItemRenderFunction = item.render as () => ReactNode;
+      return (
+        item.predicate(account, pathname) && (
+          <Link legacyBehavior passHref href={navItem.href} ref={ref} key={navItem.href} {...anchorProps}>
+            {menuItemRenderFunction()}
+          </Link>
+        )
+      );
+    });
+  }
+  return null;
+}
+
+type MainNavMenuItemWithChildrenType = {
+  navItemWithChildren: NavMenuItemWithChildrenType;
+  account: Base58CheckAccountOrNullOrUndefined;
+  pathname: string;
+};
+
+const MainNavMenuItemWithChildren = React.forwardRef<
+  React.ElementRef<"button">,
+  React.ComponentPropsWithRef<"button"> & { navItemWithChildrenProps: MainNavMenuItemWithChildrenType }
+>(({ navItemWithChildrenProps, ...buttonProps }, ref) => {
+  const { navItemWithChildren } = navItemWithChildrenProps;
+  const navItem = siteNavigation[navItemWithChildren.item];
+  const subItems = [navItemWithChildren.item, ...navItemWithChildrenProps.navItemWithChildren.children];
+
   return (
     <NavigationMenuItem>
-      {(nestedItem.as && <Link href={navItem.href}>{nestedItem.as()}</Link>) ?? (
-        <>
-          <NavigationMenuTrigger
-            className={cn(
-              "bg-transparent",
-              menuClassName.item.container,
-              menuClassName.item.text,
-              menuClassName.topLevel.text,
-              menuClassName.topLevel.textColor,
-              menuClassName.topLevel.container,
-            )}
-          >
-            {(nestedItem.as && nestedItem.as()) ?? navItem.menuTitle}
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            {subItems && (
-              <ul className="grid gap-2 p-0 sm:p-2 md:w-[24rem] md:gap-4 md:p-3 lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
-                {subItems.map((subKey, index) => {
-                  const navItem = siteNavigation[subKey];
-                  return (
-                    <SubMenuItem
-                      key={navItem.menuTitle}
-                      index={index}
-                      navItem={navItem}
-                      numItems={subItems.length}
-                      {...props}
-                      ref={ref}
-                    >
-                      {navItem.menuContent ?? navItem.title}
-                    </SubMenuItem>
-                  );
-                })}
-              </ul>
-            )}
-          </NavigationMenuContent>
-        </>
-      )}
+      <>
+        <NavigationMenuTrigger
+          ref={ref}
+          className={cn(
+            "bg-transparent",
+            menuClassName.item.container,
+            menuClassName.item.text,
+            menuClassName.topLevel.text,
+            menuClassName.topLevel.textColor,
+            menuClassName.topLevel.container,
+          )}
+          {...buttonProps}
+        >
+          {navItem.menuTitle}
+        </NavigationMenuTrigger>
+        {renderMainNavChildrenContent(subItems, {})}
+      </>
     </NavigationMenuItem>
   );
 });
-MainNavMenuWithChildrenItem.displayName = "MainNavMenuWithChildrenItem";
+MainNavMenuItemWithChildren.displayName = "MainNavMenuItemWithChildren";
+
+function renderMainNavChildrenContent(
+  subItems: Array<SiteNavigationKeyType>,
+  subItemProps: React.ComponentPropsWithoutRef<"a">,
+): ReactNode {
+  return (
+    <NavigationMenuContent>
+      {subItems && (
+        <ul className="grid gap-2 p-0 sm:p-2 md:w-[24rem] md:gap-4 md:p-3 lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
+          {subItems.map((subKey, index) => {
+            const navItem = siteNavigation[subKey];
+            return (
+              <SubMenuItem
+                key={navItem.title}
+                index={index}
+                navItem={navItem}
+                numItems={subItems.length}
+                {...subItemProps}
+              >
+                {navItem.menuContent ?? navItem.title}
+              </SubMenuItem>
+            );
+          })}
+        </ul>
+      )}
+    </NavigationMenuContent>
+  );
+}
 
 const MainNavMenuItem = React.forwardRef<
   React.ElementRef<"a">,
@@ -273,3 +301,65 @@ const ListItem = React.forwardRef<React.ElementRef<"a">, React.ComponentPropsWit
   },
 );
 ListItem.displayName = "ListItem";
+
+{
+  /* <NavigationMenuItem>
+          <NavigationMenuTrigger>About</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid gap-3 p-6 sm:w-[24rem] md:w-[24rem] lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
+              <li className="row-span-3">
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                    href="/"
+                  >
+                    <div className="mb-2 mt-4 text-lg font-medium">{siteConfig.name}</div>
+                    <p className="text-sm leading-tight text-muted-foreground">
+                      The last resume platform you will ever use.
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+              <ListItem href={siteNavigation.about.href} title="About">
+                Learn about the basics of {siteConfig.name}.
+              </ListItem>
+              <ListItem href={siteNavigation.tryApp.href} title="Try it yourself">
+                Experience, how you can import and tailor a resume in 60 seconds with {siteConfig.name}
+              </ListItem>
+              <ListItem title="Community">Join the community and get help or support.</ListItem>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem> */
+}
+{
+  /* <NavigationMenuItem>
+          <NavigationMenuTrigger>Templates</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+              {components.map((component) => (
+                <ListItem key={component.title} title={component.title}>
+                  {component.description}
+                </ListItem>
+              ))}
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem> */
+}
+{
+  /* <NavigationMenuItem>
+          <Link href="/" legacyBehavior passHref>
+            <NavigationMenuLink className="font-medium">Documentation</NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem>
+          <Link href="/" legacyBehavior passHref>
+            <NavigationMenuLink
+              className="
+              font-medium"
+            >
+              Pricing
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem> */
+}

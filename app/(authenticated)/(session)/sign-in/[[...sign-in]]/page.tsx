@@ -1,13 +1,13 @@
-import { getCurrentUserOrNull } from "@/actions/user";
+import { getCurrentAccountOrNull } from "@/actions/user";
 import WelcomeMessage from "@/app/(authenticated)/(session)/WelcomeMessage";
 import { SignIn, SignedIn, SignedOut } from "@clerk/nextjs";
 
 const SignInPage = async () => {
-  const currentUser = await getCurrentUserOrNull();
+  const currentAccount = await getCurrentAccountOrNull();
   return (
     <>
       <SignedIn>
-        <WelcomeMessage user={currentUser} />
+        <WelcomeMessage account={currentAccount} />
       </SignedIn>
       <SignedOut>
         <SignIn />

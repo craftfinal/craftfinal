@@ -4,14 +4,8 @@
 
 import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { prismaClient } from "@/prisma/client";
-import { IdSchemaType, idDefault } from "@/schemas/id";
-import {
-  ItemClientStateType,
-  ItemClientToServerType,
-  ItemOutputType,
-  ItemServerOutputType,
-  ItemServerStateType,
-} from "@/schemas/item";
+import { StateIdSchemaType } from "@/schemas/id";
+import { ItemClientStateType, ItemOutputType, ItemServerStateType } from "@/schemas/item";
 import {
   ItemDescendantClientStateType,
   ItemDescendantServerOutputListType,
@@ -19,24 +13,18 @@ import {
   itemDescendantServerStateSchema,
   itemDescendantServerToClientSchema,
 } from "@/schemas/itemDescendant";
-import { UserOutputType } from "@/schemas/user";
 import { ItemDisposition } from "@/types/item";
-import {
-  ItemDescendantModelNameType,
-  PrismaModelMethods,
-  getModelAccessor,
-  itemDescendantModelHierarchy,
-} from "@/types/itemDescendant";
+import { ItemDescendantModelNameType, PrismaModelMethods, getModelAccessor } from "@/types/itemDescendant";
 import {
   augmentClientStateToServerState,
   augmentServerOutputToServerState,
   augmentServerStateToDescendantServerState,
   augmentToItemDescendantServerState,
-  getItemDataForCreate,
-  getItemDataForUpdate,
 } from "@/types/utils/itemDescendant";
 import { PrismaClient } from "@prisma/client";
 import { getItemDescendantList, getItemsByParentId } from "./itemDescendant";
+import { getItemById } from "./itemDescendant";
+import { createFromClientItem, updateWithClientItem } from "./itemDescendant";
 
 export async function handleNestedItemDescendantListFromClient(
   clientItem: ItemDescendantClientStateType,
@@ -86,7 +74,7 @@ async function processClientItemDescendant(
     return augmentServerStateToDescendantServerState(serverItem);
   }
 
-  const processedDescendantIds = new Set<IdSchemaType>();
+  const processedDescendantIds = new Set<StateIdSchemaType>();
   const descendants: Array<ItemDescendantServerStateType> = [];
   /*
    * Process DESCENDANTS, if any
@@ -172,11 +160,18 @@ async function processClientItem(
   if (clientItem.id) {
     const id = clientItem.id;
 
-    const serverOutput: ItemOutputType = await findItemById(prismaItemModelInstance, clientItem.itemModel, id);
-
-    // If the item cannot be found, it means that the client has an obsoleted
-    // and should remove it
-    if (!serverOutput) {
+    try {
+      const serverOutput: ItemOutputType = await getItemById(prismaItemModelInstance, clientItem.itemModel, id);
+      // Handle the client's update
+      serverItem = await updateServerItemWithClientItem(
+        clientItem,
+        serverOutput,
+        currentTimestamp,
+        prismaItemModelInstance,
+      );
+    } catch (error) {
+      // If the item cannot be found, it means that the client has an obsoleted
+      // and should remove it
       const obsoletedClientItem = augmentClientStateToServerState(
         clientItem,
         ItemDisposition.Obsoleted,
@@ -185,14 +180,6 @@ async function processClientItem(
       console.log(`: tell client to delete the item that does not exist on the server:`, obsoletedClientItem);
       return augmentServerStateToDescendantServerState(obsoletedClientItem);
     }
-
-    // Handle the client's update
-    serverItem = await updateServerItemWithClientItem(
-      clientItem,
-      serverOutput,
-      currentTimestamp,
-      prismaItemModelInstance,
-    );
   } else {
     // Create item and augment it with `clientId` to return to client
     // Even though the client is the originator of this item and thus
@@ -227,7 +214,6 @@ async function updateServerItemWithClientItem(
       } with clientItem: ${JSON.stringify(clientItem)}`,
     );
   }
-  const id = clientItem.id!;
   const itemModel = clientItem.itemModel;
   const logPrefix = `updateServerItemWithClientItem ${itemModel}:`;
 
@@ -242,7 +228,7 @@ async function updateServerItemWithClientItem(
     timestampRelation = ">";
     mergeStrategy = `MERGE: item exists`;
 
-    const updatedServerOutput = await updateWithClientItem(prismaItemModelInstance, clientItem, id, logPrefix);
+    const updatedServerOutput = await updateWithClientItem(prismaItemModelInstance, clientItem, logPrefix);
     // Return the item with a disposition of `Synced` to indicate that:
     // - The serverResponse indicates to the client that the server is now at the same state as the client
     // - Descendants of this item should be processed
@@ -281,72 +267,4 @@ async function updateServerItemWithClientItem(
     ` ${dateToISOLocal(serverLastModified)}=serverLastModified`;
   console.log(logPrefix, mergeStrategy, timestampRelation, serverResponse);
   return serverResponse;
-}
-
-function ensureServerOutputHasParentId(serverOutput: ItemServerOutputType, itemModel: ItemDescendantModelNameType) {
-  // Augment output with default id if the model does not have a parentId
-  if (itemModel === itemDescendantModelHierarchy[0]) {
-    return { ...serverOutput, parentId: idDefault };
-  }
-  return serverOutput;
-}
-
-async function findItemById(
-  prismaItemModelInstance: PrismaModelMethods[ItemDescendantModelNameType],
-  itemModel: ItemDescendantModelNameType,
-  id: string,
-) {
-  let serverOutput = await prismaItemModelInstance.findUnique({
-    where: { id },
-  });
-  serverOutput = ensureServerOutputHasParentId(serverOutput, itemModel);
-  return serverOutput;
-}
-
-async function createFromClientItem(
-  prismaItemModelInstance: PrismaModelMethods[ItemDescendantModelNameType],
-  clientItem: ItemClientStateType,
-  parentId: IdSchemaType,
-  logPrefix?: string,
-) {
-  const data = getItemDataForCreate<ItemClientToServerType>(clientItem, parentId);
-  let createdServerOutput = await prismaItemModelInstance.create({
-    data,
-  });
-
-  createdServerOutput = ensureServerOutputHasParentId(createdServerOutput, clientItem.itemModel);
-
-  console.log(logPrefix, `createFromClientItem: CREATE `, "\n", clientItem);
-  console.log(logPrefix, `${clientItem.itemModel}.create:`, "\n", data);
-
-  return createdServerOutput;
-}
-
-async function updateWithClientItem(
-  prismaItemModelInstance: PrismaModelMethods[ItemDescendantModelNameType],
-  clientItem: ItemClientStateType,
-  id: IdSchemaType,
-  logPrefix?: string,
-) {
-  let data;
-  // The `User` model requires special treatment
-  if (clientItem.itemModel === "user") {
-    const { id, createdAt, lastModified, deletedAt, email, firstName, lastName } =
-      clientItem as unknown as UserOutputType;
-    data = { id, createdAt, lastModified, deletedAt, email, firstName, lastName };
-  } else {
-    data = getItemDataForUpdate<ItemClientToServerType>(clientItem);
-  }
-
-  let updatedServerOutput = await prismaItemModelInstance.update({
-    where: { id },
-    data,
-  });
-
-  updatedServerOutput = ensureServerOutputHasParentId(updatedServerOutput, clientItem.itemModel);
-
-  console.log(logPrefix, `updateWithClientItem: UPDATE `, "\n", clientItem);
-  console.log(logPrefix, `${clientItem.itemModel}.update:`, "\n", data);
-
-  return updatedServerOutput;
 }

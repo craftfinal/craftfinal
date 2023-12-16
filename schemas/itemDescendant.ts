@@ -2,7 +2,7 @@
 
 import { ItemDescendantModelNameType, itemDescendantModelHierarchy } from "@/types/itemDescendant";
 import { z } from "zod";
-import { idSchema } from "./id";
+import { stateIdSchema } from "./id";
 import {
   ItemClientStateType,
   ItemDataUntypedType,
@@ -34,6 +34,8 @@ export const itemDescendantClientStateSchema: z.ZodSchema<ItemDescendantClientSt
 );
 
 // The store state additionally includes a descendantDraft at the item level
+// NOTE: the descendants are of type `ItemDescendant**Client**StateListType` to avoid
+// some type mismatch
 export type ItemDescendantStoreStateListType = Array<ItemDescendantStoreStateType>;
 export type ItemDescendantStoreStateType = ItemClientStateType & {
   itemModel: ItemDescendantModelNameType;
@@ -79,7 +81,7 @@ export type ItemDescendantServerOutputType = ItemServerOutputType & {
 };
 export const itemDescendantServerOutputSchema: z.ZodSchema<ItemDescendantServerOutputType> =
   itemServerOutputSchema.extend({
-    id: idSchema, // Need to redefine `id` without a default value as it is always included in server-to-client transmission
+    id: stateIdSchema, // Need to redefine `id` without a default value as it is always included in server-to-client transmission
     descendants: z.lazy(() => z.array(itemDescendantServerOutputSchema)), // Lazy to handle recursive structure
   });
 
@@ -92,7 +94,7 @@ export type ItemDescendantServerToClientType = ItemServerToClientType & {
 };
 export const itemDescendantServerToClientSchema: z.ZodSchema<ItemDescendantServerToClientType> =
   itemServerToClientSchema.extend({
-    id: idSchema, // Need to redefine `id` without a default value as it is always included in server-to-client transmission
+    id: stateIdSchema, // Need to redefine `id` without a default value as it is always included in server-to-client transmission
     itemModel: z.enum(itemDescendantModelHierarchy),
     descendantModel: z.union([z.enum(itemDescendantModelHierarchy), z.null()]),
     descendants: z.lazy(() => z.array(itemDescendantServerToClientSchema)), // Lazy to handle recursive structure
@@ -108,7 +110,7 @@ export type ItemDescendantServerStateType = ItemServerStateType & {
 
 export const itemDescendantServerStateSchema: z.ZodSchema<ItemDescendantServerStateType> = itemServerStateSchema.extend(
   {
-    id: idSchema, // Need to redefine `id` without a default value as it is always included in server state
+    id: stateIdSchema, // Need to redefine `id` without a default value as it is always included in server state
     itemModel: z.enum(itemDescendantModelHierarchy),
     descendantModel: z.union([z.enum(itemDescendantModelHierarchy), z.null()]),
     descendants: z.lazy(() => z.array(itemDescendantServerStateSchema)), // Lazy to handle recursive structure
@@ -125,7 +127,7 @@ export type ItemDescendantOrderableServerStateType = ItemOrderableServerStateTyp
 
 export const itemDescendantOrderableServerStateSchema: z.ZodSchema<ItemDescendantOrderableServerStateType> =
   itemOrderableServerStateSchema.extend({
-    id: idSchema, // Need to redefine `id` without a default value as it is always included in server state
+    id: stateIdSchema, // Need to redefine `id` without a default value as it is always included in server state
     itemModel: z.enum(itemDescendantModelHierarchy),
     descendantModel: z.union([z.enum(itemDescendantModelHierarchy), z.null()]),
     descendants: z.lazy(() => z.array(itemDescendantOrderableServerStateSchema)), // Lazy to handle recursive structure

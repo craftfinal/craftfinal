@@ -19,12 +19,12 @@ import {
 // import { settingsConfig } from "@/config/settings";
 import { AccountType } from "@/auth/account";
 import { siteConfig } from "@/config/site";
-import { UserAccountOrNullOrUndefined } from "@/types/user";
+import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { Settings2Icon } from "lucide-react";
 import AppSettingsForm from "./AppSettingsForm";
 
-export default function AppSettingsSheet({ user }: { user?: UserAccountOrNullOrUndefined }) {
-  return !(user?.account.type === AccountType.Registered) ? null : (
+export default function AppSettingsSheet({ account }: { account?: Base58CheckAccountOrNullOrUndefined }) {
+  return !(account?.type === AccountType.Registered) ? null : (
     <Sheet>
       <SheetTrigger name="App settings toggle" aria-label="Show settings" className="flex flex-wrap items-center px-2">
         {<Settings2Icon />}

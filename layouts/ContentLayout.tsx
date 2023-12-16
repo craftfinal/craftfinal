@@ -1,11 +1,11 @@
 // @/components/layout/MarketingContentLayout.tsx
 
-import { UserAccountOrNullOrUndefined } from "@/types/user";
+import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { PropsWithChildren } from "react";
 import MainArticleLayoutMDX from "./mdx/MainArticleLayoutMDX";
 
 export interface ContentLayoutChildrenProps {
-  user: UserAccountOrNullOrUndefined;
+  account: Base58CheckAccountOrNullOrUndefined;
 }
 
 interface ContentLayoutProps extends PropsWithChildren {}

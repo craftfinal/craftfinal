@@ -1,6 +1,6 @@
 // @/components/layout/AuthenticatedContentLayout.tsx
 
-import { UserAccountOrNull } from "@/types/user";
+import { Base58CheckAccountOrNull } from "@/types/user";
 import { ReactNode } from "react";
 
 import AuthenticatedMainLayout from "./AuthenticatedMainLayout";
@@ -13,5 +13,5 @@ export default async function AuthenticatedContentLayout({ children, ...props }:
 }
 
 export interface AuthenticatedContentLayoutChildrenProps {
-  user?: UserAccountOrNull;
+  account?: Base58CheckAccountOrNull;
 }

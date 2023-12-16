@@ -1,11 +1,12 @@
-import { MainNavItem } from "@/types";
-import { siteConfig } from "./site";
 import { SiteLogo } from "@/components/chrome/SiteLogo";
-import { Button } from "@/components/ui/button";
 import { menuClassName } from "@/components/chrome/navigation/Navbar";
-import { ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { MainNavItem } from "@/types";
+import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { ArrowRightIcon } from "lucide-react";
+import { ReactNode } from "react";
+import { siteConfig } from "./site";
 
 // Note: avoid defining the type of the siteNavigationUntyped object
 // to let TypeScript infer it as restrictively as possible
@@ -131,14 +132,25 @@ const siteNavigationUntyped /*: SiteNavigationMapType */ = {
 // Infer SiteNavigationKeys from siteNavigation
 export type SiteNavigationKeyType = keyof typeof siteNavigationUntyped;
 
-export type SubMenuKeyType = {
+export type MenuItemTypePredicateRenderFunctionType = {
+  render: (/*key: string, ref: Ref<HTMLButtonElement>*/) => ReactNode;
+  predicate(account: Base58CheckAccountOrNullOrUndefined, pathname: string): boolean;
+};
+
+export type MenuItemRenderFunctionType = () => ReactNode;
+export type CustomMenuItemType = {
   item: SiteNavigationKeyType;
-  children?: SiteNavigationKeyType[];
-  as?: () => ReactNode;
+  render: MenuItemRenderFunctionType | Array<MenuItemTypePredicateRenderFunctionType>;
+};
+
+export type NavMenuItemWithChildrenType = {
+  item: SiteNavigationKeyType;
+  children: SiteNavigationKeyType[];
+  render?: MenuItemRenderFunctionType | Array<MenuItemTypePredicateRenderFunctionType>;
 };
 
 // Now NavItemKeyType will be restricted to the actual keys of siteNavigation
-export type NestedMenuKeyType = SiteNavigationKeyType | SubMenuKeyType;
+export type NavMenuItemType = SiteNavigationKeyType | CustomMenuItemType | NavMenuItemWithChildrenType;
 
 // Define a type that ensures all values in siteNavigation are of type MainNavItem
 export type SiteNavigationMapType = Record<SiteNavigationKeyType, MainNavItem>;
@@ -146,19 +158,31 @@ export type SiteNavigationMapType = Record<SiteNavigationKeyType, MainNavItem>;
 // Now, siteNavigation can be typed as SiteNavigationMapType
 export const siteNavigation: SiteNavigationMapType = siteNavigationUntyped;
 
-export const mainNavigationKeys: NestedMenuKeyType[] = [
+export const mainNavigationKeys: NavMenuItemType[] = [
   { item: "howItWorks", children: ["useCases"] },
   { item: "about", children: ["privacyPolicy", "termsOfUse"] },
   {
     item: "antePlayground",
-    as: () => {
-      return (
-        <Button variant="outline" className={cn(menuClassName.topLevel.container, menuClassName.topLevel.text)}>
-          <ArrowRightIcon />
-          <span className="p-1" /> {siteNavigation.antePlayground.menuTitle}
-        </Button>
-      );
-    },
+    render: [
+      {
+        render: (/*key: string, ref: Ref<HTMLAnchorElement>*/) => {
+          return (
+            <Button
+              // key={key}
+              variant="outline"
+              className={cn(menuClassName.topLevel.container, menuClassName.topLevel.text)}
+              // ref={ref}
+            >
+              <ArrowRightIcon />
+              <span className="p-1" /> {siteNavigation.antePlayground.menuTitle}
+            </Button>
+          );
+        },
+        predicate: (account: Base58CheckAccountOrNullOrUndefined, pathname: string): boolean => {
+          return pathname != siteNavigation.antePlayground.href;
+        },
+      } as MenuItemTypePredicateRenderFunctionType,
+    ],
   },
 ];
 

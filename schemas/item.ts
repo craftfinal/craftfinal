@@ -3,7 +3,7 @@
 import { ItemDisposition } from "@/types/item";
 import { itemDescendantModelHierarchy } from "@/types/itemDescendant";
 import { z } from "zod";
-import { idSchema } from "./id";
+import { stateIdSchema, clientIdSchema } from "./id";
 
 const itemDataSchema = z.object({});
 
@@ -17,13 +17,13 @@ const itemPersistSchema = z.object({
 });
 
 const itemPersistClientSchema = z.object({
-  clientId: idSchema,
-  parentClientId: idSchema.optional(),
+  clientId: clientIdSchema,
+  parentClientId: clientIdSchema.optional(),
 });
 
 const itemPersistServerSchema = z.object({
-  parentId: idSchema,
-  id: idSchema, //.default(idDefault), // UUID
+  parentId: stateIdSchema,
+  id: stateIdSchema, //.default(idDefault), // UUID
 });
 
 const itemStateSchema = z.object({
@@ -94,8 +94,8 @@ export type ItemServerOutputType = z.output<typeof itemServerOutputSchema>;
 // };
 // Use z.output to derive the ItemServerToClientType type
 export const itemServerToClientSchema = itemSchema.persistServer.merge(itemStateSchema).extend({
-  clientId: idSchema.optional(),
-  parentClientId: idSchema.optional(),
+  clientId: clientIdSchema.optional(),
+  parentClientId: clientIdSchema.optional(),
 });
 export type ItemServerToClientType = z.output<typeof itemServerToClientSchema>;
 

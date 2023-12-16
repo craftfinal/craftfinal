@@ -1,13 +1,13 @@
-// @/components/auth/TemporaryUserId.tsx
+// @/components/auth/TemporaryAccountId.tsx
 
 "use client";
 
-import { useTemporaryUser } from "@/auth/TemporaryUserProvider";
-import { UserAccountOrNullOrUndefined } from "@/types/user";
+import { useTemporaryAccount } from "@/auth/TemporaryAccountProvider";
+import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { ReactNode } from "react";
 
-export function TemporaryUserId(): ReactNode {
-  const temporaryUser: UserAccountOrNullOrUndefined = useTemporaryUser();
+export function TemporaryAccountId(): ReactNode {
+  const temporaryUser: Base58CheckAccountOrNullOrUndefined = useTemporaryAccount();
 
   return <span>{temporaryUser?.id ?? ""}</span>;
 }

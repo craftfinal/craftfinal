@@ -89,8 +89,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   // console.log(`RootLayout: pathname=${layoutHeaders.get("x-pathname")} executed middlewares:`, middlewares);
   // console.log(`Headers: x-pathname:`, layoutHeaders.get("x-pathname"), `x-query:`, layoutHeaders.get("x-query"));
 
-  // const currentUser = await getCurrentUserOrNull();
-
   return (
     <html lang={siteMetadata.language} suppressHydrationWarning>
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />

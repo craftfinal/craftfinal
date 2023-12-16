@@ -11,15 +11,14 @@ import DistinguishingFeatures from "./DistinguishingFeatures";
 export default async function HomePage() {
   // Note: If we were to call `getCurrentUserOrNull()` here, we would need to change the role
   // of this route to not be ignored but instead be public in `ClerkAuth`
-  // const currentUser = await getCurrentUserOrNull();
-  const currentUser = null;
+  const currentAcount = null;
   const sections = [
-    { id: "hero", cmp: <HeroSection user={currentUser} /> },
+    { id: "hero", cmp: <HeroSection account={currentAcount} /> },
     { id: "SocialProof", cmp: <SocialProof />, disabled: true },
     { id: "DesignedForYou", cmp: <DesignedForYou /> },
     { id: "DistinguishingFeatures", cmp: <DistinguishingFeatures /> },
     { id: "SolidFoundation", cmp: <SolidFoundation />, disabled: true },
-    { id: "CallToAction", cmp: <CallToAction user={currentUser} /> },
+    { id: "CallToAction", cmp: <CallToAction account={currentAcount} /> },
   ];
   return (
     <>

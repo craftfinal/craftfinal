@@ -1,7 +1,7 @@
 // @/schemas/utils/temporaryUser.ts
 
-import { uuidRegex } from "@/schemas/id";
-import { v4 } from "uuid";
+import { uuidRegex } from "@/types/utils/uuidId";
+import { v4 as uuidv4 } from "uuid";
 import z from "zod";
 
 export const temporaryAccountMiddlewareId = "temporaryaccount";
@@ -13,7 +13,7 @@ export const temporaryAccountIdSchema = z.string().regex(new RegExp(temporaryAcc
 export type TemporaryAccountIdSchemaType = z.infer<typeof temporaryAccountIdSchema>;
 
 export const isValidTemporaryAccountId = (id: string | null | undefined): boolean => {
-  if (!(typeof id === "string")) return false;
+  if (typeof id !== "string") return false;
 
   try {
     temporaryAccountIdSchema.parse(id);
@@ -25,7 +25,7 @@ export const isValidTemporaryAccountId = (id: string | null | undefined): boolea
 
 // Generate a new unique ID for the temporary user
 export function generateTemporaryAccountId() {
-  const id = `${temporaryAccountIdPrefix}${v4()}`;
+  const id = `${temporaryAccountIdPrefix}${uuidv4()}`;
   if (isValidTemporaryAccountId(id)) {
     return id;
   }

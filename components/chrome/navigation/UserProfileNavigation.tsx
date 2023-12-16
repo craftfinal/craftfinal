@@ -10,8 +10,8 @@ import React from "react";
 export const UserProfileNavigation = React.forwardRef<
   HTMLAnchorElement,
   React.LinkHTMLAttributes<HTMLAnchorElement> & AuthenticatedContentLayoutChildrenProps
->(({ user = null, ...props }, ref) => {
-  const Comp = user?.account.type === AccountType.Registered ? UserProfileButton : SigninButton;
+>(({ account = null, ...props }, ref) => {
+  const Comp = account?.type === AccountType.Registered ? UserProfileButton : SigninButton;
   return <Comp ref={ref} {...props} />;
 });
 UserProfileNavigation.displayName = "UserProfileNavigation";
@@ -20,14 +20,14 @@ const UserProfileButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttr
   ({ className, ...props }, ref) => {
     return (
       <div className={cn(className, "relative")}>
-        <a
+        <Link
           href={siteNavigation.userProfile.href}
           className={cn("h-[32px] w-[32px] rounded-full p-0")}
           ref={ref}
           {...props}
         >
           <div className={"absolute left-0 top-0 h-[32px] w-[32px] rounded-full bg-muted-foreground p-0"}></div>
-        </a>
+        </Link>
         <div className="absolute left-0 top-0 h-[32px] w-[32px] rounded-full p-0">
           <UserButton
             userProfileMode="navigation"
@@ -44,7 +44,7 @@ UserProfileButton.displayName = "UserProfileButton";
 const SigninButton = React.forwardRef<HTMLAnchorElement, React.LinkHTMLAttributes<HTMLAnchorElement>>(
   ({ className, ...props }, ref) => {
     return (
-      <Link href={siteNavigation.signIn.href} ref={ref} {...props}>
+      <Link legacyBehavior passHref href={siteNavigation.signIn.href} ref={ref} {...props}>
         <Button className={className} variant="secondary">
           {siteNavigation.signIn.menuTitle}
         </Button>

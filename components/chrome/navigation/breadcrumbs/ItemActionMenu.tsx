@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import { sentenceCase } from "@/lib/utils/misc";
-import { idRegex } from "@/schemas/id";
+import { stateIdRegex } from "@/schemas/id";
 import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
 import { ItemDescendantModelNameType, itemDescendantModelHierarchy } from "@/types/itemDescendant";
 import { ResumeActionType, resumeActionTypes } from "@/types/resume";
@@ -44,7 +44,7 @@ export function getItemActionURLMap(
   // Define the regular expression with named groups
   const pathBaseURLRE = `(?<pathBaseURL>(?:/[^/]+)*?)`;
   const itemModelRE = `(?<pathItemModel>(?:` + itemDescendantModelHierarchy.join("|") + `))`;
-  const itemIdRE = `(?<pathItemId>` + idRegex.substring(1, idRegex.length - 1) + `)`;
+  const itemIdRE = `(?<pathItemId>` + stateIdRegex.source.substring(1, stateIdRegex.source.length - 1) + `)`;
   const itemActionRE = `(?<pathItemAction>(?:` + resumeActionTypes.join("|") + `))`;
 
   // const extractRegExp = new RegExp(

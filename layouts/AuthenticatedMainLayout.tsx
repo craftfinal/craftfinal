@@ -1,15 +1,15 @@
 // @/layouts/AuthenticatedMainLayout.tsx
 
-import { getCurrentUserOrNull } from "@/actions/user";
+import { getCurrentAccountOrNull } from "@/actions/user";
 import withAuthenticationProviders from "@/auth/withAuthenticationProviders";
 import MainLayout, { MainLayoutProps } from "./MainLayout";
 
 export default async function AuthenticatedMainLayout({ className, children }: Readonly<MainLayoutProps>) {
   const AuthenticatedMainLayoutImpl = withAuthenticationProviders(MainLayout);
-  const currentUser = await getCurrentUserOrNull();
+  const currentAccount = await getCurrentAccountOrNull();
 
   return (
-    <AuthenticatedMainLayoutImpl user={currentUser} className={className}>
+    <AuthenticatedMainLayoutImpl account={currentAccount} className={className}>
       {children}
     </AuthenticatedMainLayoutImpl>
   );

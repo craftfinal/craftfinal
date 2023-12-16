@@ -1,14 +1,13 @@
-import * as React from "react";
+import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
 import Navbar from "./navigation/Navbar";
 import Breadcrumbs from "./navigation/breadcrumbs/Breadcrumbs";
-import { AuthenticatedContentLayoutChildrenProps } from "@/layouts/AuthenticatedContentLayout";
 
 export interface SiteHeaderProps extends AuthenticatedContentLayoutChildrenProps {}
 
-export function SiteHeader({ user }: SiteHeaderProps) {
+export function SiteHeader({ account }: SiteHeaderProps) {
   return (
-    <header className="container flex flex-col gap-y-2 pt-4 lg:gap-y-4 lg:pt-4">
-      <Navbar user={user} />
+    <header className="md:pt-4lg:gap-y-4 container flex flex-col gap-y-2 pt-4 sm:pt-2 lg:pt-6 xl:pt-10">
+      <Navbar account={account} />
       <Breadcrumbs />
     </header>
   );

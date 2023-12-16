@@ -1,7 +1,7 @@
 import { siteConfig } from "@/config/site";
-import { IdSchemaType } from "@/schemas/id";
+import { ClientIdSchemaType } from "@/schemas/id";
 
-export function getAuthProviderIdCookieName(): IdSchemaType {
+export function getAuthProviderIdCookieName(): ClientIdSchemaType {
   const cookieNameSuffix =
     process.env.NODE_ENV === "development" ? `devel.${siteConfig.canonicalDomainName}` : siteConfig.canonicalDomainName;
   const userIdCookieName = `userId.` + cookieNameSuffix;

@@ -1,15 +1,15 @@
 // @/components/auth/AccountTable.tsx
 "use server";
+import { Base58CheckAccount } from "@/types/user";
 import AccountId from "@/components/custom/AccountId";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { UserAccount } from "@/types/user";
 
 export interface AccountTableProps extends React.ComponentProps<typeof Table> {
-  user: UserAccount;
+  account: Base58CheckAccount;
   provider: string;
 }
 
-export default async function AccountTable({ user, provider, className, ...props }: AccountTableProps) {
+export default async function AccountTable({ account, provider, className, ...props }: AccountTableProps) {
   return (
     <Table className={className} {...props}>
       <TableBody className="text-xs">
@@ -17,13 +17,13 @@ export default async function AccountTable({ user, provider, className, ...props
           <TableHead className="h-auto font-bold">Name</TableHead>
           <TableCell>
             <span className="font-medium">
-              {user?.firstName} {user?.lastName}
+              {account?.user?.firstName} {account?.user?.lastName}
             </span>
           </TableCell>
         </TableRow>
         <TableRow>
           <TableHead className="h-auto font-medium">Email</TableHead>
-          <TableCell>{user?.email}</TableCell>
+          <TableCell>{account?.user?.email}</TableCell>
         </TableRow>
         <TableRow>
           <TableHead className="h-auto font-medium">Provider</TableHead>
@@ -34,13 +34,13 @@ export default async function AccountTable({ user, provider, className, ...props
         <TableRow>
           <TableHead className="h-auto font-medium">User ID</TableHead>
           <TableCell>
-            <AccountId id={user.id} className="text-xs" />.
+            <AccountId id={account.id} className="text-xs" />.
           </TableCell>
         </TableRow>
         <TableRow>
           <TableHead className="h-auto font-medium">ID</TableHead>
           <TableCell>
-            <AccountId id={user?.account.providerAccountId} className="text-xs" />.
+            <AccountId id={account?.providerAccountId} className="text-xs" />.
           </TableCell>
         </TableRow>
       </TableBody>
