@@ -11,10 +11,10 @@ import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import DescendantListItemInput from "./DescendantListItemInput";
 
 export default function DescendantInput(props: ItemDescendantRenderProps) {
-  const { ancestorClientIdChain, inputFieldIndex, item, itemModel, resumeAction } = props;
+  const { ancestorClientIdChain, /*inputFieldIndex, */ item, itemModel, resumeAction } = props;
   const canEdit = resumeAction === "edit";
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [editingInput, setEditingInput] = useState(canEdit && inputFieldIndex === 0);
+  const [editingInput, setEditingInput] = useState(canEdit);
 
   const settingsStore = useAppSettingsStore();
   const { showItemDescendantIdentifiers } = settingsStore;
