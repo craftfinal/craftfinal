@@ -43,7 +43,7 @@ export default function Item(props: ItemProps) {
             You can still restore the resume that was deleted {formatRelative(item.deletedAt!, new Date())}.
           </DialogDescription>
         </DialogHeader>
-        <Button onClick={() => restoreDeletedItem(item.clientId)}>Restore resume</Button>
+        <Button onClick={() => restoreDeletedItem()}>Restore resume</Button>
       </DialogContent>
     </Dialog>
   );

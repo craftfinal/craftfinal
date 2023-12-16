@@ -66,9 +66,9 @@ export type ItemDescendantStoreState = {
 };
 
 export type ItemDescendantStoreActions = {
-  setItemData: (data: ItemDataUntypedType, clientId: ClientIdType) => void;
-  markItemAsDeleted: (clientId: ClientIdType) => void;
-  restoreDeletedItem: (clientId: ClientIdType) => void;
+  setItemData: (data: ItemDataUntypedType) => void;
+  markItemAsDeleted: () => void;
+  restoreDeletedItem: () => void;
   getDescendants: (ancestorClientIds: Array<ClientIdType>) => ItemDescendantClientStateListType;
   setDescendantData: (
     descendantData: ItemDataUntypedType,
@@ -156,9 +156,7 @@ export const createItemDescendantStore = ({
             state.lastModified = now;
           });
         },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        markItemAsDeleted: (clientId?: ClientIdType): void => {
-          // NOTE: The argument `clientId` is only here to provide the same signature as for descendants
+        markItemAsDeleted: (): void => {
           // Update the state with the deletedAt timestamp for the item
           const now = new Date();
           set((state) => {
@@ -171,9 +169,7 @@ export const createItemDescendantStore = ({
             state.lastModified = now;
           });
         },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        restoreDeletedItem: (clientId?: ClientIdType): void => {
-          // NOTE: The argument `clientId` is only here to provide the same signature as for descendants
+        restoreDeletedItem: (): void => {
           // Update the state with the deletedAt timestamp for the item
           const now = new Date();
           set((state) => {
