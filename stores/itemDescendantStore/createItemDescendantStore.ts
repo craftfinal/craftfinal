@@ -266,8 +266,9 @@ export const createItemDescendantStore = ({
           set((state) => {
             const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorClientIds);
             // Update the state with the new draft descendant data
-            ancestorStateChain[0].descendantDraft = {
-              ...(state.descendantDraft as ItemDataUntypedType),
+            const ancestorState = ancestorStateChain[0];
+            ancestorState.descendantDraft = {
+              ...(ancestorState.descendantDraft as ItemDataUntypedType),
               ...descendantData,
             } as Draft<ItemDataUntypedType>;
           });
