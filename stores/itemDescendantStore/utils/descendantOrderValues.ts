@@ -181,7 +181,7 @@ function getAdjustedOrderValue(
             }
           }
         } else {
-          console.log(
+          window.consoleLog(
             `${index}: deltaNextValid=${deltaNextValid} deltaAfterNextValid=${deltaAfterNextValid} deltaNextAfterNextValid=${deltaNextAfterNextValid} prevOrder=${prevOrder} newOrder=${newOrder}`,
           );
         }

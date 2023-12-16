@@ -59,7 +59,7 @@ export default function Item(props: ItemProps) {
     const update = getUpdateFromEvent(itemFormSchema, event);
     if (update) {
       // Update the Zustand store
-      setItemData(update, item.clientId);
+      setItemData(update);
       // Update form state
       updateValidationStatus();
     }
@@ -70,7 +70,7 @@ export default function Item(props: ItemProps) {
     const update = getUpdateFromEdiTextField(itemFormSchema, value, inputProps);
     if (update) {
       // Update the Zustand store
-      setItemData(update, item.clientId);
+      setItemData(update);
       // Update form state
       updateValidationStatus();
     }
@@ -80,7 +80,8 @@ export default function Item(props: ItemProps) {
     <div className="flex flex-1 justify-between">
       <div
         className={cn("flex flex-1 justify-between gap-x-4 gap-y-2 outline outline-offset-2 ", {
-          "bg-background/50 text-muted-foreground bg-blend-soft-light": item.disposition !== ItemDisposition.Synced,
+          // "bg-background/50 text-muted-foreground bg-blend-soft-light": item.disposition !== ItemDisposition.Synced,
+          "text-muted-foreground": item.disposition !== ItemDisposition.Synced,
           "outline-red-500": !inputIsValid,
           "outline-none": inputIsValid,
         })}
@@ -158,7 +159,7 @@ export default function Item(props: ItemProps) {
           /* /Delete Button */
           className="text-light-txt-2 dark:text-light-txt-1 self-stretch px-4 opacity-100 transition-all duration-150 md:group-hover:opacity-100"
           title={`Delete ${itemModel}`}
-          onClick={() => markItemAsDeleted(item.clientId)}
+          onClick={() => markItemAsDeleted()}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

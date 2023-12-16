@@ -37,7 +37,7 @@ export default async function ItemDescendantList({ itemModel, itemId, ...props }
       itemId = itemId ?? userId;
     }
 
-    resumeAction = props.resumeAction ?? itemModel === itemDescendantModelHierarchy[0] ? "edit" : "view";
+    resumeAction = props.resumeAction ?? (itemModel === itemDescendantModelHierarchy[0] ? "edit" : "view");
 
     // Check if `itemModel` is a valid model
     const validModelName = itemDescendantModelHierarchy.indexOf(itemModel) >= 0;

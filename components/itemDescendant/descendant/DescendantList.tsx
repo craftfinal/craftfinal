@@ -27,8 +27,8 @@ import { useState } from "react";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import ItemDescendantSortableWrapper from "../utils/ItemDescendantSortableWrapper";
 import DescendantInput from "./DescendantInput";
-import DescendantListItem from "./DescendantListItem";
 import DescendantListItemInput from "./DescendantListItemInput";
+import DescendantListItem from "./DescendantListItem";
 
 interface DescendantListProps extends ItemDescendantRenderProps {}
 export default function DescendantList(props: DescendantListProps) {
@@ -186,13 +186,14 @@ export default function DescendantList(props: DescendantListProps) {
             {descendants.map((item: ItemDescendantClientStateType, index: number) => {
               return (
                 <DescendantListItem
+                  {...props}
                   key={item.clientId}
                   index={index}
                   rootItemModel={rootItemModel}
                   itemModel={descendantModel}
                   item={item as ItemDescendantClientStateType}
-                  resumeAction={resumeAction}
                   setItemData={setItemData}
+                  resumeAction={resumeAction}
                   markItemAsDeleted={markItemAsDeleted}
                   itemIsDragable={descendantsAreDragable}
                   canEdit={canEdit}
