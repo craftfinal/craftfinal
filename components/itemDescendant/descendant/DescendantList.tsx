@@ -163,7 +163,7 @@ export default function DescendantList(props: DescendantListProps) {
           Reset order
         </button>
       ) : null}
-      {canEdit && !inlineInsert ? <DescendantInput {...props} itemModel={descendantModel} /> : null}
+      {/* {canEdit && !inlineInsert ? <DescendantInput {...props} itemModel={descendantModel} /> : null} */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -191,6 +191,7 @@ export default function DescendantList(props: DescendantListProps) {
                   index={index}
                   rootItemModel={rootItemModel}
                   itemModel={descendantModel}
+                  itemIcon={!canEdit}
                   item={item as ItemDescendantClientStateType}
                   setItemData={setItemData}
                   resumeAction={resumeAction}
@@ -201,6 +202,9 @@ export default function DescendantList(props: DescendantListProps) {
               );
             })}
           </ItemDescendantSortableWrapper>
+          {canEdit && !inlineInsert ? (
+            <DescendantInput {...props} itemModel={descendantModel} itemIcon={!descendantsAreDragable} />
+          ) : null}
         </ul>
       </DndContext>
     </>

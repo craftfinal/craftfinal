@@ -47,6 +47,7 @@ export interface ItemDescendantRenderProps {
   commitDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => void;
   showIdentifiers: boolean;
   showSynchronization: boolean;
+  itemIcon?: boolean;
 }
 function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
   const { ancestorClientIdChain, item, rootItemModel, leafItemModel, editingInput } = props;
@@ -57,6 +58,17 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
   if (!descendantModel) return;
 
   const descendantDescendantModel = getDescendantModel(descendantModel);
+
+  // Props for descendants of current item have the same ancestorClientIdChain
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const descendantListItemProps = {
+    ...props,
+    className: cn("my-4 flex flex-col gap-2 border-solid border-slate-500/20 lg:my-8 lg:gap-3 xl:gap-4", {
+      "border-t-4 bg-slate-500/50 dark:bg-slate-500/50": editingInput && descendantModel === "resume",
+      "border-t-2 bg-slate-300/50 dark:bg-slate-700/50": editingInput && descendantModel === "organization",
+      "bg-background/50": editingInput && descendantModel === "role",
+    }),
+  };
 
   // Props for descendants of current item have the same ancestorClientIdChain
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,7 +93,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
         <DescendantList {...descendantProps} />
       ) : (
         <>
-          {!showInput ? null : <DescendantInput {...descendantProps} inputFieldIndex={inputFieldIndex++} />}
+          {/* {!showInput ? null : <DescendantInput {...descendantProps} inputFieldIndex={inputFieldIndex++} />} */}
           <ul
             key={item.clientId}
             // className={cn("my-4 border-solid border-slate-500/20 pl-2 lg:my-8 lg:pl-4 xl:pl-8", {
@@ -93,18 +105,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
             {descendants
               ?.filter((descendant) => !descendant.deletedAt)
               .map((descendant, descendantIndex) => (
-                <li
-                  key={descendant.clientId}
-                  // className="flex flex-col gap-2 lg:gap-3 xl:gap-4"
-                  className={cn(
-                    "my-4 flex flex-col gap-2 border-solid border-slate-500/20 pl-2 lg:my-8 lg:gap-3 lg:pl-4 xl:gap-4 xl:pl-8",
-                    {
-                      "border-t-4 bg-slate-500/50 dark:bg-slate-500/50": descendantModel === "resume",
-                      "border-t-2 bg-slate-300/50 dark:bg-slate-700/50": descendantModel === "organization",
-                      "bg-background/50": descendantModel === "role",
-                    },
-                  )}
-                >
+                <li key={descendant.clientId} className={descendantListItemProps.className}>
                   <ItemDescendantListRender
                     {...descendantProps}
                     index={descendantIndex}
@@ -121,6 +122,9 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
                   */}
                 </li>
               ))}
+            <li key={item.clientId} className={descendantListItemProps.className}>
+              {!showInput ? null : <DescendantInput {...descendantProps} inputFieldIndex={inputFieldIndex++} />}
+            </li>
           </ul>
         </>
       )}

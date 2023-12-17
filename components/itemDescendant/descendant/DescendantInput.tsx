@@ -3,11 +3,11 @@
 import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useStoreName } from "@/contexts/StoreNameContext";
 // import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schemas/item";
-import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
+// import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { useState } from "react";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
+import { ItemIcon } from "../utils/ItemIcon";
 import DescendantListItemInput from "./DescendantListItemInput";
 
 export default function DescendantInput(props: ItemDescendantRenderProps) {
@@ -16,9 +16,9 @@ export default function DescendantInput(props: ItemDescendantRenderProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editingInput, setEditingInput] = useState(canEdit);
 
-  const settingsStore = useAppSettingsStore();
-  const { showItemDescendantIdentifiers } = settingsStore;
-  const showIdentifiers = process.env.NODE_ENV === "development" && showItemDescendantIdentifiers;
+  // const settingsStore = useAppSettingsStore();
+  // const { showItemDescendantIdentifiers } = settingsStore;
+  // const showIdentifiers = process.env.NODE_ENV === "development" && showItemDescendantIdentifiers;
 
   const storeName = useStoreName();
   const store = useItemDescendantStore(storeName);
@@ -44,12 +44,13 @@ export default function DescendantInput(props: ItemDescendantRenderProps) {
   const itemDraft = getItemDraft();
 
   return (
-    <div key={item.clientId} className="flex items-center gap-x-4">
-      <div
+    <div key={item.clientId} className="flex items-center gap-1 lg:gap-2 xl:gap-3">
+      {/* <div
         className={cn("my-2 w-48 text-right text-sm text-muted-foreground sm:flex-shrink-0", {
           "my-4 text-xl font-medium": ["user", "resume"].includes(itemModel),
         })}
       >
+
         Add new {itemModel}
         {showIdentifiers && ancestorClientIdChain.length > 0 ? (
           <>
@@ -61,7 +62,12 @@ export default function DescendantInput(props: ItemDescendantRenderProps) {
               .join("\n")}`}</pre>
           </>
         ) : null}
-      </div>
+      </div> */}
+      {!canEdit
+        ? null
+        : ItemIcon(itemModel, {
+            className: "w-auto text-foreground h-4 sm:h-6 lg:h-6 xl:h-8 pl-2 lg:pl-4",
+          })}
       <DescendantListItemInput
         itemModel={itemModel}
         itemDraft={itemDraft}

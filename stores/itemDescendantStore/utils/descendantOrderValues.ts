@@ -248,8 +248,22 @@ function adjustListOrderValues(
 
 function validateListOrderValues(descendants: Array<ItemOrderableClientStateType>): boolean {
   const { minimalDelta } = getOrderParams(descendants);
+  // Unique constraint: order`,`parentId`,`lastModified
   for (let i = 1; i < descendants.length; i++) {
-    if (!(descendants[i].order >= descendants[i - 1].order + minimalDelta)) {
+    const current = descendants[i];
+    const previous = descendants[i - 1];
+
+    // Check if order values are separated by minimalDelta
+    if (current.order < previous.order + minimalDelta) {
+      return false;
+    }
+
+    // Check for uniqueness of order, parentId, and lastModified
+    if (
+      current.order === previous.order &&
+      current.parentId === previous.parentId &&
+      current.lastModified === previous.lastModified
+    ) {
       return false;
     }
   }

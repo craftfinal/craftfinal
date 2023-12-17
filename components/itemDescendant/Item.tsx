@@ -19,6 +19,7 @@ import { InputProps } from "react-editext";
 import { useForm } from "react-hook-form";
 import { ItemDescendantRenderProps } from "./ItemDescendantList.client";
 import EditableField from "./utils/EditableField";
+import { ItemIcon } from "./utils/ItemIcon";
 
 export interface ItemProps extends ItemDescendantRenderProps {}
 export default function Item(props: ItemProps) {
@@ -77,15 +78,30 @@ export default function Item(props: ItemProps) {
   };
 
   return (
-    <div className="flex flex-1 justify-between">
+    <div
+      className={cn(
+        "flex flex-1 items-center justify-between gap-y-2",
+        "border-solid border-slate-500/50 lg:gap-3 xl:gap-4",
+        {
+          "border-t-4 bg-slate-500/50 dark:bg-slate-500/50": canEdit && itemModel === "resume",
+          "border-t-2 bg-slate-300/50 dark:bg-slate-700/50": canEdit && itemModel === "organization",
+          "bg-background/50": canEdit && itemModel === "role",
+        },
+      )}
+    >
       <div
-        className={cn("flex flex-1 justify-between gap-x-4 gap-y-2 outline outline-offset-2 ", {
+        className={cn("flex flex-1 items-center gap-1 lg:gap-2 xl:gap-3", {
           // "bg-background/50 text-muted-foreground bg-blend-soft-light": item.disposition !== ItemDisposition.Synced,
           "text-muted-foreground": item.disposition !== ItemDisposition.Synced,
           "outline-red-500": !inputIsValid,
           "outline-none": inputIsValid,
         })}
       >
+        {!canEdit
+          ? null
+          : ItemIcon(itemModel, {
+              className: "w-auto text-foreground h-4 sm:h-6 lg:h-6 xl:h-8",
+            })}
         {itemFormFields.map((field) => (
           <div
             key={field}
@@ -102,7 +118,6 @@ export default function Item(props: ItemProps) {
             />
           </div>
         ))}
-        {/* TODO: Handle and display errors from formState.errors */}
       </div>
       {showListItemInternals && (
         <div className="flex basis-3/4 cursor-auto items-center gap-x-4 px-4 py-2 text-xs text-slate-600">

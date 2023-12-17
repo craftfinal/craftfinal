@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { ItemClientStateType, ItemDataUntypedType } from "@/schemas/item";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ClientIdType, ItemDisposition } from "@/types/item";
+import { itemDescendantModelHierarchy } from "@/types/itemDescendant";
 import { Slot } from "@radix-ui/react-slot";
 import { Grip } from "lucide-react";
 import { ElementType, useState } from "react";
@@ -25,6 +26,7 @@ import { InputProps } from "react-editext";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import EditableField from "../utils/EditableField";
 import { ItemActionButton } from "../utils/ItemActionButton";
+import { ItemIcon } from "../utils/ItemIcon";
 
 // export interface DescendantListItemProps extends ItemDescendantRenderProps {
 //   as: string;
@@ -142,7 +144,7 @@ export default function DescendantListItem<T extends ElementType = "li">({
     <Comp
       key={item.clientId}
       className={cn(
-        "border-shadow-light dark:border-dark-txt-1 bg-elem-light dark:bg-elem-dark-1 group flex flex-1 cursor-auto items-center justify-between rounded-md border-b",
+        "border-shadow-light dark:border-dark-txt-1 bg-elem-light dark:bg-elem-dark-1 group flex flex-1 cursor-auto items-center justify-between rounded-md",
         {
           // "bg-background/50 text-muted-foreground bg-blend-soft-light": item.disposition !== ItemDisposition.Synced,
           "text-muted-foreground": item.disposition !== ItemDisposition.Synced,
@@ -156,6 +158,12 @@ export default function DescendantListItem<T extends ElementType = "li">({
       {...attributes}
     >
       <>
+        {itemModel == itemDescendantModelHierarchy[1] || !canEdit
+          ? null
+          : ItemIcon(itemModel, {
+              className: "w-auto text-foreground h-4 sm:h-6 lg:h-6 xl:h-8 pl-2 lg:pl-4",
+            })}
+
         {/* {canEdit && rootItemModel === "user" ? (
         <div className="h-full">
           <Link
@@ -178,10 +186,10 @@ export default function DescendantListItem<T extends ElementType = "li">({
             })}
             {...listeners}
           >
-            <Grip />
+            <Grip className="mr-2 lg:mr-4" />
           </div>
         ) : null}
-        <div className="flex flex-1 flex-wrap justify-between gap-x-4 gap-y-2">
+        <div className="flex flex-1 flex-wrap justify-between gap-y-2">
           {itemFormFields.map((fieldName) => {
             const inputProps = getInputProps(item, itemModel, fieldName);
 

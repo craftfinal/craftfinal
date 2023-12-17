@@ -1,5 +1,6 @@
 // @/components/itemDescendant/utils/EditableInputField.tsx
 
+import { cn } from "@/lib/utils";
 import EdiText, { EdiTextProps } from "react-editext";
 import { EditableFieldEdiTextProps } from "./EditableField";
 
@@ -27,7 +28,7 @@ export default function EditableInputField({
         name: fieldName,
         placeholder: placeholder || "",
         onChange: onChange,
-        className: "p-2 flex-1 rounded-md outline-none min-w-auto",
+        className: cn(EditableFieldEdiTextProps.inputProps.className, "px-0"),
       }}
       viewProps={{ ...EditableFieldEdiTextProps.viewProps }}
       {...rest}
