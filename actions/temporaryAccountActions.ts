@@ -196,8 +196,19 @@ function getTemporaryAccountIdFromCookie(providerAccountId?: string): TemporaryA
 function getIdToCreateTemporaryAccount(): TemporaryAccountIdSchemaType | null {
   try {
     const accountId = headers().get(accountIdToCreateHeader); // Retrieve specific cookie by name
-    // console.log(`getIdToCreateTemporaryAccount: accountId=${accountId}`);
-    return accountId;
+    if (accountId && isValidTemporaryAccountId(accountId)) {
+      console.log(`getIdToCreateTemporaryAccount: accountId=${accountId}`);
+      return accountId;
+    }
+    console.log(
+      `getIdToCreateTemporaryAccount: invalid accountId=${accountId} [${typeof accountId}]`,
+      "\nheaders().getSetCookie():",
+      headers().getSetCookie(),
+      `\nheaders().get(${accountIdToCreateHeader})\n`,
+      headers().get(accountIdToCreateHeader),
+      "\ncookies().getAll()\n",
+      cookies().getAll(),
+    );
   } catch (error) {
     console.error(`getIdToCreateTemporaryAccount: exception: ${JSON.stringify(error)}`);
   }
