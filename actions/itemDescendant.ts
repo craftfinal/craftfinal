@@ -202,7 +202,7 @@ async function getDbItemDescendantList(
   prismaTransaction?: PrismaClient,
 ): Promise<ItemDescendantServerOutputType> {
   const executeLogic = async (prismaClient: PrismaClient) => {
-    const logPrefix = `getItemDescendantList(itemModel=${itemModel}, dbItemId=${dbItemId})`;
+    // const logPrefix = `getItemDescendantList(itemModel=${itemModel}, dbItemId=${dbItemId})`;
 
     const dbItem = await getDbItem(itemModel, dbItemId, prismaClient);
     let dbDescendants: Array<ItemDescendantServerOutputType> = [];
@@ -214,11 +214,11 @@ async function getDbItemDescendantList(
       const itemDescendants = await getDbItemsByDbParentId(descendantModel, dbItemId, prismaClient);
 
       if (itemDescendants && itemDescendants.length > 0) {
-        console.log(
-          `${logPrefix}: returning ${itemDescendants.length}`,
-          itemDescendants.length != 1 ? "descendants: " : "descendant: ",
-          itemDescendants,
-        );
+        // console.log(
+        //   `${logPrefix}: returning ${itemDescendants.length}`,
+        //   itemDescendants.length != 1 ? "descendants: " : "descendant: ",
+        //   itemDescendants,
+        // );
         // For each item, fetch its descendants recursively
         const descendantModel = getDescendantModel(itemModel);
         if (descendantModel) {

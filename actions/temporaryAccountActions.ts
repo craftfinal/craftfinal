@@ -4,15 +4,17 @@
 
 import { AccountType } from "@/auth/account";
 import { getAuthProviderIdCookieName } from "@/middlewares/getAuthProviderIdCookieName";
-import temporaryAccountMiddleware from "@/middlewares/withTemporaryAccount";
+import temporaryAccountMiddleware, { accountIdToCreateHeader } from "@/middlewares/withTemporaryAccount";
 import { prismaClient } from "@/prisma/client";
-import { StateIdSchemaType } from "@/schemas/id";
-import { ModelIndicator, getBase58CheckIdFromUuidAndModel } from "@/types/utils/base58checkId";
-import { InvalidAccountErr } from "@/types/user";
-import { cookies } from "next/headers";
+import { TemporaryAccountIdSchemaType, isValidTemporaryAccountId } from "@/schemas/utils/temporaryAccount";
+import { Base58CheckAccount, Base58CheckAccountOrNull, InvalidAccountErr } from "@/types/user";
+import {
+  ModelIndicator,
+  getBase58CheckIdFromUuidAndModel,
+  stateAccountFromDbAccount,
+} from "@/types/utils/base58checkId";
+import { cookies, headers } from "next/headers";
 import { getAccountByProviderAccountId } from "./user";
-import { stateAccountFromDbAccount } from "@/types/utils/base58checkId";
-import { Base58CheckAccount, Base58CheckAccountOrNull } from "@/types/user";
 
 export const getTemporaryAccountOrNull = async (providerAccountId?: string): Promise<Base58CheckAccountOrNull> => {
   try {
@@ -41,27 +43,41 @@ export async function getTemporaryAccount(providerAccountId?: string): Promise<B
 
 export async function getOrCreateTemporaryAccount(providerAccountId?: string): Promise<Base58CheckAccount> {
   const accountId = providerAccountId ?? getTemporaryAccountIdFromCookie();
-  try {
-    const existingUser = await getTemporaryAccount(accountId);
-    if (existingUser) {
-      return existingUser;
+  if (accountId && isValidTemporaryAccountId(accountId)) {
+    try {
+      const existingUser = await getTemporaryAccount(accountId);
+      if (existingUser) {
+        return existingUser;
+      }
+    } catch (exc) {
+      console.log(
+        `getOrCreateTemporaryAccount: delete accountId cookie as there is no account with acccountId="${accountId}"` +
+          `Exception: ${JSON.stringify(exc)}`,
+      );
+      deleteTemporaryAccountIdCookie();
     }
-  } catch (exc) {
-    console.log(`getOrCreateTemporaryAccount: exception in getTemporaryAccount:`, exc);
-  }
-  // If an accountId cookie is available, create the corresponding `User` and `Account`
-  if (!accountId) {
-    throw Error(`getOrCreateTemporaryAccount: cannot create tempoary user as accountId is ${accountId}`);
   }
 
-  // Create account
-  const newUser = await createOrUpdateTemporaryAccount(accountId);
-  // console.log(`getOrCreateTemporaryAccount: created or updated newTemporaryAccount from accountId=${accountId}:`, newUser);
+  // Read the accountId from headers and create the corresponding `User` and `Account`
+  const newAccount = await createOrUpdateTemporaryAccount(accountId);
+  console.log(
+    `getOrCreateTemporaryAccount: created or updated newTemporaryAccount with accountId=${newAccount.providerAccountId}:`,
+    newAccount,
+  );
 
-  return newUser;
+  return newAccount;
 }
 
-export async function createOrUpdateTemporaryAccount(providerAccountId: string): Promise<Base58CheckAccount> {
+export async function createOrUpdateTemporaryAccount(providedProviderAccountId?: string): Promise<Base58CheckAccount> {
+  const providerAccountId =
+    providedProviderAccountId && isValidTemporaryAccountId(providedProviderAccountId)
+      ? providedProviderAccountId
+      : getIdToCreateTemporaryAccount();
+
+  if (!providerAccountId || !isValidTemporaryAccountId(providerAccountId)) {
+    throw Error(`createOrUpdateTemporaryAccount: providerAccountId not available`);
+  }
+
   const provider = temporaryAccountMiddleware.id;
   const type = AccountType.Temporary;
   const firstName = "Temporary";
@@ -140,25 +156,19 @@ export async function getOrResetTemporaryAccount(providerAccountId?: string): Pr
       `getOrResetTemporaryAccount: calling resetTemporaryAccount due to exception in getTemporaryAccount:`,
       exc,
     );
-    resetTemporaryAccount();
+    deleteTemporaryAccountIdCookie();
   }
-  // // If an accountId cookie is available, create the corresponding `User` and `Account`
-  // if (accountId) {
-  //   // Create account
-  //   authUser = await createTemporaryAccount(accountId);
-  //   console.log(`getOrResetTemporaryAccount: created newTemporaryAccount from accountId=${accountId}:`, authUser);
-  // }
   return null;
 }
 
-export async function resetTemporaryAccount(): Promise<void> {
+export async function deleteTemporaryAccountIdCookie(): Promise<void> {
   const authProviderIdCookieName = getAuthProviderIdCookieName();
   // Delete the cookie as their are no corresponding `Account` and `User` records in the database
   console.log(`resetTemporaryAccount: request cookie "${authProviderIdCookieName}" to be deleted if it exists`);
   cookies().delete(authProviderIdCookieName);
 }
 
-function getTemporaryAccountIdFromCookie(providerAccountId?: string): StateIdSchemaType | undefined {
+function getTemporaryAccountIdFromCookie(providerAccountId?: string): TemporaryAccountIdSchemaType | undefined {
   if (providerAccountId) {
     return providerAccountId;
   }
@@ -168,10 +178,21 @@ function getTemporaryAccountIdFromCookie(providerAccountId?: string): StateIdSch
   //   `getTemporaryAccountIdFromCookie: accountId=${accountId}`,
   //   "\nheaders().getSetCookie():",
   //   headers().getSetCookie(),
-  //   "\nheaders().get('x-temporaryuser-create-id')\n",
-  //   headers().get("x-temporaryuser-create-id"),
+  //   `\nheaders().get(${accountIdToCreateHeader})\n`,
+  //   headers().get(accountIdToCreateHeader),
   //   "\ncookies().getAll()\n",
   //   cookies().getAll(),
   // );
   return accountId;
+}
+
+function getIdToCreateTemporaryAccount(): TemporaryAccountIdSchemaType | null {
+  try {
+    const accountId = headers().get(accountIdToCreateHeader); // Retrieve specific cookie by name
+    // console.log(`getIdToCreateTemporaryAccount: accountId=${accountId}`);
+    return accountId;
+  } catch (error) {
+    console.error(`getIdToCreateTemporaryAccount: exception: ${JSON.stringify(error)}`);
+  }
+  return null;
 }

@@ -23,7 +23,7 @@ export const isValidTemporaryAccountId = (id: string | null | undefined): boolea
   }
 };
 
-// Generate a new unique ID for the temporary user
+// Generate a new unique ID for the temporary account
 export function generateTemporaryAccountId() {
   const id = `${temporaryAccountIdPrefix}${uuidv4()}`;
   if (isValidTemporaryAccountId(id)) {

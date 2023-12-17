@@ -37,7 +37,7 @@ export async function getAccountByProviderAccountId(
 
   if (!account) {
     throw Error(
-      `No user with providerAccountId=${providerAccountId.substring(0, providerAccountId.length / 4)}... found`,
+      `No account with providerAccountId=${providerAccountId.substring(0, providerAccountId.length / 4)}... found`,
     );
   }
 
@@ -84,7 +84,7 @@ export async function getCurrentAccount(): Promise<Base58CheckAccount> {
   }
   if (!existingAccount) {
     if (authMiddlewareIds.includes(temporaryAccountMiddleware.id)) {
-      // Option 2: Try to authenticate a temporary user based on a cookie
+      // Option 2: Try to authenticate a temporary account based on a cookie
       try {
         existingAccount = await getOrCreateTemporaryAccount();
       } catch (exc) {
