@@ -7,7 +7,7 @@
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 if (typeof window !== "undefined") {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
@@ -35,6 +35,17 @@ export function PostHogPageview(): JSX.Element {
   return <></>;
 }
 
-export function PHProvider({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <PostHogProvider client={posthog}>{children}</PostHogProvider>;
+export function PHProvider({ children }: { children: React.ReactNode }): React.ReactNode {
+  return process.env.NODE_ENV === "production" ? (
+    <PostHogProvider client={posthog}>
+      {/** Ensure that the component can be statically rendered by wrapping
+        `PostHogPageview`, which calls `useSearchParams`, in a `Suspense` boundary */}
+      <Suspense>
+        <PostHogPageview />
+      </Suspense>
+      {children}
+    </PostHogProvider>
+  ) : (
+    children
+  );
 }
