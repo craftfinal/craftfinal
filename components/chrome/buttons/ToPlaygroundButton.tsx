@@ -11,6 +11,7 @@ export default async function ToPlaygroundButton({ account }: ToPlaygroundButton
       signedIn={siteNavigation.antePlayground}
       signedOut={siteNavigation.antePlayground}
       account={account}
+      prefetch={false}
     />
   );
 }

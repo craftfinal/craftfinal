@@ -2,7 +2,7 @@ import { SiteLogo } from "@/components/chrome/SiteLogo";
 import { menuClassName } from "@/components/chrome/navigation/Navbar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { MainNavItem } from "@/types";
+import { NavItem } from "@/types";
 import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { ArrowRightIcon } from "lucide-react";
 import { ReactNode } from "react";
@@ -10,7 +10,7 @@ import { siteConfig } from "./site";
 
 // Note: avoid defining the type of the siteNavigationUntyped object
 // to let TypeScript infer it as restrictively as possible
-// type SiteNavigationMapType = Record<string, MainNavItem>;
+// type SiteNavigationMapType = Record<string, NavItem>;
 const siteNavigationUntyped /*: SiteNavigationMapType */ = {
   home: {
     title: `${siteConfig.name}`,
@@ -152,8 +152,8 @@ export type NavMenuItemWithChildrenType = {
 // Now NavItemKeyType will be restricted to the actual keys of siteNavigation
 export type NavMenuItemType = SiteNavigationKeyType | CustomMenuItemType | NavMenuItemWithChildrenType;
 
-// Define a type that ensures all values in siteNavigation are of type MainNavItem
-export type SiteNavigationMapType = Record<SiteNavigationKeyType, MainNavItem>;
+// Define a type that ensures all values in siteNavigation are of type NavItem
+export type SiteNavigationMapType = Record<SiteNavigationKeyType, NavItem>;
 
 // Now, siteNavigation can be typed as SiteNavigationMapType
 export const siteNavigation: SiteNavigationMapType = siteNavigationUntyped;
@@ -187,7 +187,7 @@ export const mainNavigationKeys: NavMenuItemType[] = [
 ];
 
 /** This function is not yet in use
-export function getNavItem(id: string): MainNavItem {
+export function getNavItem(id: string): NavItem {
   const navItem = siteNavigation[id as NavItemKeyType];
   return { ...navItem, menuTitle: navItem.menuTitle ?? navItem.title };
 }

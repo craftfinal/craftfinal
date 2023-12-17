@@ -8,9 +8,10 @@ interface UserActionButtonProps {
   account?: Base58CheckAccountOrNullOrUndefined;
   signedIn: NavItem;
   signedOut: NavItem;
+  prefetch?: boolean;
 }
 
-export default function UserActionButton({ signedIn, signedOut, account }: Readonly<UserActionButtonProps>) {
+export default function UserActionButton({ signedIn, signedOut, account, prefetch }: Readonly<UserActionButtonProps>) {
   const navItem = account ? signedIn : signedOut;
-  return <MainActionButton navItem={navItem} />;
+  return <MainActionButton navItem={navItem} prefetch={prefetch} />;
 }

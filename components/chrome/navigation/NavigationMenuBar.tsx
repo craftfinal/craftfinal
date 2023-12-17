@@ -17,7 +17,7 @@ import {
   siteNavigation,
 } from "@/config/navigation";
 import { cn } from "@/lib/utils";
-import { MainNavItem } from "@/types";
+import { NavItem } from "@/types";
 import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -173,7 +173,7 @@ function renderMainNavChildrenContent(
 
 const MainNavMenuItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { navItem: MainNavItem }
+  React.ComponentPropsWithoutRef<"a"> & { navItem: NavItem }
 >(({ navItem, children, ...props }, ref) => {
   return (
     <NavigationMenuItem>
@@ -209,7 +209,7 @@ MainNavMenuItem.displayName = "MainNavMenuItem";
 
 const SubMenuItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { index?: number; numItems: number; navItem: MainNavItem }
+  React.ComponentPropsWithoutRef<"a"> & { index?: number; numItems: number; navItem: NavItem }
 >(({ navItem, index = 1, numItems, children, className, ...props }, ref) => {
   return (
     <li
@@ -266,7 +266,7 @@ SubMenuItem.displayName = "SubMenuItem";
 
 /*
 interface NavMenuItemProps extends NavigationMenuItemProps {
-  navItem: MainNavItem;
+  navItem: NavItem;
 }
 function NavMenuItem({ navItem, ...props }: NavMenuItemProps) {
   return (

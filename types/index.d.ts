@@ -6,9 +6,6 @@ export type NavItem = {
   title: string;
   href: string;
   disabled?: boolean;
-};
-
-export type MainNavItem = NavItem & {
   menuTitle?: string;
   menuContent?: string;
   menuContentIcon?: ReactNode;
@@ -38,16 +35,16 @@ export type SettingsConfig = {
 };
 
 export type DocsConfig = {
-  mainNav: MainNavItem[];
+  mainNav: NavItem[];
   sidebarNav: SidebarNavItem[];
 };
 
 export type MarketingConfig = {
-  mainNav: MainNavItem[];
+  mainNav: NavItem[];
 };
 
 export type DashboardConfig = {
-  mainNav: MainNavItem[];
+  mainNav: NavItem[];
   sidebarNav: SidebarNavItem[];
 };
 

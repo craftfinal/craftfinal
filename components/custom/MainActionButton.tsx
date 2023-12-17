@@ -6,12 +6,14 @@ import Link from "next/link";
 
 interface MainActionButtonProps {
   navItem: NavItem;
+  prefetch?: boolean;
 }
 
-export default function MainActionButton({ navItem }: Readonly<MainActionButtonProps>) {
+export default function MainActionButton({ navItem, prefetch = true }: Readonly<MainActionButtonProps>) {
   return (
-    <Link href={navItem.href}>
+    <Link href={navItem.href} title={navItem.title} prefetch={prefetch}>
       <ActionButton
+        name={navItem.menuTitle ?? navItem.title}
         variant="default"
         className="bg-gradient-to-r from-green-800
     to-indigo-900
