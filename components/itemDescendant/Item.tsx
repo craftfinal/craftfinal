@@ -18,7 +18,7 @@ import { useState } from "react";
 import { InputProps } from "react-editext";
 import { useForm } from "react-hook-form";
 import { ItemDescendantRenderProps } from "./ItemDescendantList.client";
-import EditableFieldPersist from "./utils/EditableFieldPersist";
+import EditableField from "./utils/EditableField";
 
 export interface ItemProps extends ItemDescendantRenderProps {}
 export default function Item(props: ItemProps) {
@@ -91,7 +91,7 @@ export default function Item(props: ItemProps) {
             key={field}
             className="text-shadow-dark dark:text-light-txt-1 text-dark-txt-1 dark:text-light-txt-4 flex-1"
           >
-            <EditableFieldPersist
+            <EditableField
               key={field}
               fieldName={field}
               value={item[field as keyof ItemClientStateType] as string}

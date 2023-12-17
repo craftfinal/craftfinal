@@ -18,7 +18,6 @@ export default function EditableInputField({
 }: EditableInputFieldProps) {
   return (
     <EdiText
-      data-1p-ignore
       type="text"
       className="flex-grow"
       {...EditableFieldEdiTextProps.rootProps}

@@ -1,8 +1,15 @@
 // @/components/itemDescendant/ItemDescendantListItemInput.tsx
 
 import { cn } from "@/lib/utils";
-import { getItemSchema, getSchemaFields, isNumberField } from "@/lib/utils/itemDescendantListUtils";
-import { ItemDataUntypedFieldNameType, ItemDataUntypedType } from "@/schemas/item";
+import {
+  extractFieldName,
+  getInitialItemDraftState,
+  getInputProps,
+  getItemSchema,
+  getSchemaFields,
+  isNumberField,
+} from "@/lib/utils/itemDescendantListUtils";
+import { ItemDataUntypedType } from "@/schemas/item";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ItemDescendantModelNameType } from "@/types/itemDescendant";
 import { Plus } from "lucide-react";
@@ -21,7 +28,6 @@ interface DescendantListItemInputProps {
   editingInput: boolean;
   // setEditingInput: Dispatch<SetStateAction<boolean>>;
 }
-
 export default function DescendantListItemInput({
   canEdit,
   editingInput /* setEditingInput, */,
@@ -40,30 +46,12 @@ export default function DescendantListItemInput({
   const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   // Initialize local state for field values
-  const [fieldValues, setFieldValues] = useState(
-    itemFormFields.reduce(
-      (acc, field) => {
-        let initialFieldValue: string | number | undefined = undefined;
-        if (itemDraft && field in itemDraft) {
-          initialFieldValue = itemDraft[field];
-        }
-        const fieldDraft = { [field]: initialFieldValue };
-        return { ...acc, ...fieldDraft };
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      {} as Record<string, any>,
-    ),
-  );
+  const [itemDraftState, setItemDraftState] = useState(getInitialItemDraftState(itemDraft, itemFormFields));
 
   const validate = (itemDraft: object) => {
     const validationStatus = itemFormSchema.safeParse({ ...itemDraft });
     return validationStatus;
   };
-
-  function extractFieldName(input: string): ItemDataUntypedFieldNameType {
-    const parts = input.split("-");
-    return parts[parts.length - 1];
-  }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
     if (event.target.name) {
@@ -74,7 +62,7 @@ export default function DescendantListItemInput({
         newValue = parseFloat(newValue) || 0; // Default to 0 if parsing fails
       }
 
-      setFieldValues((prev) => ({ ...prev, [fieldName]: newValue }));
+      setItemDraftState((prev) => ({ ...prev, [fieldName]: newValue }));
       updateItemDraft({ ...itemDraft, [fieldName]: newValue });
     }
 
@@ -95,9 +83,9 @@ export default function DescendantListItemInput({
       }
 
       // Update the local state
-      setFieldValues((prev) => ({ ...prev, [fieldName]: newValue }));
+      setItemDraftState((prev) => ({ ...prev, [fieldName]: newValue }));
       // Update the Zustand store
-      updateItemDraft({ ...fieldValues, [fieldName]: newValue });
+      updateItemDraft({ ...itemDraftState, [fieldName]: newValue });
     }
     return commitToStore();
   };
@@ -109,7 +97,7 @@ export default function DescendantListItemInput({
     if (validationStatus.success) {
       commitItemDraft();
       // Reset field values after commit
-      setFieldValues(itemFormFields.reduce((acc, field) => ({ ...acc, [field]: "" }), {}));
+      setItemDraftState(itemFormFields.reduce((acc, field) => ({ ...acc, [field]: "" }), {}));
       setInputIsValid(false);
     } else {
       window.consoleLog(
@@ -140,19 +128,22 @@ export default function DescendantListItemInput({
   return (
     <div className="flex flex-grow items-center">
       <div className="flex flex-grow flex-wrap justify-between gap-x-4 gap-y-2">
-        {itemFormFields.map((fieldName) => (
-          <EditableInputField
-            key={fieldName}
-            fieldName={`${itemModel}-${fieldName}`}
-            value={fieldValues[fieldName]}
-            placeholder={`${fieldName} for ${itemModel}`}
-            onChange={handleChange}
-            onSave={handleSave}
-            editing={editingInput}
-            canEdit={canEdit}
-            className="flex flex-1 gap-x-4 gap-y-2"
-          />
-        ))}
+        {itemFormFields.map((fieldName) => {
+          const inputProps = getInputProps(itemDraftState, itemModel, fieldName);
+          return (
+            <EditableInputField
+              key={inputProps.key}
+              fieldName={inputProps.fieldName}
+              value={inputProps.value}
+              placeholder={inputProps.placeholder}
+              onChange={handleChange}
+              onSave={handleSave}
+              editing={editingInput}
+              canEdit={canEdit}
+              className="flex flex-1 gap-x-4 gap-y-2"
+            />
+          );
+        })}
       </div>
       <Button variant="ghost" disabled={!inputIsValid} onClick={handleSubmitButton} title={`Create ${itemModel}`}>
         {<Plus />}

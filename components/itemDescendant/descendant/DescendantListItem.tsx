@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { DateTimeFormat, DateTimeSeparator, dateToISOLocal } from "@/lib/utils/formatDate";
 import {
+  getInputProps,
   getItemSchema,
   getSchemaFields,
   getUpdateFromEdiTextField,
@@ -22,7 +23,7 @@ import { Grip } from "lucide-react";
 import { ElementType, useState } from "react";
 import { InputProps } from "react-editext";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
-import EditableFieldPersist from "../utils/EditableFieldPersist";
+import EditableField from "../utils/EditableField";
 import { ItemActionButton } from "../utils/ItemActionButton";
 
 // export interface DescendantListItemProps extends ItemDescendantRenderProps {
@@ -181,22 +182,26 @@ export default function DescendantListItem<T extends ElementType = "li">({
           </div>
         ) : null}
         <div className="flex flex-1 flex-wrap justify-between gap-x-4 gap-y-2">
-          {itemFormFields.map((field) => (
-            <div
-              key={field}
-              className="text-shadow-dark dark:text-light-txt-1 text-dark-txt-1 dark:text-light-txt-4 flex-1"
-            >
-              <EditableFieldPersist
-                key={field}
-                fieldName={field}
-                value={item[field as keyof ItemClientStateType] as string}
-                placeholder={`${field} for ${itemModel}`}
-                onChange={handleChange}
-                onSave={handleSave}
-                canEdit={canEdit}
-              />
-            </div>
-          ))}
+          {itemFormFields.map((fieldName) => {
+            const inputProps = getInputProps(item, itemModel, fieldName);
+
+            return (
+              <div
+                key={fieldName}
+                className="text-shadow-dark dark:text-light-txt-1 text-dark-txt-1 dark:text-light-txt-4 flex-1"
+              >
+                <EditableField
+                  key={inputProps.key}
+                  fieldName={inputProps.fieldName}
+                  value={item[fieldName as keyof ItemClientStateType] as string}
+                  placeholder={inputProps.placeholder}
+                  onChange={handleChange}
+                  onSave={handleSave}
+                  canEdit={canEdit}
+                />
+              </div>
+            );
+          })}
           {/* TODO: Handle and display errors from formState.errors */}
         </div>
         {showListItemInternals && (

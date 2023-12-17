@@ -62,10 +62,46 @@ export const isNumberField = (schema: ZodTypeAny, fieldName: string): boolean =>
 //   value: string | number;
 // };
 type FormKeyValueType = Record<string, string | number>;
-function extractFieldName(input: string): ItemDataUntypedFieldNameType {
+export function extractFieldName(input: string): ItemDataUntypedFieldNameType {
   const parts = input.split("-");
   return parts[parts.length - 1];
 }
+
+export interface InputItemPersistInputProps {
+  key: string;
+  fieldName: string;
+  placeholder: string;
+  value: string;
+}
+
+export function getInputProps(
+  fieldValues: FieldValueMapType,
+  itemModel: ItemDescendantModelNameType,
+  fieldName: string,
+): InputItemPersistInputProps {
+  return {
+    key: fieldName,
+    fieldName: `${itemModel}-${fieldName}`,
+    placeholder: `${fieldName} for ${itemModel}`,
+    value: fieldValues[fieldName],
+  };
+}
+
+export function getInitialItemDraftState(itemDraft: ItemDataUntypedType, itemFormFields: string[]) {
+  const fieldValueState = itemFormFields.reduce((acc, field) => {
+    let initialFieldValue: string | number | undefined = undefined;
+    if (itemDraft && field in itemDraft) {
+      initialFieldValue = itemDraft[field];
+    }
+    const fieldDraft = { [field]: initialFieldValue };
+    return { ...acc, ...fieldDraft };
+  }, {} as FieldValueMapType);
+  return fieldValueState;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FieldValueMapType = Record<string, any>;
+
 function getUpdatedKeyValueFromEvent(
   event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
 ): FormKeyValueType | undefined {

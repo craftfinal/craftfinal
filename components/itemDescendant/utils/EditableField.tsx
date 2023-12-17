@@ -1,18 +1,18 @@
-// @/components/itemDescendant/utils/EditableField.tsx
+// @/components/itemDescendant/utils/EditableInputField.tsx
 
-import EdiText, { EdiTextProps, InputProps } from "react-editext";
+import EdiText, { EdiTextProps } from "react-editext";
 
-interface EditableFieldProps extends EdiTextProps {
+interface EditableInputFieldProps extends EdiTextProps {
   fieldName: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSave: (val: any, inputProps?: InputProps) => void;
+  placeholder?: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 export const EditableFieldEdiTextProps = {
   containerProps: {
-    className: "p-0",
+    className: "p-0 flex-grow",
   },
   inputProps: {
     placeholder: "",
@@ -22,8 +22,7 @@ export const EditableFieldEdiTextProps = {
     className: "w-full h-full min-h-[2.5rem] p-2 rounded-md",
   },
   rootProps: {
-    viewContainerClassName:
-      "w-full h-full p-0 rounded-md flex hover:outline-dotted hover:outline-slate-300 active:outline-2 hover:active:outline-2",
+    viewContainerClassName: "w-full h-full p-0 rounded-md flex", //hover:outline-dotted hover:outline-slate-300 active:outline-2 hover:active:outline-2",
     editOnViewClick: true,
     startEditingOnFocus: true,
     submitOnEnter: true,
@@ -34,19 +33,25 @@ export const EditableFieldEdiTextProps = {
     editContainerClassName: "p-0 rounded-md gap-x-2",
   },
 };
-
-export default function EditableField({ fieldName, value, onSave, ...rest }: EditableFieldProps) {
+export default function EditableField({
+  fieldName,
+  placeholder,
+  onChange,
+  inputProps,
+  ...rest
+}: EditableInputFieldProps) {
   return (
     <EdiText
-      data-1p-ignore
       type="text"
-      value={value}
-      onSave={onSave}
-      inputProps={{ ...EditableFieldEdiTextProps.inputProps, name: fieldName, placeholder: fieldName }}
-      viewProps={{ ...EditableFieldEdiTextProps.viewProps }}
       {...EditableFieldEdiTextProps.rootProps}
-      submitOnUnfocus
-      cancelOnEscape
+      inputProps={{
+        ...EditableFieldEdiTextProps.inputProps,
+        ...inputProps,
+        name: fieldName,
+        placeholder: placeholder || "",
+        onChange: onChange,
+      }}
+      viewProps={{ ...EditableFieldEdiTextProps.viewProps }}
       {...rest}
     />
   );
