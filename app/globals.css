@@ -57,6 +57,19 @@
   body {
     @apply bg-background text-foreground;
   }
+  @keyframes slow-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-slow-spin {
+    animation: slow-spin 3s linear infinite;
+  }
+
   /* FIXME: Styling react-editext does not work as expected
   // https://www.npmjs.com/package/react-editext/v/3.18.0
   div[editext="button-container"] {

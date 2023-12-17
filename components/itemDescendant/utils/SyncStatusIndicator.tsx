@@ -4,7 +4,6 @@
 
 import { SyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
 import { cn } from "@/lib/utils";
-// SyncIndicator.tsx
 import { IoAlertCircle, IoCheckmarkCircle, IoSync } from "react-icons/io5";
 
 interface SyncIndicatorProps {
@@ -12,47 +11,50 @@ interface SyncIndicatorProps {
 }
 
 export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) {
-  let content;
-
   const elementClassName = {
-    icon: "w-4 h-auto md:w-5",
-    text: "text-sm md:text-base text-muted-foreground",
+    icon: "transition-all duration-300 w-4 h-auto md:w-5",
+    text: "transition-all duration-300 text-sm md:text-base text-muted-foreground",
   };
+
+  let content;
 
   switch (syncStatus) {
     case SyncStatus.Imminent:
       content = (
         <>
-          <IoAlertCircle className={cn(elementClassName.icon, "text-muted-foreground")} />
-          <span className={cn(elementClassName.text, "")}>Unsaved changes</span>
+          <IoAlertCircle className={cn(elementClassName.icon, "text-yellow-500/75")} />
+          <span className={cn(elementClassName.text)}>Unsaved changes</span>
         </>
       );
       break;
     case SyncStatus.InProgress:
       content = (
         <>
-          <IoSync className={cn(elementClassName.icon, "animate-spin text-blue-500/50")} />
-          <span className={cn(elementClassName.text, "")}>Synchronizing...</span>
+          <IoSync className={cn(elementClassName.icon, "animate-slow-spin text-blue-500/75")} />
+          <span className={cn(elementClassName.text)}>Synchronizing...</span>
         </>
       );
-
       break;
     case SyncStatus.Succeeded:
       content = (
         <>
-          <IoCheckmarkCircle className={cn(elementClassName.icon, "text-green-500/50")} />
-          <span className={cn(elementClassName.text, "")}>Done</span>
+          <IoCheckmarkCircle className={cn(elementClassName.icon, "text-green-500/75")} />
+          <span className={cn(elementClassName.text)}>Done</span>
         </>
       );
       break;
     default:
       content = (
         <>
-          <IoCheckmarkCircle className={cn(elementClassName.icon, "text-slate-500/50")} />
-          <span className={cn(elementClassName.text, "")}>Everything in sync</span>
+          <IoCheckmarkCircle className={cn(elementClassName.icon, "text-slate-500/75")} />
+          <span className={cn(elementClassName.text)}>In sync</span>
         </>
       );
   }
 
-  return <div className="mb-4 flex h-8 flex-row-reverse items-center justify-start gap-x-2">{content}</div>;
+  return (
+    <div className="mb-4 flex h-8 flex-row-reverse items-center justify-start gap-x-2 opacity-50 transition-opacity duration-300 ease-in-out group-hover:opacity-100">
+      {content}
+    </div>
+  );
 }

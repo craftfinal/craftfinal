@@ -5,7 +5,7 @@
 import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useStoreName } from "@/contexts/StoreNameContext";
 import { syncItemDescendantStoreWithServer } from "@/stores/itemDescendantStore/utils/syncItemDescendantStore";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export enum SyncStatus {
   Imminent = "Imminent",
@@ -27,6 +27,9 @@ export function useAutoSyncItemDescendantStore() {
   const lastSyncTimeRef = useRef<Date | null>(null);
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Return sync status instead of setting it
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(SyncStatus.None);
+
   if (!rootState) {
     throw Error(`sendItemDescendantToServer(): storeName=${storeName}, rootState=${rootState})`);
   }
@@ -35,12 +38,14 @@ export function useAutoSyncItemDescendantStore() {
 
   const syncItems = useCallback(() => {
     async function executeSync() {
+      setSyncStatus(SyncStatus.InProgress);
       await syncItemDescendantStoreWithServer(
         rootState,
         updateLastModifiedOfModifiedItems,
         updateStoreWithServerData,
         forceUpdate,
       );
+      setSyncStatus(SyncStatus.Succeeded);
     }
     executeSync();
     lastSyncTimeRef.current = new Date();
@@ -54,6 +59,7 @@ export function useAutoSyncItemDescendantStore() {
       // );
       return;
     }
+    setSyncStatus(SyncStatus.Imminent);
     lastModifiedRef.current = lastModified;
 
     // Cancel any existing timeout to avoid multiple syncs
@@ -83,4 +89,5 @@ export function useAutoSyncItemDescendantStore() {
       }
     };
   }, [lastModified]); // Dependency on lastModified
+  return syncStatus;
 }
