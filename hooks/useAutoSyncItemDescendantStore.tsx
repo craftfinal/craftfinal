@@ -1,9 +1,18 @@
+// @/hooks/useAutoSyncItemDescendantStore.tsx
+
 "use client";
 
 import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useStoreName } from "@/contexts/StoreNameContext";
 import { syncItemDescendantStoreWithServer } from "@/stores/itemDescendantStore/utils/syncItemDescendantStore";
 import { useCallback, useEffect, useRef } from "react";
+
+export enum SyncStatus {
+  Imminent = "Imminent",
+  InProgress = "InProgress",
+  Succeeded = "Succeeded",
+  None = "None", // No current sync operation
+}
 
 export function useAutoSyncItemDescendantStore() {
   const storeName = useStoreName();
@@ -40,9 +49,9 @@ export function useAutoSyncItemDescendantStore() {
   useEffect(() => {
     // Only proceed if lastModified has actually changed
     if (lastModified === lastModifiedRef.current) {
-      console.log(
-        `useAutoSyncItemDescendantStore: lastModified=${lastModified} === ${lastModifiedRef.current}=lastModifiedRef.current`,
-      );
+      // console.log(
+      //   `useAutoSyncItemDescendantStore: lastModified=${lastModified} === ${lastModifiedRef.current}=lastModifiedRef.current`,
+      // );
       return;
     }
     lastModifiedRef.current = lastModified;

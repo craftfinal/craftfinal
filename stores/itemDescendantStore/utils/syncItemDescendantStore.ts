@@ -38,8 +38,9 @@ export async function syncItemDescendantStoreWithServer(
 
   if (updatedState) {
     updateStoreWithServerData(updatedState);
-    const serverModified = updatedState.lastModified;
 
+    /*
+    const serverModified = updatedState.lastModified;
     if (serverModified >= clientModified) {
       toast({
         title: `Synchronized`,
@@ -48,6 +49,7 @@ export async function syncItemDescendantStoreWithServer(
         }\nServer: ${dateToISOLocal(new Date(updatedState.lastModified))}: ${updatedState.descendants.length}`,
       });
     }
+    */
   }
   return updatedState;
 }

@@ -5,6 +5,7 @@
 import { ItemDescendantStoreProvider, useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { ResumeActionProvider } from "@/contexts/ResumeActionContext";
 import { StoreNameProvider, useStoreName } from "@/contexts/StoreNameContext";
+import { cn } from "@/lib/utils";
 import { generateClientId } from "@/schemas/id";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schemas/item";
 import { ItemDescendantClientStateType, ItemDescendantServerStateType } from "@/schemas/itemDescendant";
@@ -18,9 +19,8 @@ import RestoreItemDialog from "./RestoreItemDialog";
 import Descendant from "./descendant/Descendant";
 import DescendantInput from "./descendant/DescendantInput";
 import DescendantList from "./descendant/DescendantList";
-import { ItemDescendantListSynchronization } from "./utils/ItemDescendantListSynchronization";
-import { cn } from "@/lib/utils";
-import { useAutoSyncItemDescendantStore } from "@/hooks/useAutoSyncItemDescendantStore";
+import { AutoSync } from "./utils/AutoSync";
+import ItemDescendantListSynchronization from "./utils/ItemDescendantListSynchronization";
 
 export interface ItemDescendantRenderProps {
   index: number;
@@ -51,7 +51,7 @@ export interface ItemDescendantRenderProps {
   itemIcon?: boolean;
 }
 function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
-  const { ancestorClientIdChain, item, rootItemModel, leafItemModel, editingInput } = props;
+  const { ancestorClientIdChain, item, rootItemModel, leafItemModel, editingInput, showSynchronization } = props;
   const { itemModel, descendantModel, descendants } = item;
 
   let inputFieldIndex = props.inputFieldIndex;
@@ -88,7 +88,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
   return (
     <>
       {item.deletedAt ? <RestoreItemDialog {...descendantProps} /> : null}
-      {atRootLevel && editingInput ? <ItemDescendantListSynchronization /> : null}
+      {atRootLevel && editingInput && showSynchronization ? <ItemDescendantListSynchronization /> : null}
       {atRootLevel ? <Item {...props} /> : <Descendant {...props} />}
       {item.descendantModel === leafItemModel ? (
         <DescendantList {...descendantProps} />
@@ -154,8 +154,6 @@ function ItemDescendantListState(props: ItemDescendantListStateProps) {
   const showIdentifiers = process.env.NODE_ENV === "development" && showItemDescendantIdentifiers;
   const showSynchronization = process.env.NODE_ENV === "development" && showItemDescendantSynchronization;
 
-  useAutoSyncItemDescendantStore();
-
   const { serverState } = props;
 
   const clientProps = {
@@ -191,7 +189,12 @@ function ItemDescendantListState(props: ItemDescendantListStateProps) {
     }
   }, [serverState, storeIsInitialized, updateStoreWithServerData]);
 
-  return !storeIsInitialized ? null : <ItemDescendantListRender {...clientProps} />;
+  return !storeIsInitialized ? null : (
+    <>
+      <AutoSync />
+      <ItemDescendantListRender {...clientProps} />
+    </>
+  );
 }
 
 export interface ItemDescendantListContextProps {

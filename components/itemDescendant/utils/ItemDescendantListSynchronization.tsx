@@ -13,7 +13,7 @@ import { syncItemDescendantStoreWithServer } from "@/stores/itemDescendantStore/
 export interface ItemDescendantListSynchronizationProps {
   title?: string;
 }
-export function ItemDescendantListSynchronization(props: ItemDescendantListSynchronizationProps) {
+export default function ItemDescendantListSynchronization(props: ItemDescendantListSynchronizationProps) {
   const synchronizeButtonRef = useRef<HTMLButtonElement>(null);
 
   const title = props.title ?? "Sync now";
