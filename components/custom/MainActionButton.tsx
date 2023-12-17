@@ -9,9 +9,10 @@ interface MainActionButtonProps {
   prefetch?: boolean;
 }
 
-export default function MainActionButton({ navItem, prefetch = true }: Readonly<MainActionButtonProps>) {
+export default function MainActionButton({ navItem, prefetch }: Readonly<MainActionButtonProps>) {
+  const navPrefetch = prefetch !== undefined ? prefetch : !navItem.authenticated;
   return (
-    <Link href={navItem.href} title={navItem.title} prefetch={prefetch}>
+    <Link href={navItem.href} title={navItem.title} prefetch={navPrefetch}>
       <ActionButton
         name={navItem.menuTitle ?? navItem.title}
         variant="default"
