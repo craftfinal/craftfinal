@@ -10,7 +10,7 @@ import {
 } from "@/middlewares/utils/temporaryAccount";
 import temporaryAccountMiddleware, { accountIdToCreateHeader } from "@/middlewares/withTemporaryAccount";
 import { prismaClient } from "@/prisma/client";
-import { getStateIdFromDbId } from "@/schemas/id";
+import { generateStateId, getStateIdFromDbId } from "@/schemas/id";
 import { Base58CheckAccount, Base58CheckAccountOrNull, InvalidAccountErr } from "@/types/user";
 import { ModelIndicator, stateAccountFromDbAccount } from "@/types/utils/base58checkId";
 import { cookies, headers } from "next/headers";
@@ -90,7 +90,11 @@ export async function createOrUpdateTemporaryAccount(providedProviderAccountId?:
   const type = AccountType.Temporary;
   const firstName = "Temporary";
   const lastName = "User";
-  const tempEmail = `${providerAccountId}@example.com`;
+  // Initialize to unique but temporary placeholder email
+  // Note: multiple instances of this function may run concurrently;
+  // therefore, the id must be different on every invocation. This will be corrected
+  // down below when we update the email to correspond to the userId
+  const tempEmail = `${generateStateId("account")}@example.com`;
 
   try {
     // Upsert account and user
@@ -115,7 +119,7 @@ export async function createOrUpdateTemporaryAccount(providedProviderAccountId?:
         type,
         user: {
           create: {
-            email: tempEmail, // Initialize to unique but temporary placeholder email
+            email: tempEmail,
             firstName,
             lastName,
           },
@@ -127,7 +131,7 @@ export async function createOrUpdateTemporaryAccount(providedProviderAccountId?:
     // Generate the actual email using the user ID
     const email = `${getStateIdFromDbId(account.user.id, ModelIndicator.user)}@${provider}.com`;
 
-    // Update the user with the new email
+    // Update the user with the email address corresponding to the userId
     account = await prismaClient.account.update({
       where: {
         provider_providerAccountId: {
