@@ -4,7 +4,7 @@
 
 import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { prismaClient } from "@/prisma/client";
-import { StateIdSchemaType } from "@/schemas/id";
+import { StateIdSchemaType, stateIdDefault } from "@/schemas/id";
 import { ItemClientStateType, ItemOutputType, ItemServerStateType } from "@/schemas/item";
 import {
   ItemDescendantClientStateType,
@@ -22,9 +22,13 @@ import {
   augmentToItemDescendantServerState,
 } from "@/types/utils/itemDescendant";
 import { PrismaClient } from "@prisma/client";
-import { getItemDescendantList, getItemsByParentId } from "./itemDescendant";
-import { getItemById } from "./itemDescendant";
-import { createFromClientItem, updateWithClientItem } from "./itemDescendant";
+import {
+  createFromClientItem,
+  getItemById,
+  getItemDescendantList,
+  getItemsByParentId,
+  updateWithClientItem,
+} from "./itemDescendant";
 
 export async function handleNestedItemDescendantListFromClient(
   clientItem: ItemDescendantClientStateType,
@@ -64,11 +68,19 @@ async function processClientItemDescendant(
   /*
    * Process ITEM
    */
-  const serverItem: ItemServerStateType = await processClientItem(
-    clientItem,
-    currentTimestamp,
-    prismaItemModelInstance,
-  );
+
+  let serverItem: ItemServerStateType = {
+    ...clientItem,
+    id: clientItem.id ?? stateIdDefault,
+    parentId: clientItem.parentId ?? stateIdDefault,
+  };
+  try {
+    serverItem = await processClientItem(clientItem, currentTimestamp, prismaItemModelInstance);
+  } catch (error) {
+    // Tell client to delete this item
+    serverItem.disposition = ItemDisposition.Obsoleted;
+    console.log(logPrefix, `Tell client to delete this item as an error occurred: `, error);
+  }
 
   if (serverItem.disposition === ItemDisposition.Obsoleted) {
     return augmentServerStateToDescendantServerState(serverItem);
@@ -177,7 +189,11 @@ async function processClientItem(
         ItemDisposition.Obsoleted,
         currentTimestamp,
       );
-      console.log(`: tell client to delete the item that does not exist on the server:`, obsoletedClientItem);
+      console.log(
+        logPrefix,
+        `: tell client to delete the item that does not exist on the server:`,
+        obsoletedClientItem,
+      );
       return augmentServerStateToDescendantServerState(obsoletedClientItem);
     }
   } else {

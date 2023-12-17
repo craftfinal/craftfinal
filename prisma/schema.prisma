@@ -8,12 +8,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   // url      = env("POSTGRES_URL") // may use connection pooling
   // NOTE: For deployment to Vercel, the special `POSTGRES_PRISMA_URL` includes the required
   // extra params for PgBouncer
   // Avoid error `prepared statement \"s0\" already exists`, see https://github.com/prisma/prisma/issues/4752
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
@@ -109,6 +109,6 @@ model Achievement {
   content      String    @db.Text
   order        Float     @db.DoublePrecision
 
-  @@unique([order, parentId, lastModified])
+  @@unique([order, parentId, lastModified, deletedAt])
   @@index([parentId]) // Index for faster lookups on parentId
 }

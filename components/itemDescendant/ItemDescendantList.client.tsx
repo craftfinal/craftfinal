@@ -20,6 +20,7 @@ import DescendantInput from "./descendant/DescendantInput";
 import DescendantList from "./descendant/DescendantList";
 import { ItemDescendantListSynchronization } from "./utils/ItemDescendantListSynchronization";
 import { cn } from "@/lib/utils";
+import { useAutoSyncItemDescendantStore } from "@/hooks/useAutoSyncItemDescendantStore";
 
 export interface ItemDescendantRenderProps {
   index: number;
@@ -152,6 +153,8 @@ function ItemDescendantListState(props: ItemDescendantListStateProps) {
   const { showItemDescendantIdentifiers, showItemDescendantSynchronization } = settingsStore;
   const showIdentifiers = process.env.NODE_ENV === "development" && showItemDescendantIdentifiers;
   const showSynchronization = process.env.NODE_ENV === "development" && showItemDescendantSynchronization;
+
+  useAutoSyncItemDescendantStore();
 
   const { serverState } = props;
 

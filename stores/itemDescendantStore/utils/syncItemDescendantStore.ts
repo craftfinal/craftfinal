@@ -36,11 +36,11 @@ export async function syncItemDescendantStoreWithServer(
   }
   const updatedState = await handleNestedItemDescendantListFromClient(rootState);
 
-  if (updatedState && !(updatedState instanceof Date)) {
+  if (updatedState) {
     updateStoreWithServerData(updatedState);
     const serverModified = updatedState.lastModified;
 
-    if (serverModified > clientModified) {
+    if (serverModified >= clientModified) {
       toast({
         title: `Synchronized`,
         description: `Local: ${dateToISOLocal(new Date(clientModified))}: ${

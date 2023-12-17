@@ -164,6 +164,7 @@ export function augmentClientStateToServerState(
 
 export function augmentServerStateToDescendantServerState(
   serverItem: ItemServerStateType | ItemDescendantServerStateType,
+  validate = true,
 ): ItemDescendantServerStateType {
   let itemDescendantServerItem = serverItem as ItemDescendantServerStateType;
   // Check if the item already includes a descendants property
@@ -174,7 +175,9 @@ export function augmentServerStateToDescendantServerState(
       descendants: [], // Adding an empty descendants array
     } as ItemDescendantServerStateType;
   }
-  itemDescendantServerStateSchema.parse(itemDescendantServerItem);
+  if (validate) {
+    itemDescendantServerStateSchema.parse(itemDescendantServerItem);
+  }
 
   return itemDescendantServerItem;
 }
