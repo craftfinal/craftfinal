@@ -28,7 +28,7 @@ export default async function ItemDescendantList({ itemModel, itemId, ...props }
   try {
     const userId = await getCurrentUserIdOrNull();
     if (!userId || !isValidStateId(userId)) {
-      console.error(`ItemDescendantServerComponent: current user not found; redirecting to playground`);
+      // console.error(`ItemDescendantServerComponent: current user not found; redirecting to playground`);
       redirectInvalidRequest();
     }
     const validUserId: StateIdSchemaType = userId!;

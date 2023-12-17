@@ -25,7 +25,7 @@ export default async function PlaygroundPage() {
         </Link>
       </div>
       <WrapMDX>
-        <h2>What you will eperience</h2>
+        <h2>Scope of playground</h2>
         <p>As of December 2023, you can experience the following:</p>
         <ul>
           <li>Create a new resume</li>

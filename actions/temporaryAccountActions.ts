@@ -3,11 +3,14 @@
 "use server";
 
 import { AccountType } from "@/auth/account";
-import { getAuthProviderIdCookieName } from "@/middlewares/getAuthProviderIdCookieName";
+import {
+  TemporaryAccountIdSchemaType,
+  getAccountProviderIdCookieName,
+  isValidTemporaryAccountId,
+} from "@/middlewares/utils/temporaryAccount";
 import temporaryAccountMiddleware, { accountIdToCreateHeader } from "@/middlewares/withTemporaryAccount";
 import { prismaClient } from "@/prisma/client";
 import { getStateIdFromDbId } from "@/schemas/id";
-import { TemporaryAccountIdSchemaType, isValidTemporaryAccountId } from "@/schemas/utils/temporaryAccount";
 import { Base58CheckAccount, Base58CheckAccountOrNull, InvalidAccountErr } from "@/types/user";
 import { ModelIndicator, stateAccountFromDbAccount } from "@/types/utils/base58checkId";
 import { cookies, headers } from "next/headers";
@@ -87,6 +90,7 @@ export async function createOrUpdateTemporaryAccount(providedProviderAccountId?:
   const type = AccountType.Temporary;
   const firstName = "Temporary";
   const lastName = "User";
+  const tempEmail = `${providerAccountId}@example.com`;
 
   try {
     // Upsert account and user
@@ -111,7 +115,7 @@ export async function createOrUpdateTemporaryAccount(providedProviderAccountId?:
         type,
         user: {
           create: {
-            email: "temporary.user@example.com", // Temporary placeholder email
+            email: tempEmail, // Initialize to unique but temporary placeholder email
             firstName,
             lastName,
           },
@@ -167,7 +171,7 @@ export async function getOrResetTemporaryAccount(providerAccountId?: string): Pr
 }
 
 export async function deleteTemporaryAccountIdCookie(): Promise<void> {
-  const authProviderIdCookieName = getAuthProviderIdCookieName();
+  const authProviderIdCookieName = getAccountProviderIdCookieName();
   // Delete the cookie as their are no corresponding `Account` and `User` records in the database
   console.log(
     `deleteTemporaryAccountIdCookie: request cookie "${authProviderIdCookieName}" to be deleted if it exists`,
@@ -179,7 +183,7 @@ function getTemporaryAccountIdFromCookie(providerAccountId?: string): TemporaryA
   if (providerAccountId) {
     return providerAccountId;
   }
-  const authProviderIdCookieName = getAuthProviderIdCookieName();
+  const authProviderIdCookieName = getAccountProviderIdCookieName();
   const accountId = cookies().get(authProviderIdCookieName)?.value; // Retrieve specific cookie by name
   // console.log(
   //   `getTemporaryAccountIdFromCookie: accountId=${accountId}`,
@@ -204,8 +208,12 @@ function getIdToCreateTemporaryAccount(): TemporaryAccountIdSchemaType | null {
       `getIdToCreateTemporaryAccount: invalid accountId=${accountId} [${typeof accountId}]`,
       "\nheaders().getSetCookie():",
       headers().getSetCookie(),
+      "\nheaders().get('set-cookie'):",
+      headers().get("set-cookie"),
       `\nheaders().get(${accountIdToCreateHeader})\n`,
       headers().get(accountIdToCreateHeader),
+      "\nheaders():",
+      headers(),
       "\ncookies().getAll()\n",
       cookies().getAll(),
     );

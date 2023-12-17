@@ -10,28 +10,30 @@ import ItemActionMenu from "./ItemActionMenu";
 
 export default function RenderBreadcrumbs({
   pathname,
-  query,
+  searchParams: searchParams,
 }: {
   pathname: string | null;
-  query: string | null;
+  searchParams: string | null;
 }): ReactNode {
   const clientPathname = usePathname();
-  const clientQuery = useSearchParams().toString();
+  const clientSearchParams = useSearchParams().toString();
   const [previousClientPathname, setPreviousClientPathname] = useState<string | null>(pathname);
   useEffect(() => {
-    if (clientPathname !== null && clientQuery !== null && clientPathname !== previousClientPathname) {
-      renderBreadcrumbs(clientPathname, clientQuery);
+    if (clientPathname !== null && clientSearchParams !== null && clientPathname !== previousClientPathname) {
+      renderBreadcrumbs(clientPathname, clientSearchParams);
       setPreviousClientPathname(clientPathname);
     }
-  }, [clientPathname, clientQuery, previousClientPathname]);
+  }, [clientPathname, clientSearchParams, previousClientPathname]);
 
-  return !clientPathname ? renderBreadcrumbs(pathname, query) : renderBreadcrumbs(clientPathname, clientQuery);
+  return !clientPathname
+    ? renderBreadcrumbs(pathname, searchParams)
+    : renderBreadcrumbs(clientPathname, clientSearchParams);
 }
 
 function renderBreadcrumbs(
   pathname: string | null = null,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  query: string | null = null,
+  searchParams: string | null = null,
 ) {
   const transformLabel = (title: string) => {
     let prettyTitle = title;
@@ -76,11 +78,11 @@ function renderBreadcrumbs(
     },
   };
 
-  return renderBreadcrumbsWithParams(pathname, query, breadcrumbsProps);
+  return renderBreadcrumbsWithParams(pathname, searchParams, breadcrumbsProps);
 }
 
 /**
- * Takes an URL String and removes query params and hash params
+ * Takes an URL String and removes searchParams params and hash params
  *
  * @param url - The URL string
  * @returns The transformed URL string
@@ -224,7 +226,7 @@ export interface BreadcrumbsProps {
 function renderBreadcrumbsWithParams(
   pathname: string | null = null,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  query: string | null = null,
+  searchParams: string | null = null,
   {
     useDefaultStyle = false,
     rootLabel = "Home",

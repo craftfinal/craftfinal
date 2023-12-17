@@ -1,0 +1,1 @@
+drop table "Achievement"; drop table "Role"; drop table "Organization"; drop table "Resume"; drop table "Account"; drop table "User"; drop table "_prisma_migrations"; drop type "AccountType"

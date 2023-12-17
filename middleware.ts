@@ -5,13 +5,13 @@ export const config = {
 };
 
 import executeMiddleware, { MiddlewareEntry } from "@/middlewares/executeMiddleware";
-import pathnameMiddleware from "@/middlewares/withPathname";
-import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
+import withPathnameAndSearchParams from "@/middlewares/withPathnameAndSearchParams";
+// import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
 import temporaryAccountMiddleware from "./middlewares/withTemporaryAccount";
 
-const middlewares: Array<MiddlewareEntry> = [
-  pathnameMiddleware,
-  registeredAccountMiddleware,
+export const middlewares: Array<MiddlewareEntry> = [
+  withPathnameAndSearchParams,
+  // registeredAccountMiddleware,
   temporaryAccountMiddleware,
 ];
 

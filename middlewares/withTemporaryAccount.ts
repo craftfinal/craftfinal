@@ -4,10 +4,10 @@ import {
   generateTemporaryAccountId,
   isValidTemporaryAccountId,
   temporaryAccountMiddlewareId,
-} from "@/schemas/utils/temporaryAccount";
+} from "@/middlewares/utils/temporaryAccount";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { MiddlewareEntry, MiddlewareFactory } from "./executeMiddleware";
-import { getAuthProviderIdCookieName } from "./getAuthProviderIdCookieName";
+import { getAccountProviderIdCookieName } from "@/middlewares/utils/temporaryAccount";
 
 export const accountIdToCreateHeader: string = `x-${temporaryAccountMiddlewareId}-create-id`.toLowerCase();
 
@@ -15,7 +15,7 @@ const withTemporaryAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
     const response = await nextMiddlewareHandler(request, event);
 
-    const authProviderIdCookieName = getAuthProviderIdCookieName();
+    const authProviderIdCookieName = getAccountProviderIdCookieName();
 
     if (response instanceof NextResponse) {
       const providerAccountCookie = request.cookies.get(authProviderIdCookieName);

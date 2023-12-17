@@ -1,7 +1,10 @@
+// @/middlewares/withPathnameAndSearchParams.ts
+
+import { pathnameAndSearchParamsHeaderName } from "@/middlewares/utils/pathnameAndSearchParams";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { MiddlewareEntry, MiddlewareFactory } from "./executeMiddleware";
 
-const withPathname: MiddlewareFactory = (nextMiddlewareHandler) => {
+const withPathnameAndSearchParams: MiddlewareFactory = (nextMiddlewareHandler) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
     // Execute the next middleware in the chain and get its response
     const response = await nextMiddlewareHandler(request, event);
@@ -12,8 +15,8 @@ const withPathname: MiddlewareFactory = (nextMiddlewareHandler) => {
       const query = request.nextUrl.searchParams.toString();
 
       // Add the pathname and query string as headers to the response
-      response.headers.set("x-pathname", pathname);
-      response.headers.set("x-query", query);
+      response.headers.set(pathnameAndSearchParamsHeaderName.pathname, pathname);
+      response.headers.set(pathnameAndSearchParamsHeaderName.searchParams, query);
     }
 
     // Return the modified response
@@ -22,8 +25,8 @@ const withPathname: MiddlewareFactory = (nextMiddlewareHandler) => {
 };
 
 const pathnameMiddleware: MiddlewareEntry = {
-  id: "pathname",
-  fn: withPathname,
+  id: "pathnameandsearchparams",
+  fn: withPathnameAndSearchParams,
   // disabled: true,
 };
 

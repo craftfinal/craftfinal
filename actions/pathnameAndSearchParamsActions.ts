@@ -1,14 +1,14 @@
+// @/actions/pathnameAndSearchParamsActions.ts
+
 "use server";
 
 import { headers } from "next/headers";
-import RenderBreadcrumbs from "./RenderBreadcrumbs";
-
 import {
   PathnameAndSearchParamsType,
   pathnameAndSearchParamsHeaderName,
-} from "@/middlewares/utils/pathnameAndSearchParams";
-/*
-function getPathnameAndSearchParams(): Promise<PathnameAndSearchParamsType> {
+} from "../middlewares/utils/pathnameAndSearchParams";
+
+export async function getPathnameAndSearchParams(): Promise<PathnameAndSearchParamsType> {
   let pathnameAndSearchParams: PathnameAndSearchParamsType = {
     pathname: null,
     searchParams: null,
@@ -25,15 +25,11 @@ function getPathnameAndSearchParams(): Promise<PathnameAndSearchParamsType> {
   }
   return pathnameAndSearchParams;
 }
-*/
-export default async function Breadcrumbs() {
-  const props: PathnameAndSearchParamsType = {
-    // pathname: headers().get("x-pathname"),
-    // searchParams: headers().get("x-query"),
-    pathname: headers().get(pathnameAndSearchParamsHeaderName.pathname),
-    searchParams: headers().get(pathnameAndSearchParamsHeaderName.searchParams),
-  };
-  // const props = await getPathnameAndSearchParams();
 
-  return <RenderBreadcrumbs {...props} />;
+export async function getPathname(): Promise<string | null> {
+  const pathnameAndSearchParams = await getPathnameAndSearchParams();
+  if (pathnameAndSearchParams) {
+    return pathnameAndSearchParams.pathname;
+  }
+  return null;
 }

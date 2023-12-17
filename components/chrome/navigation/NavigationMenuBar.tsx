@@ -21,12 +21,10 @@ import { NavItem } from "@/types";
 import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { ReactNode } from "react";
+import React, { ReactNode, Suspense } from "react";
 import { menuClassName } from "./Navbar";
 
 export function NavigationMenuBar() {
-  const account = useTemporaryAccount();
-  const pathname = usePathname();
   return (
     <NavigationMenu className="w-full">
       <NavigationMenuList className="space-x-1 sm:space-x-2 md:space-x-4">
@@ -44,17 +42,12 @@ export function NavigationMenuBar() {
             // which requires state and is rendered as a button by RadixUI
             const navItemWithChildrenProps: MainNavMenuItemWithChildrenType = {
               navItemWithChildren: key,
-              account,
-              pathname,
+              // account,
+              // pathname,
             };
             return <MainNavMenuItemWithChildren key={key.item} navItemWithChildrenProps={navItemWithChildrenProps} />;
           } else {
-            const customItemProps: MainNavCustomItemType = {
-              customItem: key,
-              account,
-              pathname,
-            };
-            return <MainNavCustomItem key={key.item} customItemProps={customItemProps} />;
+            return <MainNavCustomItem key={key.item} customItem={key} />;
           }
         })}
       </NavigationMenuList>
@@ -69,9 +62,12 @@ type MainNavCustomItemType = {
 };
 const MainNavCustomItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { customItemProps: MainNavCustomItemType }
->(({ customItemProps, ...props }, ref) => {
-  return <NavigationMenuItem>{renderCustomMenuItem(customItemProps, props, ref)}</NavigationMenuItem>;
+  React.ComponentPropsWithoutRef<"a"> & { customItem: CustomMenuItemType }
+>(({ customItem, ...props }, ref) => {
+  const pathname = usePathname();
+  const account = useTemporaryAccount();
+
+  return <NavigationMenuItem>{renderCustomMenuItem({ customItem, pathname, account }, props, ref)}</NavigationMenuItem>;
 });
 MainNavCustomItem.displayName = "MainNavCustomItem";
 
@@ -85,9 +81,11 @@ function renderCustomMenuItem(
   if (typeof customItem?.render === "function") {
     const menuItemRenderFunction = customItem.render as () => ReactNode;
     return (
-      <Link legacyBehavior passHref href={navItem.href} ref={ref} key={navItem.href} {...anchorProps}>
-        {menuItemRenderFunction()}
-      </Link>
+      <Suspense fallback={<button>loading</button>}>
+        <Link legacyBehavior passHref href={navItem.href} ref={ref} key={navItem.href} {...anchorProps}>
+          {menuItemRenderFunction()}
+        </Link>
+      </Suspense>
     );
   } else if (typeof customItem?.render === "object") {
     const menuItemPredicateArray = customItem.render;
@@ -95,9 +93,11 @@ function renderCustomMenuItem(
       const menuItemRenderFunction = item.render as () => ReactNode;
       return (
         item.predicate(account, pathname) && (
-          <Link legacyBehavior passHref href={navItem.href} ref={ref} key={navItem.href} {...anchorProps}>
-            {menuItemRenderFunction()}
-          </Link>
+          <Suspense fallback={<button>loading</button>} key={navItem.href}>
+            <Link legacyBehavior passHref href={navItem.href} ref={ref} key={navItem.href} {...anchorProps}>
+              {menuItemRenderFunction()}
+            </Link>
+          </Suspense>
         )
       );
     });
@@ -107,8 +107,8 @@ function renderCustomMenuItem(
 
 type MainNavMenuItemWithChildrenType = {
   navItemWithChildren: NavMenuItemWithChildrenType;
-  account: Base58CheckAccountOrNullOrUndefined;
-  pathname: string;
+  // account: Base58CheckAccountOrNullOrUndefined;
+  // pathname: string;
 };
 
 const MainNavMenuItemWithChildren = React.forwardRef<

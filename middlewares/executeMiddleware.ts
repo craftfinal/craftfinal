@@ -1,9 +1,14 @@
 // @/middlewares/executeMiddlewares.ts
 
+import { middlewares } from "@/middleware";
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { NextMiddleware, NextResponse } from "next/server";
 
 // Inspired by: https://reacthustle.com/blog/how-to-chain-multiple-middleware-functions-in-nextjs
+
+export function hasMiddleware(middlewareId: string) {
+  return middlewares.find((middleware) => middleware.id === middlewareId && !middleware.disabled);
+}
 
 /**
  * A factory type for creating middleware functions.
