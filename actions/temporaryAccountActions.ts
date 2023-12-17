@@ -6,13 +6,10 @@ import { AccountType } from "@/auth/account";
 import { getAuthProviderIdCookieName } from "@/middlewares/getAuthProviderIdCookieName";
 import temporaryAccountMiddleware, { accountIdToCreateHeader } from "@/middlewares/withTemporaryAccount";
 import { prismaClient } from "@/prisma/client";
+import { getStateIdFromDbId } from "@/schemas/id";
 import { TemporaryAccountIdSchemaType, isValidTemporaryAccountId } from "@/schemas/utils/temporaryAccount";
 import { Base58CheckAccount, Base58CheckAccountOrNull, InvalidAccountErr } from "@/types/user";
-import {
-  ModelIndicator,
-  getBase58CheckIdFromUuidAndModel,
-  stateAccountFromDbAccount,
-} from "@/types/utils/base58checkId";
+import { ModelIndicator, stateAccountFromDbAccount } from "@/types/utils/base58checkId";
 import { cookies, headers } from "next/headers";
 import { getAccountByProviderAccountId } from "./user";
 
@@ -50,11 +47,19 @@ export async function getOrCreateTemporaryAccount(providerAccountId?: string): P
         return existingUser;
       }
     } catch (exc) {
+      /* FIXME: It appears that the following call to `deleteTemporaryAccountIdCookie` leads to error 500:
+      Error: Cookies can only be modified in a Server Action or Route Handler. 
+      Read more: https://nextjs.org/docs/app/api-reference/functions/cookies#cookiessetname-value-options
       console.log(
         `getOrCreateTemporaryAccount: delete accountId cookie as there is no account with acccountId="${accountId}"` +
           `Exception: ${JSON.stringify(exc)}`,
       );
       deleteTemporaryAccountIdCookie();
+      */
+      console.log(
+        `getOrCreateTemporaryAccount: should delete accountId cookie as there is no account with acccountId="${accountId}"` +
+          `Exception: ${JSON.stringify(exc)}`,
+      );
     }
   }
 
@@ -116,7 +121,7 @@ export async function createOrUpdateTemporaryAccount(providedProviderAccountId?:
     });
 
     // Generate the actual email using the user ID
-    const email = `${getBase58CheckIdFromUuidAndModel(account.user.id, ModelIndicator.user)}@${provider}.com`;
+    const email = `${getStateIdFromDbId(account.user.id, ModelIndicator.user)}@${provider}.com`;
 
     // Update the user with the new email
     account = await prismaClient.account.update({
@@ -153,7 +158,7 @@ export async function getOrResetTemporaryAccount(providerAccountId?: string): Pr
     }
   } catch (exc) {
     console.log(
-      `getOrResetTemporaryAccount: calling resetTemporaryAccount due to exception in getTemporaryAccount:`,
+      `getOrResetTemporaryAccount: calling deleteTemporaryAccountIdCookie due to exception in getTemporaryAccount:`,
       exc,
     );
     deleteTemporaryAccountIdCookie();
@@ -164,7 +169,9 @@ export async function getOrResetTemporaryAccount(providerAccountId?: string): Pr
 export async function deleteTemporaryAccountIdCookie(): Promise<void> {
   const authProviderIdCookieName = getAuthProviderIdCookieName();
   // Delete the cookie as their are no corresponding `Account` and `User` records in the database
-  console.log(`resetTemporaryAccount: request cookie "${authProviderIdCookieName}" to be deleted if it exists`);
+  console.log(
+    `deleteTemporaryAccountIdCookie: request cookie "${authProviderIdCookieName}" to be deleted if it exists`,
+  );
   cookies().delete(authProviderIdCookieName);
 }
 
