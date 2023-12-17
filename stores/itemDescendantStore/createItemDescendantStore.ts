@@ -1,20 +1,20 @@
 // @/stores/itemDescendant/createItemDescendantStore.ts
 import { siteConfig } from "@/config/site";
 import { StateIdSchemaType, generateClientId } from "@/schemas/id";
-import { ItemClientStateType, ItemDataType, ItemDataUntypedType, ItemOrderableClientStateType } from "@/schemas/item";
+import { ItemDataType, ItemDataUntypedType, ItemOrderableClientStateType } from "@/schemas/item";
 import {
-  ItemDescendantClientStateListType,
   ItemDescendantOrderableClientStateListType,
   ItemDescendantOrderableStoreStateListType,
   ItemDescendantOrderableStoreStateType,
   ItemDescendantServerStateType,
   ItemDescendantStoreStateListType,
+  ItemDescendantStoreStateType,
   itemDescendantOrderableStoreStateSchema,
   itemDescendantStoreStateSchema,
 } from "@/schemas/itemDescendant";
 import { ClientIdType, ItemDisposition } from "@/types/item";
 import { ItemDescendantModelNameType, getDescendantModel } from "@/types/itemDescendant";
-import { createDateSafeLocalStorage } from "@/types/utils/itemDescendant";
+import { createDateSafeLocalStorage } from "@/stores/itemDescendantStore/utils/createDateSafeLocalStorage";
 import { Draft } from "immer";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -25,28 +25,6 @@ import {
   updateListOrderValues,
 } from "./utils/descendantOrderValues";
 import { handleNestedItemDescendantListFromServer } from "./utils/syncItemDescendantStore";
-
-// NOTE: This type must be kept in sync with `ItemClientStateType`, which is
-// inferred using the Zod schemas in `@/schemas/itemDescendant`
-export type ItemClientState = {
-  createdAt: Date;
-  lastModified: Date;
-  deletedAt: Date | null;
-  parentClientId: ClientIdType;
-  clientId: ClientIdType;
-  id?: StateIdSchemaType;
-  parentId?: StateIdSchemaType;
-  disposition: ItemDisposition;
-};
-
-// NOTE: This type must be kept in sync with `ItemDescendantClientStateListType`, which is
-// inferred using the Zod schemas in `@/schemas/itemDescendant`
-export type ItemDescendantClientStateList = Array<ItemDescendantClientState>;
-export type ItemDescendantClientState = ItemClientStateType & {
-  itemModel: ItemDescendantModelNameType;
-  descendantModel: ItemDescendantModelNameType | null;
-  descendants: ItemDescendantClientStateList;
-};
 
 // NOTE: This type must be kept in sync with `ItemDescendantStoreStateType`, which is
 // inferred using the Zod schemas in `@/schemas/itemDescendant`
@@ -61,7 +39,7 @@ export type ItemDescendantStoreState = {
   disposition: ItemDisposition;
   itemModel: ItemDescendantModelNameType;
   descendantModel: ItemDescendantModelNameType | null;
-  descendants: ItemDescendantClientStateListType;
+  descendants: ItemDescendantStoreStateListType;
   descendantDraft: ItemDataUntypedType;
 };
 
@@ -69,7 +47,7 @@ export type ItemDescendantStoreActions = {
   setItemData: (data: ItemDataUntypedType) => void;
   markItemAsDeleted: () => void;
   restoreDeletedItem: () => void;
-  getDescendants: (ancestorClientIds: Array<ClientIdType>) => ItemDescendantClientStateListType;
+  getDescendants: (ancestorClientIds: Array<ClientIdType>) => ItemDescendantStoreStateListType;
   setDescendantData: (
     descendantData: ItemDataUntypedType,
     clientId: ClientIdType,
@@ -180,7 +158,7 @@ export const createItemDescendantStore = ({
             state.lastModified = now;
           });
         },
-        getDescendants: (ancestorClientIds: Array<ClientIdType>): ItemDescendantClientStateListType => {
+        getDescendants: (ancestorClientIds: Array<ClientIdType>): ItemDescendantStoreStateListType => {
           const ancestorStateChain = getDescendantFromAncestorChain([get()], ancestorClientIds);
           const ancestorState = ancestorStateChain[0];
           return ancestorState.descendants;
@@ -407,14 +385,14 @@ function getDescendantFromAncestorChain(
  * If an override timestamp is provided, it updates the timestamp to this value;
  * otherwise, it uses the most recent timestamp of any modified descendant.
  *
- * @param {ItemDescendantClientState} item - The item to update.
+ * @param {ItemDescendantStoreStateType} item - The item to update.
  * @param {Date | undefined} overrideLastModified - Optional override timestamp.
- * @returns {ItemDescendantClientState} - The updated item.
+ * @returns {ItemDescendantStoreStateType} - The updated item.
  */
 function updateItemToLastModifiedDescendant(
-  item: ItemDescendantClientState,
+  item: ItemDescendantStoreStateType,
   overrideLastModified?: Date,
-): ItemDescendantClientState {
+): ItemDescendantStoreStateType {
   // Base case: If the item has no descendants, return the item as is
   if (!item.descendants || item.descendants.length === 0) {
     if (item.disposition !== ItemDisposition.Synced) {

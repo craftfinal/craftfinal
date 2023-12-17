@@ -28,7 +28,9 @@ export const dbIdDefault = uuidIdDefault;
 
 export type DbIdSchemaType = UuidIdSchemaType;
 
-export function isValidDbId(id: string | null | undefined): boolean {
+type StringOrNullOrUndefined = string | null | undefined;
+
+export function isValidDbId(id: StringOrNullOrUndefined): boolean {
   return isValidUuidId(id);
 }
 
@@ -85,7 +87,7 @@ export function generateClientId(model: ModelIndicatorType | ModelIndicatorNameT
   return generateBase58CheckId(model);
 }
 
-export function isValidClientId(id: string | null | undefined): boolean {
+export function isValidClientId(id: StringOrNullOrUndefined): boolean {
   return isValidBs58CheckId(id);
 }
 
@@ -93,7 +95,7 @@ export function getItemModelFromStateId(id: string): string {
   return getItemModelFromBase58CheckId(id);
 }
 
-export function getItemModelOrNullFromStateId(id: string | null | undefined): string | null {
+export function getItemModelOrNullFromStateId(id: StringOrNullOrUndefined): string | null {
   if (id) {
     try {
       return getItemModelFromStateId(id);
@@ -108,7 +110,7 @@ export function getClientIdFromStateId(id: string): ClientIdSchemaType {
   return id;
 }
 
-export function renderClientIdPrefix(id: string | null | undefined, length: number = 4): string | null {
+export function renderClientIdPrefix(id: StringOrNullOrUndefined, length: number = 4): string | null {
   if (id) {
     try {
       return getPrefixFromBase58CheckId(id, length);

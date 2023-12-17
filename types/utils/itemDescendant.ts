@@ -8,16 +8,15 @@ import {
   itemServerStateSchema,
 } from "@/schemas/item";
 import {
+  ItemDescendantClientStateType,
   ItemDescendantOrderableServerStateListType,
   ItemDescendantOrderableServerStateType,
   ItemDescendantServerOutputType,
   ItemDescendantServerStateType,
-  ItemDescendantStoreStateType,
   itemDescendantServerStateSchema,
 } from "@/schemas/itemDescendant";
-import { ItemDescendantClientState, ItemDescendantStore } from "@/stores/itemDescendantStore/createItemDescendantStore";
+import { ItemDescendantStore } from "@/stores/itemDescendantStore/createItemDescendantStore";
 import { sortDescendantsByOrderValues } from "@/stores/itemDescendantStore/utils/descendantOrderValues";
-import { PersistStorage } from "zustand/middleware";
 import { ItemDisposition } from "../item";
 import { ItemDescendantModelNameType, getDescendantModel, getItemOrderFunction } from "../itemDescendant";
 
@@ -78,7 +77,7 @@ export function getItemDescendantStoreStateForServer<T extends ItemDescendantSto
 
   // const payload = stripFields(rootState, fieldsToStrip);
   const payload = stripToType(rootState, propertiesToRemove);
-  return payload as ItemDescendantClientState;
+  return payload as ItemDescendantClientStateType;
 }
 
 export function augmentServerOutputToServerState(
@@ -231,50 +230,7 @@ export function augmentToItemDescendantServerState(
   return serverStateItemDescendant;
 }
 
-/*
-import { parse, stringify } from "devalue";
-export function createTypesafeLocalstorage(): PersistStorage<ItemDescendantStoreStateType> {
-  return {
-    getItem: (name) => {
-      const str = localStorage.getItem(name);
-      if (!str) return null;
-      return parse(str);
-    },
-    setItem: (name, value) => {
-      // localStorage.setItem(name, stringify(value));
-      // Create a deep clone of the value, excluding functions
-      const valueWithoutFunctions = JSON.parse(
-        JSON.stringify(value, (key, val) => (typeof val === "function" ? undefined : val)),
-      );
-      localStorage.setItem(name, stringify(valueWithoutFunctions));
-    },
-    removeItem: (name) => {
-      localStorage.removeItem(name);
-    },
-  };
-}
-*/
-
-export function createDateSafeLocalStorage(): PersistStorage<ItemDescendantStoreStateType> {
-  return {
-    getItem: (name) => {
-      const str = localStorage.getItem(name);
-      if (!str) return null;
-      const jsonTimestamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-      return JSON.parse(str, (key, val) => (jsonTimestamp.test(val) ? new Date(val) : val));
-    },
-    setItem: (name, value) => {
-      // Create a deep clone of the value, excluding functions
-      const valueWithoutFunctions = JSON.parse(
-        JSON.stringify(value, (key, val) => (typeof val === "function" ? undefined : val)),
-      );
-      localStorage.setItem(name, JSON.stringify(valueWithoutFunctions));
-    },
-    removeItem: (name) => {
-      localStorage.removeItem(name);
-    },
-  };
-} /**
+/**
  * Finds the index of a descendant object in a given array.
  * @param arr - Array of Items.
  * @param id - ID of the descendant object.

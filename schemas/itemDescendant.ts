@@ -25,7 +25,7 @@ export type ItemDescendantClientStateType = ItemClientStateType & {
   descendantModel: ItemDescendantModelNameType | null;
   descendants: ItemDescendantClientStateListType;
 };
-// FIXME: The type cannot be inferred from the Zod schema due to the recursive nature
+// Note: The type cannot be inferred from the Zod schema due to the recursive nature
 // export type ItemDescendantClientStateType = z.output<typeof itemDescendantClientStateSchema>;
 export const itemDescendantClientStateSchema: z.ZodSchema<ItemDescendantClientStateType> = itemClientStateSchema.extend(
   {
@@ -34,13 +34,11 @@ export const itemDescendantClientStateSchema: z.ZodSchema<ItemDescendantClientSt
 );
 
 // The store state additionally includes a descendantDraft at the item level
-// NOTE: the descendants are of type `ItemDescendant**Client**StateListType` to avoid
-// some type mismatch
 export type ItemDescendantStoreStateListType = Array<ItemDescendantStoreStateType>;
 export type ItemDescendantStoreStateType = ItemClientStateType & {
   itemModel: ItemDescendantModelNameType;
   descendantModel: ItemDescendantModelNameType | null;
-  descendants: ItemDescendantClientStateListType;
+  descendants: ItemDescendantStoreStateListType;
   descendantDraft: ItemDataUntypedType;
 };
 export const itemDescendantStoreStateSchema: z.ZodSchema<ItemDescendantStoreStateType> = itemClientStateSchema.extend({

@@ -3,7 +3,7 @@
 import { handleNestedItemDescendantListFromClient } from "@/actions/syncItemDescendant";
 import { toast } from "@/components/ui/use-toast";
 import { dateToISOLocal } from "@/lib/utils/formatDate";
-import { generateClientId, isValidDbId } from "@/schemas/id";
+import { generateClientId, isValidClientId } from "@/schemas/id";
 import {
   ItemDescendantClientStateType,
   ItemDescendantOrderableClientStateListType,
@@ -443,14 +443,14 @@ function clientItemMatchesServerItem(
   if (clientItem.id === undefined) {
     // For items that have just been sent to the server and are now being returned,
     // matching is based on `clientId` and `parentClientId`
-    const newItemMatches = isValidDbId(clientItem.clientId) && clientItem.clientId === serverItem.clientId;
+    const newItemMatches = isValidClientId(clientItem.clientId) && clientItem.clientId === serverItem.clientId;
     return newItemMatches;
   } else {
     // Matching is based on `id` and `parentId` for items
     // that have already been persisted on the server
-    const existingItemMatches = isValidDbId(clientItem.id) && clientItem.id === serverItem.id;
+    const existingItemMatches = isValidClientId(clientItem.id) && clientItem.id === serverItem.id;
     if (existingItemMatches) {
-      if (!isValidDbId(clientItem.parentId) || clientItem.parentId !== serverItem.parentId) {
+      if (!isValidClientId(clientItem.parentId) || clientItem.parentId !== serverItem.parentId) {
         throw Error(`clientItemMatchesServerItem: matching ids but different or invalid parentId`);
       }
     }
