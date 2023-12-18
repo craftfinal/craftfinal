@@ -303,8 +303,7 @@ const ListItem = React.forwardRef<React.ElementRef<"a">, React.ComponentPropsWit
 );
 ListItem.displayName = "ListItem";
 
-{
-  /* <NavigationMenuItem>
+/* <NavigationMenuItem>
           <NavigationMenuTrigger>About</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-6 sm:w-[24rem] md:w-[24rem] lg:w-[36rem] lg:grid-cols-[.75fr_1fr]">
@@ -331,9 +330,8 @@ ListItem.displayName = "ListItem";
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem> */
-}
-{
-  /* <NavigationMenuItem>
+
+/* <NavigationMenuItem>
           <NavigationMenuTrigger>Templates</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
@@ -345,9 +343,8 @@ ListItem.displayName = "ListItem";
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem> */
-}
-{
-  /* <NavigationMenuItem>
+
+/* <NavigationMenuItem>
           <Link href="/" legacyBehavior passHref>
             <NavigationMenuLink className="font-medium">Documentation</NavigationMenuLink>
           </Link>
@@ -363,4 +360,3 @@ ListItem.displayName = "ListItem";
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem> */
-}
