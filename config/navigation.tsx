@@ -25,12 +25,12 @@ const siteNavigationUntyped /*: SiteNavigationMapType */ = {
     href: "/about",
   },
   howItWorks: {
-    title: `How ${siteConfig.name} works`,
-    menuTitle: `How it works`,
-    href: "/how-it-works",
+    title: `Our vision of how ${siteConfig.name} will revolutionize the creative process of crafting a pitch`,
+    menuTitle: `Product`,
+    href: "/product",
   },
   useCases: {
-    title: `Key use cases of ${siteConfig.name}`,
+    title: `Use ${siteConfig.name} in consulting, strategy and research`,
     menuTitle: `Use cases`,
     href: "/use-cases",
   },

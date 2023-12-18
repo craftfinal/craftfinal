@@ -6,7 +6,7 @@ export type AppRoutes = {
 };
 
 const contentRoutes = ["/(about|terms|privacy)(/.*)?"];
-const marketingRoutes = ["/(how-it-works|use-cases)(/.*)?"];
+const marketingRoutes = ["/(product|use-cases)(/.*)?"];
 const authenticatedRoutes = ["/(try|playground)(/.*)?"];
 export const appRoutes = {
   publicRoutes: [...authenticatedRoutes, ...marketingRoutes],
