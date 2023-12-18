@@ -20,7 +20,7 @@ export default async function HeroSection({ account }: HeroSectionProps) {
         </p>
         <h1 className="mb-4 flex flex-wrap items-baseline gap-4 text-2xl font-bold dark:text-white md:text-4xl xl:mb-8 xl:text-5xl">
           <EnterPlaygroundButton account={account} />
-          <div className="mt-4 text-xl font-normal md:text-2xl lg:text-4xl">
+          <div className="mt-4 text-xl font-normal md:text-2xl">
             {" "}
             to see, how CraftFinal helps creating the final version
           </div>

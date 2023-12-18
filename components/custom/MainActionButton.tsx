@@ -20,7 +20,7 @@ export default function MainActionButton({ navItem, prefetch }: Readonly<MainAct
     to-indigo-900
     p-5 text-lg text-background hover:from-green-600
     hover:to-indigo-700 dark:from-blue-200 dark:to-slate-300 hover:dark:from-blue-300
-    hover:dark:to-slate-400 dark:hover:text-foreground md:p-8 md:text-3xl
+    hover:dark:to-slate-400 dark:hover:text-foreground md:p-6 md:text-2xl
     "
       >
         {navItem.title}

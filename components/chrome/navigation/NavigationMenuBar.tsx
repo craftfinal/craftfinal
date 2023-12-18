@@ -22,12 +22,13 @@ import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { ReactNode, Suspense } from "react";
-import { menuClassName } from "./Navbar";
+import { NavbarProps, menuClassName } from "./Navbar";
 
-export function NavigationMenuBar() {
+interface NavigationMenuBarProps extends NavbarProps {}
+export function NavigationMenuBar({ className }: NavigationMenuBarProps) {
   return (
-    <NavigationMenu className="w-full">
-      <NavigationMenuList className="space-x-1 sm:space-x-2 md:space-x-4">
+    <NavigationMenu className={className}>
+      <NavigationMenuList>
         {mainNavigationKeys.map((key) => {
           if (typeof key === "string") {
             const navItem = siteNavigation[key];

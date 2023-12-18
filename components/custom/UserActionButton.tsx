@@ -13,6 +13,6 @@ interface UserActionButtonProps {
 
 export default function UserActionButton({ signedIn, signedOut, account, prefetch }: Readonly<UserActionButtonProps>) {
   const navItem = account ? signedIn : signedOut;
-  const navPrefetch = prefetch !== undefined ? prefetch : !navItem.authenticated;
+  const navPrefetch = prefetch ?? !navItem.authenticated;
   return <MainActionButton navItem={navItem} prefetch={navPrefetch} />;
 }

@@ -6,7 +6,7 @@ export interface SiteHeaderProps extends AuthenticatedContentLayoutChildrenProps
 
 export function SiteHeader({ account }: SiteHeaderProps) {
   return (
-    <header className="md:pt-4lg:gap-y-4 container flex flex-col gap-y-2 pt-4 sm:pt-2 lg:pt-6 xl:pt-10">
+    <header className="container flex flex-col gap-y-2 pt-4  md:pt-6 lg:gap-y-4 lg:pt-10">
       <Navbar account={account} />
       <Breadcrumbs />
     </header>
