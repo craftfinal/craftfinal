@@ -21,11 +21,54 @@ import { NavItem } from "@/types";
 import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { ReactNode, Suspense } from "react";
+import React, { ReactNode, Suspense, useEffect, useRef, useState } from "react";
 import { NavbarProps, menuClassName } from "./Navbar";
 
 interface NavigationMenuBarProps extends NavbarProps {}
 export function NavigationMenuBar({ className }: NavigationMenuBarProps) {
+  // init disable state
+  const [menuTriggerOnClickEnabled, setMenuTriggerOnClickEnabled] = useState(true);
+
+  // init reference array
+  const targetRef = useRef<Array<HTMLButtonElement | null>>([]);
+
+  // Create observer on first render
+  useEffect(() => {
+    // Callback function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const observerCallback = (mutationsList: any) => {
+      for (const mutation of mutationsList) {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "data-state" &&
+          mutation.target.dataset.state === "open"
+        ) {
+          setMenuTriggerOnClickEnabled(false);
+          const timeout = setTimeout(() => {
+            setMenuTriggerOnClickEnabled(true);
+            clearTimeout(timeout);
+          }, 2000);
+        }
+      }
+    };
+
+    // Init MutationObserver
+    const observer = new MutationObserver(observerCallback);
+
+    // Add ref nodes to observer watch
+    targetRef.current.forEach((element) => {
+      if (element) {
+        observer.observe(element, {
+          attributes: true,
+        });
+      }
+    });
+
+    // Disconnect on dismount
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
   return (
     <NavigationMenu className={className}>
       <NavigationMenuList>
@@ -45,6 +88,8 @@ export function NavigationMenuBar({ className }: NavigationMenuBarProps) {
               navItemWithChildren: key,
               // account,
               // pathname,
+              targetRef,
+              menuTriggerOnClickEnabled,
             };
             return <MainNavMenuItemWithChildren key={key.item} navItemWithChildrenProps={navItemWithChildrenProps} />;
           } else {
@@ -108,6 +153,8 @@ function renderCustomMenuItem(
 
 type MainNavMenuItemWithChildrenType = {
   navItemWithChildren: NavMenuItemWithChildrenType;
+  targetRef: React.MutableRefObject<Array<HTMLButtonElement | null>>;
+  menuTriggerOnClickEnabled: boolean;
   // account: Base58CheckAccountOrNullOrUndefined;
   // pathname: string;
 };
@@ -116,7 +163,7 @@ const MainNavMenuItemWithChildren = React.forwardRef<
   React.ElementRef<"button">,
   React.ComponentPropsWithRef<"button"> & { navItemWithChildrenProps: MainNavMenuItemWithChildrenType }
 >(({ navItemWithChildrenProps, ...buttonProps }, ref) => {
-  const { navItemWithChildren } = navItemWithChildrenProps;
+  const { navItemWithChildren, targetRef, menuTriggerOnClickEnabled } = navItemWithChildrenProps;
   const navItem = siteNavigation[navItemWithChildren.item];
   const subItems = [navItemWithChildren.item, ...navItemWithChildrenProps.navItemWithChildren.children];
 
@@ -124,7 +171,18 @@ const MainNavMenuItemWithChildren = React.forwardRef<
     <NavigationMenuItem>
       <>
         <NavigationMenuTrigger
-          ref={ref}
+          // Add element to `targetRef` array for MutationObserver //////////////
+          ref={(elementRef) => {
+            targetRef.current.push(elementRef);
+            return ref;
+          }}
+          // Prevent clicks if not enabled /////////////////////////////////////?
+          onClick={(e) => {
+            if (!menuTriggerOnClickEnabled) {
+              // console.log(`MainNavMenuItemWithChildren: preventDefault`);
+              e.preventDefault();
+            }
+          }}
           className={cn(
             "bg-transparent",
             menuClassName.item.container,
