@@ -5,9 +5,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getOrCreateRegisteredAccount } from "@/actions/registeredAccountActions";
 import { getOrCreateTemporaryAccount } from "@/actions/temporaryAccountActions";
+import { getOrCreateIronSessionAccount } from "@/auth/iron-session/ironSessionActions";
+import { ironSessionAccountMiddlewareId } from "@/auth/iron-session/lib";
 import { getExecutedMiddlewareIds } from "@/middlewares/executeMiddleware";
+import { temporaryAccountMiddlewareId } from "@/middlewares/utils/temporaryAccount";
 import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
-import temporaryAccountMiddleware from "@/middlewares/withTemporaryAccount";
 import { prismaClient } from "@/prisma/client";
 import { StateIdSchemaType } from "@/schemas/id";
 import {
@@ -83,12 +85,22 @@ export async function getCurrentAccount(): Promise<Base58CheckAccount> {
     }
   }
   if (!existingAccount) {
-    if (authMiddlewareIds.includes(temporaryAccountMiddleware.id)) {
+    if (authMiddlewareIds.includes(temporaryAccountMiddlewareId)) {
       // Option 2: Try to authenticate a temporary account based on a cookie
       try {
         existingAccount = await getOrCreateTemporaryAccount();
       } catch (exc) {
         console.log(`getCurrentAccount: Exception in getOrCreateTemporaryAccount:`, exc);
+      }
+    }
+  }
+  if (!existingAccount) {
+    if (authMiddlewareIds.includes(ironSessionAccountMiddlewareId)) {
+      // Option 2: Try to authenticate a temporary account based on a cookie
+      try {
+        existingAccount = await getOrCreateIronSessionAccount();
+      } catch (exc) {
+        console.log(`getCurrentAccount: Exception in getOrCreateIronSession:`, exc);
       }
     }
   }

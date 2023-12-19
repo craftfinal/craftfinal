@@ -1,5 +1,5 @@
 // @/components/auth/AccountTable.tsx
-"use server";
+
 import { Base58CheckAccount } from "@/types/user";
 import AccountId from "@/components/custom/AccountId";
 import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
@@ -9,7 +9,7 @@ export interface AccountTableProps extends React.ComponentProps<typeof Table> {
   provider: string;
 }
 
-export default async function AccountTable({ account, provider, className, ...props }: AccountTableProps) {
+export default function AccountTable({ account, provider, className, ...props }: AccountTableProps) {
   return (
     <Table className={className} {...props}>
       <TableBody className="text-xs">

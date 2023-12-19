@@ -1,6 +1,6 @@
-// @/components/auth/AccountCard.tsx
+// @/components/auth/AccountCard.client.tsx
 
-"use server";
+"use client";
 
 import AccountId from "@/components/custom/AccountId";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,8 +18,7 @@ export interface AccountCardProps extends React.ComponentProps<typeof Card> {
   account: Base58CheckAccountOrNullOrUndefined;
   provider?: string;
 }
-
-export default async function AccountCard({ account, provider, className, ...props }: AccountCardProps) {
+export default function AccountCardClient({ account, provider, className, ...props }: AccountCardProps) {
   const accountProvider = provider ?? account?.provider;
   return (
     <Card className={cn(className)} {...props}>

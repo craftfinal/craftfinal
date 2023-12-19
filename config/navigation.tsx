@@ -11,7 +11,7 @@ import { siteConfig } from "./site";
 // Note: avoid defining the type of the siteNavigationUntyped object
 // to let TypeScript infer it as restrictively as possible
 // type SiteNavigationMapType = Record<string, NavItem>;
-const siteNavigationUntyped /*: SiteNavigationMapType */ = {
+export const siteNavigationUntyped /*: SiteNavigationMapType */ = {
   home: {
     title: `${siteConfig.name}`,
     menuTitle: `Home`,

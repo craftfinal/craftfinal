@@ -1,4 +1,4 @@
-// @/schemas/utils/temporaryUser.ts
+// @/schemas/utils/temporaryAccount.ts
 
 import { siteConfig } from "@/config/site";
 import { uuidRegex } from "@/types/utils/uuidId";
@@ -33,6 +33,7 @@ export function generateTemporaryAccountId() {
   }
   throw Error(`generateTemporaryAccountId: id="${id}" failed validation`);
 }
+
 export function getAccountProviderIdCookieName(): ClientIdSchemaType {
   const cookieNameSuffix =
     process.env.NODE_ENV === "development" ? `devel.${siteConfig.canonicalDomainName}` : siteConfig.canonicalDomainName;

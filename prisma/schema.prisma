@@ -19,6 +19,7 @@ datasource db {
 
 enum AccountType {
   Temporary
+  IronSession
   Registered
 }
 

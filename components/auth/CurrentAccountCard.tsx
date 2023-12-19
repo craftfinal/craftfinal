@@ -6,8 +6,8 @@ import { getCurrentAccountOrNull } from "@/actions/user";
 import { AuthenticatedAccountCardProps } from "./AccountCard";
 import AccountCard from "./AccountCard";
 
-export default async function CurrentAccountCard(props: AuthenticatedAccountCardProps) {
+export default async function CurrentAccountCard({ account, ...props }: AuthenticatedAccountCardProps) {
   // Fetch current user on the server
-  const account = await getCurrentAccountOrNull();
-  return <AccountCard {...props} account={account} />;
+  const currentAccount = account ?? (await getCurrentAccountOrNull());
+  return <AccountCard {...props} account={currentAccount} />;
 }

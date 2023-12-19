@@ -19,11 +19,12 @@ import {
 // import { settingsConfig } from "@/config/settings";
 // import { AccountType } from "@/auth/account";
 import { siteConfig } from "@/config/site";
-import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { Settings2Icon } from "lucide-react";
+import { NavbarProps } from "../chrome/navigation/Navbar";
 import AppSettingsForm from "./AppSettingsForm";
 
-export default function AppSettingsSheet({ account }: { account?: Base58CheckAccountOrNullOrUndefined }) {
+export interface AppSettingsSheetProps extends NavbarProps {}
+export default function AppSettingsSheet({ account }: AppSettingsSheetProps) {
   // return !(account?.type === AccountType.Registered) ? null : (
   return !account ? null : (
     <Sheet>

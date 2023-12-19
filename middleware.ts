@@ -5,14 +5,16 @@ export const config = {
 };
 
 import executeMiddleware, { MiddlewareEntry } from "@/middlewares/executeMiddleware";
-import withPathnameAndSearchParams from "@/middlewares/withPathnameAndSearchParams";
-// import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
-import temporaryAccountMiddleware from "./middlewares/withTemporaryAccount";
+import pathnameMiddleware from "./middlewares/withPathnameAndSearchParams";
+// import temporaryAccountMiddleware from "./middlewares/withTemporaryAccount";
+// import registeredAccountMiddleware from "./middlewares/withRegisteredAccount";
+import ironSessionAccountMiddleware from "./middlewares/withIronSessionAccount";
 
 export const middlewares: Array<MiddlewareEntry> = [
-  withPathnameAndSearchParams,
+  pathnameMiddleware,
+  // temporaryAccountMiddleware,
   // registeredAccountMiddleware,
-  temporaryAccountMiddleware,
+  ironSessionAccountMiddleware,
 ];
 
 export default executeMiddleware(middlewares);

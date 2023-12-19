@@ -3,7 +3,7 @@
 "use client";
 
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { getOrResetTemporaryAccount } from "../actions/temporaryAccountActions";
+import { getOrResetTemporaryAccount } from "@/actions/temporaryAccountActions";
 
 import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 

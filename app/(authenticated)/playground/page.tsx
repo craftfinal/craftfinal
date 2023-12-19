@@ -2,14 +2,13 @@
 
 "use server;";
 
-import CurrentUserCard from "@/components/auth/CurrentAccountCard";
-import { Button } from "@/components/ui/button";
-import { siteNavigation } from "@/config/navigation";
+import { getCurrentAccountOrNull } from "@/actions/user";
 import WrapMDX from "@/layouts/mdx/WrapMDX";
-import { CheckIcon } from "lucide-react";
-import Link from "next/link";
+import EnterPlaygroundButtonClient from "./EnterPlaygroundButton.client";
 
 export default async function PlaygroundPage() {
+  // Fetch current user on the server
+  const currentAccount = await getCurrentAccountOrNull();
   return (
     <div className="flex flex-col gap-y-8">
       <WrapMDX className="prose">
@@ -17,12 +16,10 @@ export default async function PlaygroundPage() {
         <p>This is an evolving demonstration of the core features of CraftFinal.</p>
       </WrapMDX>
       <div className="flex flex-wrap gap-4">
-        <CurrentUserCard />
-        <Link href={siteNavigation.inPlayground.href} title={siteNavigation.inPlayground.title}>
-          <Button className="">
-            <CheckIcon className="mr-2 h-4 w-4" /> {siteNavigation.inPlayground.title}
-          </Button>
-        </Link>
+        {/* <CurrentAccountCard account={currentAccount} /> */}
+        {/* <CurrentAccountCardClient account={currentAccount} /> */}
+        {/* <EnterPlaygroundButton account={currentAccount} /> */}
+        <EnterPlaygroundButtonClient account={currentAccount} />
       </div>
       <WrapMDX>
         <h2>Scope of playground</h2>

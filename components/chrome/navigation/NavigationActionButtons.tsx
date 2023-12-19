@@ -1,7 +1,7 @@
 import AppSettingsSheet from "@/components/appSettings/AppSettingsSheet";
 import { DarkModeToggle } from "@/components/custom/DarkModeToggle";
 import { cn } from "@/lib/utils";
-import { hasMiddleware } from "@/middlewares/executeMiddleware";
+import { hasMiddleware } from "@/middlewares/hasMiddleware";
 import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
 import { NavbarProps, menuClassName } from "./Navbar";
 import { SignupNavigation } from "./SignupNavigation";
