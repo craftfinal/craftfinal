@@ -26,6 +26,7 @@ export function IronSessionProvider({ children }: IronSessionProviderProps): JSX
       };
       initializeIronSession();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array to run only once after component mounts
 
   return <IronSessionContext.Provider value={ironSession}>{children}</IronSessionContext.Provider>;

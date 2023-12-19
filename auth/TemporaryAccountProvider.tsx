@@ -26,6 +26,7 @@ export function TemporaryAccountProvider({ children }: TemporaryAccountProviderP
       };
       initializeTemporaryAccount();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array to run only once after component mounts
 
   return <TemporaryAccountContext.Provider value={temporaryAccount}>{children}</TemporaryAccountContext.Provider>;
