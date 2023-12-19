@@ -1,5 +1,5 @@
 import { SiteLogo } from "@/components/chrome/SiteLogo";
-import { menuClassName } from "@/components/chrome/navigation/Navbar";
+import { menuClassName } from "@/components/chrome/navigation/NavbarProps";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NavItem } from "@/types";

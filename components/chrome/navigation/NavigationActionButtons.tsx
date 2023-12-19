@@ -3,7 +3,7 @@ import { DarkModeToggle } from "@/components/custom/DarkModeToggle";
 import { cn } from "@/lib/utils";
 import { hasMiddleware } from "@/middlewares/hasMiddleware";
 import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
-import { NavbarProps, menuClassName } from "./Navbar";
+import { NavbarProps, menuClassName } from "./NavbarProps";
 import { SignupNavigation } from "./SignupNavigation";
 import { UserProfileNavigation } from "./UserProfileNavigation";
 

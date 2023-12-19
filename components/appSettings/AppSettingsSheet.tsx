@@ -20,7 +20,7 @@ import {
 // import { AccountType } from "@/auth/account";
 import { siteConfig } from "@/config/site";
 import { Settings2Icon } from "lucide-react";
-import { NavbarProps } from "../chrome/navigation/Navbar";
+import { NavbarProps } from "../chrome/navigation/NavbarProps";
 import AppSettingsForm from "./AppSettingsForm";
 
 export interface AppSettingsSheetProps extends NavbarProps {}

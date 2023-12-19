@@ -22,7 +22,7 @@ import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { ReactNode, Suspense, useEffect, useRef, useState } from "react";
-import { NavbarProps, menuClassName } from "./Navbar";
+import { NavbarProps, menuClassName } from "./NavbarProps";
 
 interface NavigationMenuBarProps extends NavbarProps {}
 export function NavigationMenuBar({ className }: NavigationMenuBarProps) {
