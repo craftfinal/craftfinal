@@ -2,7 +2,7 @@ import { z } from "zod";
 import { itemClientStateSchema, itemSchema } from "./item";
 
 export const achievementFormSchema = z.object({
-  content: z.string(),
+  content: z.string().min(1),
 });
 
 export const achievementInternalSchema = z.object({

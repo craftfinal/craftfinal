@@ -12,9 +12,10 @@ import {
 import { ItemDataUntypedType } from "@/schemas/item";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ItemDescendantModelNameType } from "@/types/itemDescendant";
-import { Plus } from "lucide-react";
-import { /*Dispatch, SetStateAction, */ useState } from "react";
+import { CheckCircleIcon } from "lucide-react";
+import { /*Dispatch, SetStateAction, */ useEffect, useState } from "react";
 import { InputProps } from "react-editext";
+import { SafeParseReturnType, z } from "zod";
 import { Button } from "../../ui/button";
 import { toast } from "../../ui/use-toast";
 import EditableInputField from "../utils/EditableInputField";
@@ -39,7 +40,13 @@ export default function DescendantListItemInput({
   const itemFormSchema = getItemSchema(itemModel, "form");
   const itemFormFields = getSchemaFields(itemModel, "display");
 
-  const [inputIsValid, setInputIsValid] = useState(false);
+  type ItemDataType = z.output<typeof itemFormSchema>;
+  type ItemDataFieldNameType = keyof ItemDataType;
+  type ItemDataFieldValueType = string | number;
+
+  const [draftValidationStatus, setDraftValidationStatus] = useState<
+    SafeParseReturnType<ItemDataUntypedType, ItemDataUntypedType>
+  >({} as SafeParseReturnType<ItemDataUntypedType, ItemDataUntypedType>);
 
   const settingsStore = useAppSettingsStore();
   const { showItemDescendantInternals } = settingsStore;
@@ -48,26 +55,54 @@ export default function DescendantListItemInput({
   // Initialize local state for field values
   const [itemDraftState, setItemDraftState] = useState(getInitialItemDraftState(itemDraft, itemFormFields));
 
-  const validate = (itemDraft: object) => {
-    const validationStatus = itemFormSchema.safeParse({ ...itemDraft });
-    return validationStatus;
+  // Updadte validationStatus once when component mounts
+  useEffect(() => {
+    validate();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const validate = (newDraftState = itemDraft) => {
+    const validationStatus = itemFormSchema.safeParse(newDraftState);
+    setDraftValidationStatus(validationStatus);
+  };
+
+  const updateItemDraftAndState = (fieldName: ItemDataFieldNameType, newValue: ItemDataFieldValueType) => {
+    const newDraftState = { ...itemDraft, [fieldName]: newValue };
+    // Update the local state
+    // setItemDraftState((prev) => ({ ...prev, [fieldName]: newValue }));
+    setItemDraftState(newDraftState);
+    // Update the Zustand store
+    // NOTE: Taking the `itemDraftState` does not work as it will only change on the next render
+    // updateItemDraft({ ...itemDraftState });
+    updateItemDraft(newDraftState);
+    // Update validation status after changing the draft
+    validate(newDraftState);
+  };
+
+  // Reset field values after commit
+  const resetItemDraftAndState = (initialValue: string | null | undefined = "") => {
+    // Update the local state
+    setItemDraftState(itemFormFields.reduce((acc, field) => ({ ...acc, [field]: initialValue }), {}));
+    // Update the Zustand store
+    // updateItemDraft({ ...itemDraft, [fieldName]: newValue });
+    // updateItemDraft({ ...itemDraftState, [fieldName]: newValue });
+    updateItemDraft(itemDraftState);
+    // Update validation status after changing the draft
+    validate();
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
+    event.preventDefault();
     if (event.target.name) {
       const fieldName = extractFieldName(event.target.name);
-      let newValue: string | number = event.target.value;
+      let newValue: ItemDataFieldValueType = event.target.value;
       // Check if the field is a number and parse it
       if (isNumberField(itemFormSchema, fieldName)) {
         newValue = parseFloat(newValue) || 0; // Default to 0 if parsing fails
       }
-
-      setItemDraftState((prev) => ({ ...prev, [fieldName]: newValue }));
-      updateItemDraft({ ...itemDraft, [fieldName]: newValue });
+      updateItemDraftAndState(fieldName, newValue);
     }
-
-    const validationStatus = validate({ ...itemDraft });
-    setInputIsValid(validationStatus.success);
   };
 
   const handleSave = (value?: string, inputProps?: InputProps) => {
@@ -75,40 +110,33 @@ export default function DescendantListItemInput({
       // Update the item draft in the store
       const fieldName = extractFieldName(inputProps.name);
 
-      let newValue: string | number = value;
+      let newValue: ItemDataFieldValueType = value;
 
       // Check if the field is a number and parse it
       if (isNumberField(itemFormSchema, fieldName)) {
         newValue = parseFloat(newValue) || 0; // Default to 0 if parsing fails
       }
-
-      // Update the local state
-      setItemDraftState((prev) => ({ ...prev, [fieldName]: newValue }));
-      // Update the Zustand store
-      updateItemDraft({ ...itemDraftState, [fieldName]: newValue });
+      updateItemDraftAndState(fieldName, newValue);
     }
     return commitToStore();
   };
 
-  const commitToStore = (): boolean => {
+  const commitToStore = () => {
     // Perform validation before committing
-    const validationStatus = validate({ ...itemDraft });
-    setInputIsValid(validationStatus.success);
-    if (validationStatus.success) {
+    validate();
+    if (draftValidationStatus.success) {
       commitItemDraft();
       // Reset field values after commit
-      setItemDraftState(itemFormFields.reduce((acc, field) => ({ ...acc, [field]: "" }), {}));
-      setInputIsValid(false);
+      resetItemDraftAndState();
     } else {
       window.consoleLog(
         `handleSubmit: Validation failed. itemDraft:`,
         itemDraft,
-        `validationStatus:`,
-        validationStatus,
+        `draftValidationStatus:`,
+        draftValidationStatus,
       );
-      toast({ title: `Validation failed`, description: JSON.stringify(validationStatus) });
+      toast({ title: `Validation failed`, description: JSON.stringify(draftValidationStatus) });
     }
-    return validationStatus.success;
   };
 
   const handleSubmitButton = () => {
@@ -145,8 +173,13 @@ export default function DescendantListItemInput({
           );
         })}
       </div>
-      <Button variant="ghost" disabled={!inputIsValid} onClick={handleSubmitButton} title={`Create ${itemModel}`}>
-        {<Plus />}
+      <Button
+        variant="ghost"
+        disabled={!draftValidationStatus.success}
+        onClick={handleSubmitButton}
+        title={`Create ${itemModel}`}
+      >
+        {<CheckCircleIcon />}
       </Button>
       {showListItemInternals && (
         <div className={cn("my-2", { "bg-muted-foreground": canEdit /*editingInput */ })}>
