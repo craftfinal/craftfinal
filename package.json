@@ -6,6 +6,9 @@
     "name": "Simon Heimlicher",
     "url": "https://simon.heimlicher.com"
   },
+  "engines": {
+    "node": ">20.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "dev-local": "sudo ifconfig lo0 alias devel.craftfinal.local up && next dev --hostname devel.craftfinal.local -p 3000",
