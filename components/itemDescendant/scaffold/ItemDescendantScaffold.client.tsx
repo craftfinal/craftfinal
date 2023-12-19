@@ -115,12 +115,10 @@ export default function ItemDescendantScaffoldClientComponent(props: ItemDescend
   const parentId = serverState.parentId;
   const id = serverState.id;
 
-  const storeVersion = 1; // Or any logic to determine the version
-
   return (
     <ResumeActionProvider resumeAction={resumeAction}>
       <StoreNameProvider storeName={`${itemModel}`}>
-        <ItemDescendantStoreProvider configs={[{ itemModel, parentClientId, clientId, parentId, id, storeVersion }]}>
+        <ItemDescendantStoreProvider configs={[{ itemModel, parentClientId, clientId, parentId, id }]}>
           <ItemDescendantClientContext {...props} />
         </ItemDescendantStoreProvider>
       </StoreNameProvider>

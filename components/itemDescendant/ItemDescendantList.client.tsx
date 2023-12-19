@@ -211,12 +211,11 @@ export default function ItemDescendantListContext(props: ItemDescendantListConte
   const clientId = generateClientId(itemModel);
   const parentId = serverState.parentId;
   const id = serverState.id;
-  const storeVersion = 1; // FIXME: add logic to determine the version from the serverUpdate
 
   return (
     <ResumeActionProvider resumeAction={resumeAction}>
       <StoreNameProvider storeName={`${itemModel}`}>
-        <ItemDescendantStoreProvider configs={[{ itemModel, parentClientId, clientId, parentId, id, storeVersion }]}>
+        <ItemDescendantStoreProvider configs={[{ itemModel, parentClientId, clientId, parentId, id }]}>
           <ItemDescendantListState {...props} />
         </ItemDescendantStoreProvider>
       </StoreNameProvider>

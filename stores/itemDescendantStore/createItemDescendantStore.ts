@@ -12,9 +12,9 @@ import {
   itemDescendantOrderableStoreStateSchema,
   itemDescendantStoreStateSchema,
 } from "@/schemas/itemDescendant";
+import { createDateSafeLocalStorage } from "@/stores/itemDescendantStore/utils/createDateSafeLocalStorage";
 import { ClientIdType, ItemDisposition } from "@/types/item";
 import { ItemDescendantModelNameType, getDescendantModel } from "@/types/itemDescendant";
-import { createDateSafeLocalStorage } from "@/stores/itemDescendantStore/utils/createDateSafeLocalStorage";
 import { Draft } from "immer";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -26,8 +26,7 @@ import {
 } from "./utils/descendantOrderValues";
 import { handleNestedItemDescendantListFromServer } from "./utils/syncItemDescendantStore";
 
-// NOTE: This type must be kept in sync with `ItemDescendantStoreStateType`, which is
-// inferred using the Zod schemas in `@/schemas/itemDescendant`
+// NOTE: This type must be kept in sync with `ItemDescendantStoreStateType` in `@/schemas/itemDescendant`
 export type ItemDescendantStoreState = {
   createdAt: Date;
   lastModified: Date;
@@ -83,40 +82,41 @@ export interface ItemDescendantStoreConfigType {
   parentId: StateIdSchemaType | undefined;
   id: StateIdSchemaType | undefined;
 
-  storeVersion?: number;
   storeName?: string;
 }
-export const storeVersion = 1;
+
 const storeNameSuffix =
   process.env.NODE_ENV === "development" ? `devel.${siteConfig.canonicalDomainName}` : siteConfig.canonicalDomainName;
 
-export const createItemDescendantStore = ({
-  parentClientId,
-  clientId,
-  parentId,
-  id,
-  itemModel,
-  storeVersion = 1,
-  storeName: customStoreName,
-}: ItemDescendantStoreConfigType) => {
-  const storeName = customStoreName ?? `${itemModel}-${storeNameSuffix}`;
+export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfigType) => {
+  const { parentClientId, clientId, parentId, id, itemModel, storeName } = storeConfig;
+
+  const currentStoreName = storeName ?? `${itemModel}-${storeNameSuffix}`;
+
+  const initialState = {
+    parentClientId,
+    clientId,
+    parentId,
+    id,
+    createdAt: new Date(0),
+    lastModified: new Date(0),
+    deletedAt: null,
+    disposition: ItemDisposition.Modified,
+
+    itemModel: itemModel,
+    descendantModel: getDescendantModel(itemModel),
+    descendants: [],
+    descendantDraft: {} as ItemDataUntypedType,
+  };
+
+  // NOTE: Consider adding a migration path at the end of the `create` function below
+  // when changing the storeVersion
+  const storeVersion = 2;
 
   return create(
     persist(
       immer<ItemDescendantStore>((set, get) => ({
-        parentClientId,
-        clientId,
-        parentId,
-        id,
-        createdAt: new Date(0),
-        lastModified: new Date(0),
-        deletedAt: null,
-        disposition: ItemDisposition.Modified,
-
-        itemModel: itemModel,
-        descendantModel: getDescendantModel(itemModel),
-        descendants: [],
-        descendantDraft: {} as ItemDataUntypedType,
+        ...initialState,
 
         setItemData: (descendantData: ItemDataUntypedType): void => {
           const now = new Date();
@@ -332,9 +332,23 @@ export const createItemDescendantStore = ({
         },
       })),
       {
-        name: storeName,
-        version: storeVersion,
+        version: storeVersion, // a migration will be triggered if the version in the persisted state in localStorage does not match this one
+        name: currentStoreName,
         storage: createDateSafeLocalStorage(),
+        migrate: (persistedState, persistedVersion) => {
+          try {
+            itemDescendantStoreStateSchema.parse(persistedState);
+            window.consoleLog(
+              `createItemDescendantStore.migrate: validated persistedVersion=${persistedVersion} against itemDescendantStoreStateSchema of ${storeVersion}=storeVersion`,
+            );
+            return persistedState as ItemDescendantStore;
+          } catch (error) {
+            window.consoleLog(
+              `createItemDescendantStore.migrate: persistedVersion=${persistedVersion} failed validation against itemDescendantStoreStateSchema of ${storeVersion}=storeVersion; returning {}`,
+            );
+            return {} as ItemDescendantStore;
+          }
+        },
       },
     ),
   );

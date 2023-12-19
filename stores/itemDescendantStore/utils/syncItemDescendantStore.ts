@@ -4,10 +4,12 @@ import { handleNestedItemDescendantListFromClient } from "@/actions/syncItemDesc
 import { toast } from "@/components/ui/use-toast";
 import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { generateClientId, isValidClientId } from "@/schemas/id";
+import { ItemDataUntypedType } from "@/schemas/item";
 import {
   ItemDescendantClientStateType,
   ItemDescendantOrderableClientStateListType,
   ItemDescendantServerStateType,
+  ItemDescendantStoreStateType,
 } from "@/schemas/itemDescendant";
 import { ClientIdType, ItemDisposition } from "@/types/item";
 import { getDescendantModel, getItemOrderFunction, getParentModel } from "@/types/itemDescendant";
@@ -328,7 +330,8 @@ function mergeDescendantListFromServer(
         processServerItemDescendant(clientDescendant, serverDescendant);
       } else {
         // New item from server
-        const newDescendant = augmentToItemDescendantClientState({ ...serverDescendant }, clientItem.clientId);
+        // const newDescendant = augmentToItemDescendantClientState({ ...serverDescendant }, clientItem.clientId);
+        const newDescendant = augmentToItemDescendantStoreState({ ...serverDescendant }, clientItem.clientId);
         clientItem.descendants = [...clientItem.descendants, newDescendant];
       }
       lastModifiedDescendant =
@@ -385,7 +388,8 @@ function mergeDescendantListFromServer(
       // Descendant list of server initializes the one of the client
       // Before we can use the descendants from the server, we need to
       // augment them with clientIds recursively
-      const augmentedServerState = augmentToItemDescendantClientState(serverItem, clientItem.clientId);
+      // const augmentedServerState = augmentToItemDescendantClientState(serverItem, clientItem.clientId);
+      const augmentedServerState = augmentToItemDescendantStoreState(serverItem, clientItem.clientId);
       clientItem.descendants = augmentedServerState.descendants;
     }
   } else {
@@ -394,6 +398,7 @@ function mergeDescendantListFromServer(
   }
 }
 
+/*
 export function augmentToItemDescendantClientState(
   serverItem: ItemDescendantServerStateType,
   providedParentClientId?: ClientIdType,
@@ -426,6 +431,42 @@ export function augmentToItemDescendantClientState(
     descendants: clientDescendants || [],
   };
   return clientItem as Draft<ItemDescendantClientStateType>;
+}
+*/
+
+function augmentToItemDescendantStoreState(
+  serverItem: ItemDescendantServerStateType,
+  providedParentClientId?: ClientIdType,
+  disposition = ItemDisposition.Synced,
+): Draft<ItemDescendantStoreStateType> {
+  // Disposition property is set to `synced` on all items
+  const dispositionProperty = {
+    disposition,
+  };
+  const itemModel = serverItem.itemModel;
+  const descendantModel = serverItem.descendantModel ?? getDescendantModel(itemModel);
+  const modelProperties = {
+    itemModel,
+    descendantModel,
+  };
+  const parentClientId = providedParentClientId ?? generateClientId(getParentModel(itemModel) ?? undefined);
+  const clientId = generateClientId(itemModel);
+
+  const clientDescendants = serverItem.descendants.map((serverDescendant) => {
+    const newDescendant = augmentToItemDescendantStoreState(serverDescendant, clientId, disposition);
+    return newDescendant as ItemDescendantServerStateType;
+  });
+
+  const clientItem = {
+    ...serverItem,
+    ...modelProperties,
+    ...dispositionProperty,
+    parentClientId,
+    clientId,
+    descendants: clientDescendants || [],
+    descendantDraft: {} as ItemDataUntypedType,
+  };
+  return clientItem as Draft<ItemDescendantStoreStateType>;
 }
 
 function clientItemMatchesServerItem(
