@@ -57,12 +57,12 @@ export default function DescendantListItemInput({
 
   // Updadte validationStatus once when component mounts
   useEffect(() => {
-    validate();
+    validate(itemDraft);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const validate = (newDraftState = itemDraft) => {
+  const validate = (newDraftState: ItemDataUntypedType) => {
     const validationStatus = itemFormSchema.safeParse(newDraftState);
     setDraftValidationStatus(validationStatus);
   };
@@ -75,21 +75,22 @@ export default function DescendantListItemInput({
     // Update the Zustand store
     // NOTE: Taking the `itemDraftState` does not work as it will only change on the next render
     // updateItemDraft({ ...itemDraftState });
-    updateItemDraft(newDraftState);
+    updateItemDraft({ ...newDraftState });
     // Update validation status after changing the draft
     validate(newDraftState);
   };
 
   // Reset field values after commit
   const resetItemDraftAndState = (initialValue: string | null | undefined = "") => {
+    const initialDraftState = itemFormFields.reduce((acc, field) => ({ ...acc, [field]: initialValue }), {});
     // Update the local state
-    setItemDraftState(itemFormFields.reduce((acc, field) => ({ ...acc, [field]: initialValue }), {}));
+    setItemDraftState(initialDraftState);
     // Update the Zustand store
     // updateItemDraft({ ...itemDraft, [fieldName]: newValue });
     // updateItemDraft({ ...itemDraftState, [fieldName]: newValue });
-    updateItemDraft(itemDraftState);
+    updateItemDraft({ ...initialDraftState });
     // Update validation status after changing the draft
-    validate();
+    validate(initialDraftState);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -123,7 +124,7 @@ export default function DescendantListItemInput({
 
   const commitToStore = () => {
     // Perform validation before committing
-    validate();
+    validate(itemDraft);
     if (draftValidationStatus.success) {
       commitItemDraft();
       // Reset field values after commit
