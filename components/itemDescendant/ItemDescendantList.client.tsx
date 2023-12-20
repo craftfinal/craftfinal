@@ -20,7 +20,7 @@ import Descendant from "./descendant/Descendant";
 import DescendantInput from "./descendant/DescendantInput";
 import DescendantList from "./descendant/DescendantList";
 import { AutoSync } from "./utils/AutoSync";
-import ItemDescendantListSynchronization from "./utils/ItemDescendantListSynchronization";
+import ItemDescendantListSynchronization from "./utils/SyncButton";
 
 export interface ItemDescendantRenderProps {
   index: number;

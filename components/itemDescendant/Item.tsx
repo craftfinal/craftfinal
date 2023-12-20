@@ -23,16 +23,43 @@ import { ItemIcon } from "./utils/ItemIcon";
 
 export interface ItemProps extends ItemDescendantRenderProps {}
 export default function Item(props: ItemProps) {
-  const { itemModel, item, index, resumeAction } = props;
-  // const [editingInput, setEditingInput] = useState(resumeAction === "edit");
-  const storeName = useStoreName();
-  const store = useItemDescendantStore(storeName);
-  const setItemData = store((state) => state.setItemData);
-  const markItemAsDeleted = store((state) => state.markItemAsDeleted);
+  const { itemModel, resumeAction } = props;
+  const canEdit = itemModel === "user" ? false : resumeAction === "edit";
 
   const settingsStore = useAppSettingsStore();
   const { showItemDescendantInternals } = settingsStore;
   const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
+
+  return (
+    <div
+      className={cn(
+        "flex flex-1 items-center justify-between gap-y-2",
+        "border-solid border-slate-500/50 lg:gap-3 xl:gap-4",
+        {
+          "border-t-4 bg-slate-500/50 dark:bg-slate-500/50": canEdit && itemModel === "resume",
+          "border-t-2 bg-slate-300/50 dark:bg-slate-700/50": canEdit && itemModel === "organization",
+          "bg-background/50": canEdit && itemModel === "role",
+        },
+      )}
+    >
+      <div className="flex flex-1 items-center gap-1 lg:gap-2 xl:gap-3">
+        <ItemHeader {...props} />
+      </div>
+      {showListItemInternals && <ListItemInternals {...props} />}
+    </div>
+  );
+}
+
+function ItemHeader(props: ItemProps) {
+  const { itemModel, item, resumeAction } = props;
+  // const [editingInput, setEditingInput] = useState(resumeAction === "edit");
+  const descendantModel = item.descendantModel;
+  const numDescendants = item.descendants.filter((descendant) => !descendant.deletedAt).length;
+
+  const storeName = useStoreName();
+  const store = useItemDescendantStore(storeName);
+  const setItemData = store((state) => state.setItemData);
+  const markItemAsDeleted = store((state) => state.markItemAsDeleted);
 
   const canEdit = itemModel === "user" ? false : resumeAction === "edit";
 
@@ -79,30 +106,23 @@ export default function Item(props: ItemProps) {
 
   return (
     <div
-      className={cn(
-        "flex flex-1 items-center justify-between gap-y-2",
-        "border-solid border-slate-500/50 lg:gap-3 xl:gap-4",
-        {
-          "border-t-4 bg-slate-500/50 dark:bg-slate-500/50": canEdit && itemModel === "resume",
-          "border-t-2 bg-slate-300/50 dark:bg-slate-700/50": canEdit && itemModel === "organization",
-          "bg-background/50": canEdit && itemModel === "role",
-        },
-      )}
+      className={cn("flex flex-1 items-center gap-1 lg:gap-2 xl:gap-3", {
+        // "bg-background/50 text-muted-foreground bg-blend-soft-light": item.disposition !== ItemDisposition.Synced,
+        "text-muted-foreground": item.disposition !== ItemDisposition.Synced,
+        "outline-red-500": !inputIsValid,
+        "outline-none": inputIsValid,
+      })}
     >
-      <div
-        className={cn("flex flex-1 items-center gap-1 lg:gap-2 xl:gap-3", {
-          // "bg-background/50 text-muted-foreground bg-blend-soft-light": item.disposition !== ItemDisposition.Synced,
-          "text-muted-foreground": item.disposition !== ItemDisposition.Synced,
-          "outline-red-500": !inputIsValid,
-          "outline-none": inputIsValid,
-        })}
-      >
-        {!canEdit
-          ? null
-          : ItemIcon(itemModel, {
-              className: "w-auto text-foreground h-4 sm:h-6 lg:h-6 xl:h-8",
-            })}
-        {itemFormFields.map((field) => (
+      {canEdit && ItemIcon(itemModel)}
+      {itemModel === "user" ? (
+        <div className="py-4 text-lg font-medium xl:text-xl">
+          You{" "}
+          {numDescendants === 0
+            ? `don‘t have any ${descendantModel}s yet`
+            : `have ${numDescendants === 1 ? `one ${descendantModel}` : `${numDescendants} ${descendantModel}s`}`}
+        </div>
+      ) : (
+        itemFormFields.map((field) => (
           <div
             key={field}
             className="text-shadow-dark dark:text-light-txt-1 text-dark-txt-1 dark:text-light-txt-4 flex-1"
@@ -117,59 +137,9 @@ export default function Item(props: ItemProps) {
               canEdit={canEdit}
             />
           </div>
-        ))}
-      </div>
-      {showListItemInternals && (
-        <div className="flex basis-3/4 cursor-auto items-center gap-x-4 px-4 py-2 text-xs text-slate-600">
-          <p className="flex h-full items-center bg-slate-200 px-2 text-lg">{index}</p>
-          <table>
-            <tbody>
-              <tr>
-                <td className="py-0">{item.disposition}</td>
-              </tr>
-            </tbody>
-          </table>
-          <table className="w-auto">
-            <tbody>
-              <tr>
-                <td
-                  className={cn("py-0", {
-                    "text-red-500": item.disposition !== ItemDisposition.Synced,
-                  })}
-                >
-                  <span className="text-xs text-muted-foreground">modified</span>:&nbsp;
-                  <span className="py-0">
-                    {dateToISOLocal(item.lastModified, DateTimeFormat.MonthDayTime, DateTimeSeparator.Newline)}
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td className={"py-0"}>
-                  <span className="text-xs text-muted-foreground">created</span>:&nbsp;
-                  {dateToISOLocal(item.createdAt, DateTimeFormat.MonthDayTime, DateTimeSeparator.Newline)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <table className="w-auto">
-            <tbody>
-              <tr>
-                <td className="py-0">
-                  <span className="text-xs text-muted-foreground">client</span>&nbsp;
-                  <code>{item.clientId?.substring(0, 8)}&hellip;</code>
-                </td>
-              </tr>
-              <tr>
-                <td className="py-0">
-                  <span className="text-xs text-muted-foreground">server</span>&nbsp;
-                  <code>{item.id?.substring(0, 8)}&hellip;</code>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        ))
       )}
-      {canEdit && itemModel !== "user" ? (
+      {canEdit && (
         <button
           /* /Delete Button */
           className="text-light-txt-2 dark:text-light-txt-1 self-stretch px-4 opacity-100 transition-all duration-150 md:group-hover:opacity-100"
@@ -187,7 +157,61 @@ export default function Item(props: ItemProps) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-      ) : null}
+      )}
+    </div>
+  );
+}
+
+export function ListItemInternals(props: ItemProps) {
+  const { index, item } = props;
+  return (
+    <div className="flex cursor-auto items-center gap-x-4 px-4 py-2 text-xs text-slate-600">
+      <p className="flex h-full items-center bg-slate-200 px-2 text-lg">{index}</p>
+      <table>
+        <tbody>
+          <tr>
+            <td className="py-0">{item.disposition}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table className="w-auto">
+        <tbody>
+          <tr>
+            <td
+              className={cn("py-0", {
+                "text-red-500": item.disposition !== ItemDisposition.Synced,
+              })}
+            >
+              <span className="text-xs text-muted-foreground">modified</span>:&nbsp;
+              <span className="py-0">
+                {dateToISOLocal(item.lastModified, DateTimeFormat.MonthDayTime, DateTimeSeparator.Newline)}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td className={"py-0"}>
+              <span className="text-xs text-muted-foreground">created</span>:&nbsp;
+              {dateToISOLocal(item.createdAt, DateTimeFormat.MonthDayTime, DateTimeSeparator.Newline)}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <table className="w-auto">
+        <tbody>
+          <tr>
+            <td className="py-0">
+              <span className="text-xs text-muted-foreground">client</span>&nbsp;
+              <code>{item.clientId?.substring(0, 8)}&hellip;</code>
+            </td>
+          </tr>
+          <tr>
+            <td className="py-0">
+              <span className="text-xs text-muted-foreground">server</span>&nbsp;
+              <code>{item.id?.substring(0, 8)}&hellip;</code>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -45,29 +45,7 @@ export default function DescendantInput(props: ItemDescendantRenderProps) {
 
   return (
     <div key={item.clientId} className="flex items-center gap-1 lg:gap-2 xl:gap-3">
-      {/* <div
-        className={cn("my-2 w-48 text-right text-sm text-muted-foreground sm:flex-shrink-0", {
-          "my-4 text-xl font-medium": ["user", "resume"].includes(itemModel),
-        })}
-      >
-
-        Add new {itemModel}
-        {showIdentifiers && ancestorClientIdChain.length > 0 ? (
-          <>
-            {" "}
-            below{" "}
-            <pre>{`${ancestorClientIdChain
-              .toReversed()
-              .map((id) => id.substring(0, 8))
-              .join("\n")}`}</pre>
-          </>
-        ) : null}
-      </div> */}
-      {!canEdit
-        ? null
-        : ItemIcon(itemModel, {
-            className: "w-auto text-foreground h-4 sm:h-6 lg:h-6 xl:h-8 pl-2 lg:pl-4",
-          })}
+      {!canEdit ? null : ItemIcon(itemModel)}
       <DescendantListItemInput
         itemModel={itemModel}
         itemDraft={itemDraft}

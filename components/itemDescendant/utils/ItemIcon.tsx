@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { ItemDescendantModelNameType } from "@/types/itemDescendant";
 import { DotIcon } from "lucide-react";
 import { GrUserManager } from "react-icons/gr";
@@ -11,7 +12,8 @@ export const itemModelIcon = {
   achievement: DotIcon,
 };
 export type ItemModelIconKeyType = keyof typeof itemModelIcon;
-export function ItemIcon(itemModel: ItemDescendantModelNameType, props: React.SVGProps<SVGSVGElement>) {
+export function ItemIcon(itemModel: ItemDescendantModelNameType, props?: React.SVGProps<SVGSVGElement>) {
   const IconComponent = itemModelIcon[itemModel as ItemModelIconKeyType];
-  return IconComponent ? <IconComponent {...props} /> : null;
+  const iconProps = { ...props, className: cn("w-auto shrink-0 h-6 xl:h-8 pl-4 pr-2", props?.className) };
+  return IconComponent ? <IconComponent {...iconProps} /> : null;
 }

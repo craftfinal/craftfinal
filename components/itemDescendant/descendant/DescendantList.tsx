@@ -152,7 +152,7 @@ export default function DescendantList(props: DescendantListProps) {
 
   return !descendantModel ? null : (
     <>
-      {canEdit && showListItemInternals ? (
+      {canEdit && descendantModel === "achievement" && showListItemInternals ? (
         <button
           className="rounded-md border-2 px-1 text-primary"
           name="resetDescendantsOrderValues"

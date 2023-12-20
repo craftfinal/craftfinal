@@ -1,4 +1,4 @@
-// @/components/itemDescendant/ItemDescendantListSynchronization.tsx
+// @/components/itemDescendant/ItemDescendantListSyncButton.tsx
 
 "use client";
 
@@ -7,13 +7,12 @@ import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useStoreName } from "@/contexts/StoreNameContext";
 import { useRef } from "react";
 
-import { useSyncItemDescendantStore } from "@/hooks/useSyncItemDescendantStore";
 import { syncItemDescendantStoreWithServer } from "@/stores/itemDescendantStore/utils/syncItemDescendantStore";
 
-export interface ItemDescendantListSynchronizationProps {
+export interface ItemDescendantListSyncButtonProps {
   title?: string;
 }
-export default function ItemDescendantListSynchronization(props: ItemDescendantListSynchronizationProps) {
+export default function SyncButton(props: ItemDescendantListSyncButtonProps) {
   const synchronizeButtonRef = useRef<HTMLButtonElement>(null);
 
   const title = props.title ?? "Sync now";
@@ -24,8 +23,6 @@ export default function ItemDescendantListSynchronization(props: ItemDescendantL
   const parentId = store((state) => state.parentId);
   const updateLastModifiedOfModifiedItems = store((state) => state.updateLastModifiedOfModifiedItems);
   const updateStoreWithServerData = store((state) => state.updateStoreWithServerData);
-
-  useSyncItemDescendantStore();
 
   async function handleSynchronization(e: React.MouseEvent) {
     e.preventDefault();

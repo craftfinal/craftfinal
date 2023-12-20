@@ -1,7 +1,6 @@
 // @/component/itemDescendant/ItemDescendantListItem.tsx
 
 import { cn } from "@/lib/utils";
-import { DateTimeFormat, DateTimeSeparator, dateToISOLocal } from "@/lib/utils/formatDate";
 import {
   getInputProps,
   getItemSchema,
@@ -23,6 +22,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { Grip } from "lucide-react";
 import { ElementType, useState } from "react";
 import { InputProps } from "react-editext";
+import { ListItemInternals } from "../Item";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import EditableField from "../utils/EditableField";
 import { ItemActionButton } from "../utils/ItemActionButton";
@@ -40,33 +40,25 @@ import { ItemIcon } from "../utils/ItemIcon";
 // When `as` is passed as an argument, it renders as the provided HTML element
 // When `asChild` is true, it renders using the Slot component, adapting to the parent's component structure and styles.
 
-// Define a type that conditionally checks if T is a string (like 'div', 'span', etc.)
-// and uses JSX.IntrinsicElements[T] to get the correct prop types.
-type ElementProps<T extends ElementType> = T extends keyof JSX.IntrinsicElements ? JSX.IntrinsicElements[T] : T;
-
-export type DescendantListItemProps<T extends ElementType> = {
-  as?: T;
-  asChild?: boolean;
+export interface DescendantListItemProps extends ItemDescendantRenderProps {
   setItemData: (data: ItemDataUntypedType, clientId: string) => void;
   markItemAsDeleted: (clientId: ClientIdType) => void;
   itemIsDragable: boolean;
   canEdit: boolean;
+}
+
+// Define a type that conditionally checks if T is a string (like 'div', 'span', etc.)
+// and uses JSX.IntrinsicElements[T] to get the correct prop types.
+type ElementProps<T extends ElementType> = T extends keyof JSX.IntrinsicElements ? JSX.IntrinsicElements[T] : T;
+
+export type DescendantListItemElementProps<T extends ElementType> = {
+  as?: T;
+  asChild?: boolean;
 } & ElementProps<T> &
-  ItemDescendantRenderProps;
+  DescendantListItemProps;
 // export default function DescendantListItem({
-export default function DescendantListItem<T extends ElementType = "li">({
-  as,
-  asChild = false,
-  resumeAction = "view",
-  index,
-  itemModel,
-  item,
-  setItemData,
-  markItemAsDeleted,
-  itemIsDragable,
-  canEdit,
-  // }: DescendantListItemProps) {
-}: DescendantListItemProps<T>) {
+export default function DescendantListItem<T extends ElementType = "li">(props: DescendantListItemElementProps<T>) {
+  const { as, asChild = false, resumeAction = "view", itemModel, item, setItemData, itemIsDragable, canEdit } = props;
   const Comp = asChild ? Slot : as || "li";
 
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -158,24 +150,8 @@ export default function DescendantListItem<T extends ElementType = "li">({
       {...attributes}
     >
       <>
-        {itemModel == itemDescendantModelHierarchy[1] || !canEdit
-          ? null
-          : ItemIcon(itemModel, {
-              className: "w-auto text-foreground h-4 sm:h-6 lg:h-6 xl:h-8 pl-2 lg:pl-4",
-            })}
+        {itemModel == itemDescendantModelHierarchy[1] || !canEdit ? null : ItemIcon(itemModel)}
 
-        {/* {canEdit && rootItemModel === "user" ? (
-        <div className="h-full">
-          <Link
-            title={`Edit resume ${(item as unknown as ResumeItemClientStateType).name}`}
-            href={getItemActionURL("edit")}
-          >
-            <Button variant={"ghost"} className="h-full">
-              {<Edit />}
-            </Button>
-          </Link>
-        </div>
-      ) : null} */}
         {item.id && (itemModel === "resume" || pathname.startsWith("/item")) ? (
           <ItemActionButton pathname={pathname} item={item} action={resumeAction} />
         ) : null}
@@ -212,77 +188,33 @@ export default function DescendantListItem<T extends ElementType = "li">({
           })}
           {/* TODO: Handle and display errors from formState.errors */}
         </div>
-        {showListItemInternals && (
-          <div className="flex basis-3/4 cursor-auto items-center gap-x-4 px-4 py-2 text-xs text-slate-600">
-            <p className="flex h-full items-center bg-slate-200 px-2 text-lg">{index}</p>
-            <table>
-              <tbody>
-                <tr>
-                  <td className="py-0">{item.disposition}</td>
-                </tr>
-              </tbody>
-            </table>
-            <table className="w-auto">
-              <tbody>
-                <tr>
-                  <td
-                    className={cn("py-0", {
-                      "text-red-500": item.disposition !== ItemDisposition.Synced,
-                    })}
-                  >
-                    <span className="text-xs text-muted-foreground">modified</span>:&nbsp;
-                    <span className="py-0">
-                      {dateToISOLocal(item.lastModified, DateTimeFormat.MonthDayTime, DateTimeSeparator.Newline)}
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className={"py-0"}>
-                    <span className="text-xs text-muted-foreground">created</span>:&nbsp;
-                    {dateToISOLocal(item.createdAt, DateTimeFormat.MonthDayTime, DateTimeSeparator.Newline)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <table className="w-auto">
-              <tbody>
-                <tr>
-                  <td className="py-0">
-                    <span className="text-xs text-muted-foreground">client</span>&nbsp;
-                    <code>{item.clientId?.substring(0, 8)}&hellip;</code>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-0">
-                    <span className="text-xs text-muted-foreground">server</span>&nbsp;
-                    <code>{item.id?.substring(0, 8)}&hellip;</code>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        )}
-        {canEdit && itemModel !== "user" ? (
-          <button
-            /* /Delete Button */
-            className="text-light-txt-2 dark:text-light-txt-1 self-stretch px-4 opacity-100 transition-all duration-150 md:group-hover:opacity-100"
-            title={`Delete ${itemModel}`}
-            onClick={() => markItemAsDeleted(item.clientId)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        ) : null}
+        <ListItemDeleteButton {...props} />
+        {showListItemInternals && <ListItemInternals {...props} />}
       </>
     </Comp>
   );
   return item.deletedAt ? null : asChild ? <Comp>{content}</Comp> : content;
+}
+
+export function ListItemDeleteButton(props: DescendantListItemProps) {
+  const { itemModel, item, markItemAsDeleted, canEdit } = props;
+  return canEdit && itemModel !== "user" ? (
+    <button
+      /* /Delete Button */
+      className="text-light-txt-2 dark:text-light-txt-1 self-stretch px-4 opacity-100 transition-all duration-150 md:group-hover:opacity-100"
+      title={`Delete ${itemModel}`}
+      onClick={() => markItemAsDeleted(item.clientId)}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  ) : null;
 }
