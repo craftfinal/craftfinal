@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 export function DarkModeToggle({ className }: { className: string }) {
   const defaultTheme = "system";
   const themes = {
-    system: { icon: <Icons.sunMoon className="absolute transition-all" />, label: "auto" },
+    system: { icon: <Icons.sunMoon className="transition-all" />, label: "auto" },
     dark: {
-      icon: <Icons.moon className="absolute rotate-90 transition-all dark:rotate-0 dark:scale-100" />,
+      icon: <Icons.moon className="rotate-90 transition-all dark:rotate-0 dark:scale-100" />,
       label: "dark",
     },
     light: {
