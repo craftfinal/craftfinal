@@ -2,6 +2,7 @@
 
 import { handleNestedItemDescendantListFromClient } from "@/actions/syncItemDescendant";
 import { toast } from "@/components/ui/use-toast";
+import { SyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
 import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { generateClientId, isValidClientId } from "@/schemas/id";
 import { ItemDataUntypedType } from "@/schemas/item";
@@ -10,21 +11,106 @@ import {
   ItemDescendantOrderableClientStateListType,
   ItemDescendantServerStateType,
   ItemDescendantStoreStateType,
+  itemDescendantServerStateSchema,
 } from "@/schemas/itemDescendant";
+import { ItemDescendantStore } from "@/stores/itemDescendantStore/createItemDescendantStore";
 import { ClientIdType, ItemDisposition } from "@/types/item";
 import { getDescendantModel, getItemOrderFunction, getParentModel } from "@/types/itemDescendant";
 import { ModificationTimestampType } from "@/types/timestamp";
 import { getItemDescendantStoreStateForServer } from "@/types/utils/itemDescendant";
 import { Draft } from "immer";
-import { ItemDescendantStore } from "../createItemDescendantStore";
 import { sortDescendantsByOrderValues } from "./descendantOrderValues";
+import { deserializeItemDescendantState, serializeItemDescendantState } from "./lib";
 
-export async function syncItemDescendantStoreWithServer(
+export function syncItemDescendantStoreWithServer(
   store: ItemDescendantStore,
   updateLastModifiedOfModifiedItems: (overrideLastModified?: Date) => void,
   updateStoreWithServerData: (serverState: ItemDescendantServerStateType) => void,
   forceUpdate?: boolean,
-): Promise<ItemDescendantServerStateType | Date | null> {
+): Promise<SyncStatus> {
+  const rootState = getItemDescendantStoreStateForServer(store);
+  let clientModified = new Date(rootState.lastModified);
+
+  if (forceUpdate) {
+    // Advance the lastModified timestamp by a second / 1000ms
+    clientModified = new Date(rootState.lastModified.getTime() + 1000);
+    updateLastModifiedOfModifiedItems(clientModified);
+    toast({
+      title: `Forced synchronization`,
+      description: `Updated lastModified: ${dateToISOLocal(new Date(clientModified))}`,
+    });
+  }
+  const fetchInsteadOfServerAction = true;
+  // eslint-disable-next-line no-constant-condition
+  if (fetchInsteadOfServerAction) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return new Promise((resolve, reject) => {
+      const requestBody = serializeItemDescendantState(rootState);
+      fetch("/api/item-descendant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: requestBody,
+        cache: "no-store",
+      })
+        .then(async (fetchResponse) => {
+          if (fetchResponse.status !== 200) {
+            console.error(`syncItemDescendantStoreWithServer: unsuccessful HTTP status: ${fetchResponse.status}`);
+            resolve(SyncStatus.Failed);
+            return;
+          }
+          const responseBody = await fetchResponse.text(); // Get response body as text
+          // Deserialize to server state
+          const updatedState = deserializeItemDescendantState<ItemDescendantServerStateType>(responseBody);
+          try {
+            itemDescendantServerStateSchema.parse(updatedState);
+          } catch (error) {
+            console.error(`syncItemDescendantStoreWithServer: updatedState failed to pass schema validation`, error);
+            resolve(SyncStatus.Failed);
+            return;
+          }
+          if (updatedState) {
+            updateStoreWithServerData(updatedState);
+          }
+          window.consoleLog(
+            `syncItemDescendantStoreWithServer: synchronization succeeded: response: ${JSON.stringify(fetchResponse)}`,
+          );
+          resolve(SyncStatus.Succeeded);
+        })
+        .catch((error) => {
+          console.error(
+            `syncItemDescendantStoreWithServer: synchronization failed: error during fetch: ${JSON.stringify(error)}`,
+          );
+          resolve(SyncStatus.Failed); // Resolve with `Failed` status instead of rejecting
+        });
+    });
+  }
+
+  // Return a new Promise
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return new Promise((resolve, reject) => {
+    handleNestedItemDescendantListFromClient(rootState)
+      .then((updatedState) => {
+        if (updatedState) {
+          updateStoreWithServerData(updatedState);
+          // ... other code as needed
+        }
+        resolve(SyncStatus.Succeeded);
+      })
+      .catch((error) => {
+        console.error(`syncItemDescendantStoreWithServer: synchronization failed: ${JSON.stringify(error)}`);
+        resolve(SyncStatus.Failed); // Resolve with `Failed` status instead of rejecting
+      });
+  });
+}
+
+export async function asyncSyncItemDescendantStoreWithServer(
+  store: ItemDescendantStore,
+  updateLastModifiedOfModifiedItems: (overrideLastModified?: Date) => void,
+  updateStoreWithServerData: (serverState: ItemDescendantServerStateType) => void,
+  forceUpdate?: boolean,
+): Promise<SyncStatus> {
   const rootState = getItemDescendantStoreStateForServer(store);
   let clientModified = new Date(rootState.lastModified);
   if (forceUpdate) {
@@ -36,24 +122,30 @@ export async function syncItemDescendantStoreWithServer(
       description: `Updated lastModified: ${dateToISOLocal(new Date(clientModified))}`,
     });
   }
-  const updatedState = await handleNestedItemDescendantListFromClient(rootState);
+  try {
+    const updatedState = await handleNestedItemDescendantListFromClient(rootState);
 
-  if (updatedState) {
-    updateStoreWithServerData(updatedState);
+    if (updatedState) {
+      updateStoreWithServerData(updatedState);
 
-    /*
-    const serverModified = updatedState.lastModified;
-    if (serverModified >= clientModified) {
-      toast({
-        title: `Synchronized`,
-        description: `Local: ${dateToISOLocal(new Date(clientModified))}: ${
-          rootState.descendants.length
-        }\nServer: ${dateToISOLocal(new Date(updatedState.lastModified))}: ${updatedState.descendants.length}`,
-      });
+      /*
+      const serverModified = updatedState.lastModified;
+      if (serverModified >= clientModified) {
+        toast({
+          title: `Synchronized`,
+          description: `Local: ${dateToISOLocal(new Date(clientModified))}: ${
+            rootState.descendants.length
+          }\nServer: ${dateToISOLocal(new Date(updatedState.lastModified))}: ${updatedState.descendants.length}`,
+        });
+      }
+      */
     }
-    */
+    return SyncStatus.Succeeded;
+  } catch (error) {
+    const errorMsg = `syncItemDescendantStoreWithServer: synchronization failed: ${JSON.stringify(error)}`;
+    console.error(errorMsg);
+    return SyncStatus.Failed;
   }
-  return updatedState;
 }
 
 export function handleNestedItemDescendantListFromServer(

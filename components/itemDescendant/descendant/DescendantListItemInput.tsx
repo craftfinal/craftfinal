@@ -183,9 +183,8 @@ export default function DescendantListItemInput({
         {<CheckCircleIcon />}
       </Button>
       {showListItemInternals && (
-        <div className={cn("my-2", { "bg-muted-foreground": canEdit /*editingInput */ })}>
-          <span>itemDraft=</span>
-          <code>{JSON.stringify(itemDraft)}</code>
+        <div className={cn("my-2 p-2 text-xs")}>
+          <pre>{JSON.stringify(itemDraft, undefined, 2)}</pre>
         </div>
       )}
     </div>

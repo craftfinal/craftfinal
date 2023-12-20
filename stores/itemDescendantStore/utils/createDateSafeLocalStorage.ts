@@ -32,7 +32,7 @@ export function createDateSafeLocalStorage(): PersistStorage<ItemDescendantStore
       if (!str) return null;
       const jsonTimestamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
       const item = JSON.parse(str, (key, val) => (jsonTimestamp.test(val) ? new Date(val) : val));
-      window.consoleLog(`createDateSafeLocalStorage: returning`, item);
+      // window.consoleLog(`createDateSafeLocalStorage: returning`, item);
       return item;
     },
     setItem: (name, value) => {

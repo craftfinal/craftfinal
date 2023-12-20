@@ -6,7 +6,10 @@ import { immer } from "zustand/middleware/immer";
 
 export type AppSettingsStoreState = {
   // Settings to be exposed to user
-  synchronizationInterval: number;
+  autoSyncDelay: number;
+  autoSyncBackoffBase: number;
+  autoSyncBackoffExponent: number;
+  autoSyncBackoffExponentMax: number;
 
   // Flags have an effect only in development environment
   // TODO: Make sure those flags are not exposed in settings in production
@@ -20,7 +23,7 @@ export type AppSettingsStoreState = {
 
 export type AppSettingsStoreActions = {
   setSettings: (newSettings: AppSettingsStoreState) => void;
-  setSynchronizationInterval: (newInterval: number) => void;
+  // setSynchronizationInterval: (newInterval: number) => void;
   // toggleAllowDeleteAllItems: () => void;
 };
 
@@ -52,7 +55,11 @@ const storeVersion = 1;
 const useAppSettingsStore = create(
   persist(
     immer<AppSettingsStore>((set /*, get */) => ({
-      synchronizationInterval: 0,
+      autoSyncDelay: 1,
+      autoSyncBackoffBase: 2,
+      autoSyncBackoffExponent: 2,
+      autoSyncBackoffExponentMax: 10,
+
       showItemDescendantInternals: false,
       showItemDescendantIdentifiers: false,
       showItemDescendantSynchronization: false,
@@ -66,11 +73,11 @@ const useAppSettingsStore = create(
         });
       },
 
-      setSynchronizationInterval: (newInterval: number): void => {
-        set((state) => {
-          state.synchronizationInterval = newInterval;
-        });
-      },
+      // setSynchronizationInterval: (newInterval: number): void => {
+      //   set((state) => {
+      //     state.autoSyncDelay = newInterval;
+      //   });
+      // },
     })),
     {
       name: `settings.${storeNameSuffix}`, // unique name for localStorage key

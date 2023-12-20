@@ -3,8 +3,9 @@
 "use client";
 
 import { useAutoSyncItemDescendantStore } from "@/hooks/useAutoSyncItemDescendantStore";
-// SyncIndicator.tsx
 import SyncStatusIndicator from "./SyncStatusIndicator";
+// import { Suspense } from "react";
+// import ErrorBoundary from "@/app/(authenticated)/playground/ErrorBoundary";
 
 export function AutoSync() {
   // const [syncStatus, setSyncStatus] = useState<SyncStatus>(SyncStatus.None);
@@ -14,5 +15,11 @@ export function AutoSync() {
 
   const syncStatus = useAutoSyncItemDescendantStore(); // Use the hook to get the current sync status
 
-  return <SyncStatusIndicator syncStatus={syncStatus} />;
+  return (
+    // <Suspense fallback="Offline">
+    //   <ErrorBoundary fallback={<div>ErrorBoundary</div>}>
+    <SyncStatusIndicator syncStatus={syncStatus} />
+    //   </ErrorBoundary>
+    // </Suspense>
+  );
 }
