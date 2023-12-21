@@ -113,12 +113,15 @@ async function getItemDescendantFromProps(
     const userOwnedItem = itemsOwnedByUser.find((item) => item.id === itemId);
 
     if (!userOwnedItem) {
-      throw Error(
-        `ItemDescendantList/getServerOutputForProduction: ` +
-          `could not find itemDbId=${itemDbId} among the descendants of userDbId=${getDbIdFromStateId(
-            userId,
-          )}; secondModel=${secondModel}`,
-      );
+      if (process.env.NODE_ENV === "development") {
+        throw Error(
+          `ItemDescendantList/getServerOutputForProduction: ` +
+            `could not find itemDbId=${itemDbId} among the descendants of userDbId=${getDbIdFromStateId(
+              userId,
+            )}; secondModel=${secondModel}`,
+        );
+      }
+      notFound();
     }
   }
 
