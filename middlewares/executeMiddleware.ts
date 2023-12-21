@@ -3,8 +3,9 @@
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { NextMiddleware, NextResponse } from "next/server";
 // import registeredAccountMiddleware from "@/middlewares/withRegisteredAccount";
-// import temporaryAccountMiddleware from "./middlewares/withTemporaryAccount";
+
 // Inspired by: https://reacthustle.com/blog/how-to-chain-multiple-middleware-functions-in-nextjs
+
 /**
  * A factory type for creating middleware functions.
  */
@@ -61,7 +62,6 @@ export default function executeMiddleware(middlewares: MiddlewareEntry[], index 
  * A prefix that is added, along with the `id` of the middleware and its index in the
  * list of middleware entries, as a header after executing each middleware
  */
-
 export const authMiddlewareHeaderPrefix = `x-middleware-`;
 
 /**
@@ -86,7 +86,6 @@ export function addMiddlewareId(response: NextResponse, current: MiddlewareEntry
  * @param prefix - The prefix to filter by.
  * @returns An array of header key-value pairs that match the prefix.
  */
-
 export function filterHeadersByPrefix(headersList: ReadonlyHeaders, prefix: string) {
   const filteredHeaders = [];
 
@@ -105,7 +104,6 @@ export function filterHeadersByPrefix(headersList: ReadonlyHeaders, prefix: stri
  * @param headersList - The headers to extract middleware IDs from.
  * @returns An array of middleware IDs that were executed.
  */
-
 export function getExecutedMiddlewareIds(headersList: ReadonlyHeaders) {
   const prefixRegex = new RegExp(`^${authMiddlewareHeaderPrefix}`);
   const authMiddlewareIds = filterHeadersByPrefix(headersList, authMiddlewareHeaderPrefix).map((entry) =>

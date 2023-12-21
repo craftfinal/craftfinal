@@ -5,11 +5,12 @@
 import { getAccountByProviderAccountId } from "@/actions/user";
 import { AccountType } from "@/auth/account";
 import { AppRouteType } from "@/config/appRoutes";
-import ironSessionMiddleware from "@/middlewares/withIronSessionAccountOld";
+import ironSessionMiddleware from "@/middlewares/withIronSessionAccount";
 import { prismaClient } from "@/prisma/client";
 import { generateStateId, getStateIdFromDbId } from "@/schemas/id";
 import { Base58CheckAccount, Base58CheckAccountOrNull, InvalidAccountErr } from "@/types/user";
 import { ModelIndicator, stateAccountFromDbAccount } from "@/types/utils/base58checkId";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { IronSession, getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import {
@@ -19,7 +20,6 @@ import {
   revalidateAuthenticatedPaths,
   sessionOptions,
 } from "./lib";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export const getIronSessionAccountOrNull = async (providerAccountId?: string): Promise<Base58CheckAccountOrNull> => {
   try {

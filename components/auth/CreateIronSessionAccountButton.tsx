@@ -1,5 +1,6 @@
 // @/components/auth/CurrentAccountCardClient.tsx
 "use client";
+
 import { getOrCreateIronSessionAccount } from "@/auth/iron-session/ironSessionActions";
 import { Base58CheckAccountOrNullOrUndefined } from "@/types/user";
 import { Dispatch, SetStateAction } from "react";

@@ -7,13 +7,12 @@ import {
   sessionOptions,
 } from "@/auth/iron-session/lib";
 import { AppRouteType } from "@/config/appRoutes";
-import { temporaryAccountMiddlewareId } from "@/middlewares/utils/temporaryAccount";
 import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { MiddlewareEntry, MiddlewareFactory } from "./executeMiddleware";
-import { cookies } from "next/headers";
 
-export const accountIdToCreateHeader: string = `x-${temporaryAccountMiddlewareId}-create-id`.toLowerCase();
+export const accountIdToCreateHeader: string = `x-${ironSessionAccountMiddlewareId}-create-id`.toLowerCase();
 
 const withIronSessionAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
   return async (request: NextRequest, event: NextFetchEvent) => {
@@ -42,7 +41,6 @@ const withIronSessionAccount: MiddlewareFactory = (nextMiddlewareHandler) => {
 };
 
 const ironSessionAccountMiddleware: MiddlewareEntry = {
-  // FIXME: temporaryAccountMiddlewareId had to be defined externally to avoid circular dependencies
   id: ironSessionAccountMiddlewareId,
   fn: withIronSessionAccount,
   // disabled: true,

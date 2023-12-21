@@ -1,6 +1,6 @@
 "use client";
 
-import { useTemporaryAccount } from "@/auth/TemporaryAccountProvider";
+import { useIronSession } from "@/auth/iron-session/IronSessionProvider";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -111,7 +111,7 @@ const MainNavCustomItem = React.forwardRef<
   React.ComponentPropsWithoutRef<"a"> & { customItem: CustomMenuItemType }
 >(({ customItem, ...props }, ref) => {
   const pathname = usePathname();
-  const account = useTemporaryAccount();
+  const account = useIronSession();
 
   return <NavigationMenuItem>{renderCustomMenuItem({ customItem, pathname, account }, props, ref)}</NavigationMenuItem>;
 });

@@ -103,7 +103,7 @@ export function useAutoSyncItemDescendantStore() {
       const backoffInterval =
         1000 * autoSyncBackoffBase ** Math.min(autoSyncBackoffExponent * numFailedAttempts, autoSyncBackoffExponentMax);
       if (timeSinceLastSync < backoffInterval) {
-        console.log(
+        window.consoleLog(
           `useAutoSyncItemDescendantStore: ${numFailedAttempts} attempts failed in a row; wait for backoffInterval=${
             backoffInterval / 1000
           } seconds`,

@@ -5,11 +5,11 @@
 import { Card } from "@/components/ui/card";
 
 import { getRegisteredAccountOrNull } from "@/actions/registeredAccountActions";
-import { getTemporaryAccountOrNull } from "@/actions/temporaryAccountActions";
 import { getCurrentAccountOrNull } from "@/actions/user";
 import CurrentAccountCard from "./CurrentAccountCard";
 import RegisteredAccountCard from "./RegisteredAccountCard";
-import TemporaryAccountCard from "./TemporaryAccountCard";
+import IronSessionAccountCard from "./IronSessionAccountCard";
+import { getIronSessionAccountOrNull } from "@/auth/iron-session/ironSessionActions";
 
 type CardProps = React.ComponentProps<typeof Card>;
 
@@ -17,12 +17,12 @@ export interface AllAccountCardsProps extends CardProps {}
 
 export default async function AllAccountCards(props: AllAccountCardsProps) {
   const currentAccount = await getCurrentAccountOrNull();
-  const temporaryAccount = await getTemporaryAccountOrNull();
+  const ironSessionAccount = await getIronSessionAccountOrNull();
   const registeredAccount = await getRegisteredAccountOrNull();
   return (
     <>
       <CurrentAccountCard {...props} account={currentAccount} />
-      <TemporaryAccountCard {...props} account={temporaryAccount} />
+      <IronSessionAccountCard {...props} account={ironSessionAccount} />
       <RegisteredAccountCard {...props} account={registeredAccount} />
     </>
   );

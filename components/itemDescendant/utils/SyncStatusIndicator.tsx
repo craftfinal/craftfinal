@@ -47,6 +47,7 @@ export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) 
         setDelayStatusChange(false);
       }, syncStatusDisplayDuration);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncStatus, delayStatusChange]);
 
   const indicatorAnimationClassName = "transition-all duration-500 ease-in-out ";
