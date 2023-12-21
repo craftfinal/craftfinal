@@ -5,7 +5,6 @@
 import { ItemDescendantStoreProvider, useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { ResumeActionProvider } from "@/contexts/ResumeActionContext";
 import { StoreNameProvider, useStoreName } from "@/contexts/StoreNameContext";
-import { cn } from "@/lib/utils";
 import { generateClientId } from "@/schemas/id";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schemas/item";
 import { ItemDescendantClientStateType, ItemDescendantServerStateType } from "@/schemas/itemDescendant";
@@ -48,6 +47,7 @@ export interface ItemDescendantRenderProps {
   commitDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => void;
   showIdentifiers: boolean;
   showSynchronization: boolean;
+  className?: string;
   itemIcon?: boolean;
 }
 function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
@@ -60,21 +60,37 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
 
   const descendantDescendantModel = getDescendantModel(descendantModel);
 
+  const modelClassname: Record<ItemDescendantModelNameType, string> = {
+    user: "",
+    resume: "bg-muted-foreground/50 dark:bg-background/50",
+    organization: "bg-muted-foreground/30 dark:bg-background/30",
+    role: "bg-muted-foreground/10 dark:bg-background/10",
+    achievement: "",
+  };
+  const itemModelClassname = () => {
+    return editingInput && itemModel ? modelClassname[itemModel] : "";
+  };
+  const descendantModelClassname = () => {
+    return editingInput && itemModel ? modelClassname[descendantModel] : "";
+  };
+
   // Props for descendants of current item have the same ancestorClientIdChain
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const descendantListItemProps = {
     ...props,
-    className: cn("my-4 flex flex-col gap-2 border-solid border-slate-500/20 lg:my-8 lg:gap-3 xl:gap-4", {
-      "border-t-4 bg-slate-500/50 dark:bg-slate-500/50": editingInput && descendantModel === "resume",
-      "border-t-2 bg-slate-300/50 dark:bg-slate-700/50": editingInput && descendantModel === "organization",
-      "bg-background/50": editingInput && descendantModel === "role",
-    }),
+    className: "my-4 flex flex-col gap-2 border-solid border-slate-500/20 lg:my-8 lg:gap-3 xl:gap-4",
+  };
+
+  const itemProps = {
+    ...props,
+    className: itemModelClassname(),
   };
 
   // Props for descendants of current item have the same ancestorClientIdChain
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const descendantProps = {
     ...props,
+    className: descendantModelClassname(),
     inputFieldIndex: inputFieldIndex,
     itemModel: descendantModel,
     descendantModel: descendantDescendantModel,
@@ -89,7 +105,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
     <>
       {item.deletedAt ? <RestoreItemDialog {...descendantProps} /> : null}
       {atRootLevel && editingInput && showSynchronization ? <ItemDescendantListSynchronization /> : null}
-      {atRootLevel ? <Item {...props} /> : <Descendant {...props} />}
+      {atRootLevel ? <Item {...itemProps} /> : <Descendant {...itemProps} />}
       {item.descendantModel === leafItemModel ? (
         <DescendantList {...descendantProps} />
       ) : (

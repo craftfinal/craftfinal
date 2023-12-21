@@ -1,7 +1,9 @@
 // @/components/itemDescendant/ItemDescendantList.tsx
 
+import { Button } from "@/components/ui/button";
 import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useStoreName } from "@/contexts/StoreNameContext";
+import { cn } from "@/lib/utils";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schemas/item";
 import {
   ItemDescendantClientStateType,
@@ -27,12 +29,12 @@ import { useState } from "react";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import ItemDescendantSortableWrapper from "../utils/ItemDescendantSortableWrapper";
 import DescendantInput from "./DescendantInput";
-import DescendantListItemInput from "./DescendantListItemInput";
 import DescendantListItem from "./DescendantListItem";
+import DescendantListItemInput from "./DescendantListItemInput";
 
 interface DescendantListProps extends ItemDescendantRenderProps {}
 export default function DescendantList(props: DescendantListProps) {
-  const { ancestorClientIdChain, rootItemModel, leafItemModel, itemModel, item, resumeAction } = props;
+  const { className, ancestorClientIdChain, rootItemModel, leafItemModel, itemModel, item, resumeAction } = props;
 
   const canEdit = resumeAction === "edit";
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -152,16 +154,20 @@ export default function DescendantList(props: DescendantListProps) {
 
   return !descendantModel ? null : (
     <>
-      {canEdit && descendantModel === "achievement" && showListItemInternals ? (
-        <button
-          className="rounded-md border-2 px-1 text-primary"
-          name="resetDescendantsOrderValues"
-          onClick={() => {
-            resetItemsOrderValues();
-          }}
-        >
-          Reset order
-        </button>
+      {canEdit && descendantModel === "achievement" && descendants.length > 0 && showListItemInternals ? (
+        <div className="flex items-center justify-end px-4">
+          <Button
+            className="h-4 text-muted-foreground"
+            variant="outline"
+            size="sm"
+            name="resetDescendantsOrderValues"
+            onClick={() => {
+              resetItemsOrderValues();
+            }}
+          >
+            Reset order
+          </Button>
+        </div>
       ) : null}
       {/* {canEdit && !inlineInsert ? <DescendantInput {...props} itemModel={descendantModel} /> : null} */}
       <DndContext
@@ -170,7 +176,7 @@ export default function DescendantList(props: DescendantListProps) {
         modifiers={[restrictToParentElement]}
         onDragEnd={handleDragEnd}
       >
-        <ul className="bg-elem-light dark:bg-elem-dark-1 flex flex-col overflow-auto">
+        <ul className={cn("bg-elem-light dark:bg-elem-dark-1 flex flex-col overflow-auto", className)}>
           {canEdit && inlineInsert ? (
             <DescendantListItemInput
               itemModel={descendantModel}

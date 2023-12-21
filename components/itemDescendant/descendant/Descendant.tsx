@@ -6,9 +6,10 @@ import { ItemDataUntypedType } from "@/schemas/item";
 import { ClientIdType } from "@/types/item";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import DescendantListItem from "./DescendantListItem";
+import { cn } from "@/lib/utils";
 
 export default function Descendant(props: ItemDescendantRenderProps) {
-  const { ancestorClientIdChain, itemModel, index, resumeAction } = props;
+  const { className, ancestorClientIdChain, itemModel, index, resumeAction } = props;
   // const [editingInput, setEditingInput] = useState(resumeAction === "edit");
   const storeName = useStoreName();
   const store = useItemDescendantStore(storeName);
@@ -34,7 +35,7 @@ export default function Descendant(props: ItemDescendantRenderProps) {
   const canEdit = itemModel === "user" ? false : resumeAction === "edit";
 
   return (
-    <div className="flex items-center gap-1 lg:gap-2 xl:gap-3">
+    <div className={cn("flex items-center gap-1 lg:gap-2 xl:gap-3", className)}>
       <DescendantListItem
         {...props}
         asChild={true}

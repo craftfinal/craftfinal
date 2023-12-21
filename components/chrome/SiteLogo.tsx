@@ -13,7 +13,7 @@ export interface SiteLogoProps extends React.HTMLAttributes<HTMLDivElement>, Var
 const SiteLogo = React.forwardRef<HTMLDivElement, SiteLogoProps>(({ className, asChild = false, ...props }, ref) => {
   const Comp = asChild ? Slot : "div";
   return (
-    <Comp className={cn("flex items-center gap-x-2 hover:cursor-pointer lg:gap-x-3", className)} ref={ref}>
+    <Comp className={cn("flex items-center gap-x-2 hover:cursor-pointer md:gap-x-3  lg:gap-x-4", className)} ref={ref}>
       <LogoImage {...(props as BrandIconProps)} />
       <LogoText {...(props as BrandTextProps)}>{siteConfig.name}</LogoText>
     </Comp>

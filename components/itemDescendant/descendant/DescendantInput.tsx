@@ -9,9 +9,10 @@ import { useState } from "react";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import { ItemIcon } from "../utils/ItemIcon";
 import DescendantListItemInput from "./DescendantListItemInput";
+import { cn } from "@/lib/utils";
 
 export default function DescendantInput(props: ItemDescendantRenderProps) {
-  const { ancestorClientIdChain, /*inputFieldIndex, */ item, itemModel, resumeAction } = props;
+  const { className, ancestorClientIdChain, /*inputFieldIndex, */ item, itemModel, resumeAction } = props;
   const canEdit = resumeAction === "edit";
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editingInput, setEditingInput] = useState(canEdit);
@@ -44,7 +45,7 @@ export default function DescendantInput(props: ItemDescendantRenderProps) {
   const itemDraft = getItemDraft();
 
   return (
-    <div key={item.clientId} className="flex items-center gap-1 lg:gap-2 xl:gap-3">
+    <div key={item.clientId} className={cn("flex items-center gap-1 lg:gap-2 xl:gap-3", className)}>
       {!canEdit ? null : ItemIcon(itemModel)}
       <DescendantListItemInput
         itemModel={itemModel}

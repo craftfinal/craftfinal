@@ -23,25 +23,12 @@ import { ItemIcon } from "./utils/ItemIcon";
 
 export interface ItemProps extends ItemDescendantRenderProps {}
 export default function Item(props: ItemProps) {
-  const { itemModel, resumeAction } = props;
-  const canEdit = itemModel === "user" ? false : resumeAction === "edit";
-
   const settingsStore = useAppSettingsStore();
   const { showItemDescendantInternals } = settingsStore;
   const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   return (
-    <div
-      className={cn(
-        "flex flex-1 items-center justify-between gap-y-2",
-        "border-solid border-slate-500/50 lg:gap-3 xl:gap-4",
-        {
-          "border-t-4 bg-slate-500/50 dark:bg-slate-500/50": canEdit && itemModel === "resume",
-          "border-t-2 bg-slate-300/50 dark:bg-slate-700/50": canEdit && itemModel === "organization",
-          "bg-background/50": canEdit && itemModel === "role",
-        },
-      )}
-    >
+    <div className={cn("gap-y-2lg:gap-3 flex flex-1 items-center justify-between xl:gap-4", props.className)}>
       <div className="flex flex-1 items-center gap-1 lg:gap-2 xl:gap-3">
         <ItemHeader {...props} />
       </div>
@@ -170,7 +157,13 @@ export function ListItemInternals(props: ItemProps) {
       <table>
         <tbody>
           <tr>
-            <td className="py-0">{item.disposition}</td>
+            <td
+              className={cn("py-0", {
+                "text-red-500": item.disposition !== ItemDisposition.Synced,
+              })}
+            >
+              {item.disposition}
+            </td>
           </tr>
         </tbody>
       </table>
