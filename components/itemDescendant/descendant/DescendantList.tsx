@@ -46,7 +46,7 @@ export default function DescendantList(props: DescendantListProps) {
   const [inlineInsert, setInlineInsert] = useState(!isRootItemModel && !isLeafItemModel);
 
   const settingsStore = useAppSettingsStore();
-  const { showItemDescendantInternals } = settingsStore;
+  const { showItemDescendantInternals } = settingsStore.itemDescendant;
   const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   const descendantModel = item.descendantModel;

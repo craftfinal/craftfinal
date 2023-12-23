@@ -13,6 +13,7 @@ import { OrganizationItemClientStateType } from "@/schemas/organization";
 import { ResumeItemClientStateType } from "@/schemas/resume";
 import { RoleItemClientStateType } from "@/schemas/role";
 import { UserItemClientStateType } from "@/schemas/user";
+import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { getParentModel } from "@/types/itemDescendant";
 import { useEffect, useState } from "react";
 import { ItemDescendantListContextProps } from "../ItemDescendantList.client";
@@ -118,7 +119,9 @@ export default function ItemDescendantScaffoldClientComponent(props: ItemDescend
   return (
     <ResumeActionProvider resumeAction={resumeAction}>
       <StoreNameProvider storeName={`${itemModel}`}>
-        <ItemDescendantStoreProvider configs={[{ itemModel, parentClientId, clientId, parentId, id }]}>
+        <ItemDescendantStoreProvider
+          configs={[{ itemModel, parentClientId, clientId, parentId, id, useAppSettingsStore }]}
+        >
           <ItemDescendantClientContext {...props} />
         </ItemDescendantStoreProvider>
       </StoreNameProvider>

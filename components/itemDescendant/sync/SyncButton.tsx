@@ -7,8 +7,6 @@ import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useStoreName } from "@/contexts/StoreNameContext";
 import { useRef } from "react";
 
-import { syncItemDescendantStoreWithServer } from "@/stores/itemDescendantStore/utils/syncItemDescendantStore";
-
 export interface ItemDescendantListSyncButtonProps {
   title?: string;
 }
@@ -17,29 +15,20 @@ export default function SyncButton(props: ItemDescendantListSyncButtonProps) {
 
   const title = props.title ?? "Sync now";
 
-  const storeName = useStoreName();
-  const store = useItemDescendantStore(storeName);
-  const rootState = store((state) => state);
-  const parentId = store((state) => state.parentId);
-  const updateLastModifiedOfModifiedItems = store((state) => state.updateLastModifiedOfModifiedItems);
-  const updateStoreWithServerData = store((state) => state.updateStoreWithServerData);
+  const store = useItemDescendantStore(useStoreName());
+  const syncWithServer = store((state) => state.syncWithServer);
 
   async function handleSynchronization(e: React.MouseEvent) {
     e.preventDefault();
     const forceUpdate = e.shiftKey;
 
-    if (!rootState) {
-      throw Error(`sendItemDescendantToServer(): storeName=${storeName}, rootState=${rootState})`);
+    if (!store) {
+      throw Error(`sendItemDescendantToServer(): store=${store})`);
     }
-    await syncItemDescendantStoreWithServer(
-      rootState,
-      updateLastModifiedOfModifiedItems,
-      updateStoreWithServerData,
-      forceUpdate,
-    );
+    syncWithServer(true, forceUpdate);
   }
 
-  return !store || !parentId ? null : (
+  return !store ? null : (
     <div>
       <form
         className="bg-elem-light dark:bg-elem-dark-1 mt-8 flex items-center gap-x-3 rounded-md py-2"

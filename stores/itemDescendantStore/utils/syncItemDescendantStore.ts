@@ -2,7 +2,7 @@
 
 import { handleNestedItemDescendantListFromClient } from "@/actions/syncItemDescendant";
 import { toast } from "@/components/ui/use-toast";
-import { SyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
+import { StoreSyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
 import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { generateClientId, isValidClientId } from "@/schemas/id";
 import { ItemDataUntypedType } from "@/schemas/item";
@@ -22,14 +22,45 @@ import { Draft } from "immer";
 import { sortDescendantsByOrderValues } from "./descendantOrderValues";
 import { deserializeItemDescendantState, serializeItemDescendantState } from "./lib";
 
-export function syncItemDescendantStoreWithServer(
-  store: ItemDescendantStore,
+export function syncStoreWithServer(
+  rootState: ItemDescendantClientStateType,
   updateLastModifiedOfModifiedItems: (overrideLastModified?: Date) => void,
   updateStoreWithServerData: (serverState: ItemDescendantServerStateType) => void,
+  scheduleSyncWithServer: () => void,
+  getNumFailedAttempts: () => number,
+  incrementFailedAttempts: () => void,
+  resetFailedAttempts: () => void,
+  setLastSyncTime: (time: Date | null) => void,
+  resetSyncScheduler: () => void,
+  resetScheduling?: boolean,
   forceUpdate?: boolean,
-): Promise<SyncStatus> {
-  const rootState = getItemDescendantStoreStateForServer(store);
+): Promise<StoreSyncStatus> {
   let clientModified = new Date(rootState.lastModified);
+  // Take the cutoff time for this sync
+  const syncStartTime = new Date();
+
+  const handleSuccess = (resolve: (value: StoreSyncStatus | PromiseLike<StoreSyncStatus>) => void) => {
+    window.consoleLog(`syncStoreWithServer: synchronization succeeded`);
+    resetFailedAttempts();
+    setLastSyncTime(syncStartTime);
+    resolve(StoreSyncStatus.Succeeded);
+  };
+
+  const handleError = (resolve: (value: StoreSyncStatus | PromiseLike<StoreSyncStatus>) => void, error: Error) => {
+    console.error(`syncStoreWithServer: synchronization failed for ${getNumFailedAttempts()} in a row`, error);
+    setLastSyncTime(syncStartTime);
+    incrementFailedAttempts();
+    scheduleSyncWithServer();
+    resolve(StoreSyncStatus.Failed);
+  };
+
+  if (resetScheduling) {
+    // Reset failed attempts, so the next attempt will be scheduled as
+    // if the preceding one had been successful
+    // Note: this will also cancel any outstanding timeout to allow scheduling the next one
+    // as soon as possible
+    resetSyncScheduler();
+  }
 
   if (forceUpdate) {
     // Advance the lastModified timestamp by a second / 1000ms
@@ -40,6 +71,9 @@ export function syncItemDescendantStoreWithServer(
       description: `Updated lastModified: ${dateToISOLocal(new Date(clientModified))}`,
     });
   }
+
+  // FIXME: As of Next.js 14.0.4, it appears to be impossible to catch errors in fetch
+  // when using server actions. Therefore, we are now using an API route below
   const fetchInsteadOfServerAction = true;
   // eslint-disable-next-line no-constant-condition
   if (fetchInsteadOfServerAction) {
@@ -56,9 +90,7 @@ export function syncItemDescendantStoreWithServer(
       })
         .then(async (fetchResponse) => {
           if (fetchResponse.status !== 200) {
-            console.error(`syncItemDescendantStoreWithServer: unsuccessful HTTP status: ${fetchResponse.status}`);
-            resolve(SyncStatus.Failed);
-            return;
+            return handleError(resolve, new Error(`Unsuccessful HTTP status: ${fetchResponse.status}`));
           }
           const responseBody = await fetchResponse.text(); // Get response body as text
           // Deserialize to server state
@@ -66,23 +98,15 @@ export function syncItemDescendantStoreWithServer(
           try {
             itemDescendantServerStateSchema.parse(updatedState);
           } catch (error) {
-            console.error(`syncItemDescendantStoreWithServer: updatedState failed to pass schema validation`, error);
-            resolve(SyncStatus.Failed);
-            return;
+            return handleError(resolve, new Error(`updatedState failed to pass schema validation:`, error as Error));
           }
           if (updatedState) {
             updateStoreWithServerData(updatedState);
           }
-          window.consoleLog(
-            `syncItemDescendantStoreWithServer: synchronization succeeded: response: ${JSON.stringify(fetchResponse)}`,
-          );
-          resolve(SyncStatus.Succeeded);
+          return handleSuccess(resolve);
         })
         .catch((error) => {
-          console.error(
-            `syncItemDescendantStoreWithServer: synchronization failed: error during fetch: ${JSON.stringify(error)}`,
-          );
-          resolve(SyncStatus.Failed); // Resolve with `Failed` status instead of rejecting
+          return handleError(resolve, new Error(`error during fetch:`, error));
         });
     });
   }
@@ -96,21 +120,44 @@ export function syncItemDescendantStoreWithServer(
           updateStoreWithServerData(updatedState);
           // ... other code as needed
         }
-        resolve(SyncStatus.Succeeded);
+        return handleSuccess(resolve);
       })
       .catch((error) => {
-        console.error(`syncItemDescendantStoreWithServer: synchronization failed: ${JSON.stringify(error)}`);
-        resolve(SyncStatus.Failed); // Resolve with `Failed` status instead of rejecting
+        return handleError(resolve, new Error(`exception when applying response from server:`, error));
       });
   });
 }
+
+// export function scheduleSyncWithServer(
+//   syncWithServer: (forceUpdate?: boolean) => void,
+//   syncStatus: StoreSyncStatus,
+//   setSyncStatus: (status: StoreSyncStatus) => void,
+//   syncTimeout: NodeJS.Timeout | null,
+//   setSyncTimeout: (timeout: NodeJS.Timeout | null) => void,
+//   getSyncDelay: () => number,
+// ) {
+//   if (syncStatus === StoreSyncStatus.InProgress) {
+//     // A sync is running, let's schedule the next unless one is scheduled
+//     if (syncTimeout) {
+//       console.log(`scheduleSyncWithServer: not scheduling a sync as one is already scheduled:`, syncTimeout);
+//       return;
+//     }
+//     const delay = getSyncDelay();
+//     const newSyncTimeout = setTimeout(() => {
+//       setSyncStatus(StoreSyncStatus.Synced);
+//     }, delay);
+//     setSyncTimeout(newSyncTimeout);
+//   }
+//   const delay = getSyncDelay();
+//   setTimeout(syncWithServer, delay);
+// }
 
 export async function asyncSyncItemDescendantStoreWithServer(
   store: ItemDescendantStore,
   updateLastModifiedOfModifiedItems: (overrideLastModified?: Date) => void,
   updateStoreWithServerData: (serverState: ItemDescendantServerStateType) => void,
   forceUpdate?: boolean,
-): Promise<SyncStatus> {
+): Promise<StoreSyncStatus> {
   const rootState = getItemDescendantStoreStateForServer(store);
   let clientModified = new Date(rootState.lastModified);
   if (forceUpdate) {
@@ -140,11 +187,11 @@ export async function asyncSyncItemDescendantStoreWithServer(
       }
       */
     }
-    return SyncStatus.Succeeded;
+    return StoreSyncStatus.Succeeded;
   } catch (error) {
-    const errorMsg = `syncItemDescendantStoreWithServer: synchronization failed: ${JSON.stringify(error)}`;
+    const errorMsg = `syncStoreWithServer: synchronization failed: ${JSON.stringify(error)}`;
     console.error(errorMsg);
-    return SyncStatus.Failed;
+    return StoreSyncStatus.Failed;
   }
 }
 
@@ -259,7 +306,8 @@ function updateClientItemWithServerItem(
     // The server has not applied our update and is responding with a more recent version of this item
     // Disposition determines, how we interpret this update
     if (serverItem.disposition === ItemDisposition.Deleted) {
-      // Item has been deleted, either by business logic on the server or triggered by another client
+      // Item has been marked as deleted, either by business logic on the server or via
+      // synchronization from another client
       mergeStrategy = "DELETE";
     } else if (
       serverItem.disposition === ItemDisposition.Modified ||
@@ -274,7 +322,7 @@ function updateClientItemWithServerItem(
         deletedAt: getDeletedAtProperty(clientItem, serverItem),
       } as ItemDescendantClientStateType;
     } else {
-      window.consoleLog(
+      console.error(
         logPrefix,
         ` unexpected serverItem.disposition ${serverItem.disposition}:`,
         timestampRelation.join(` `),
@@ -310,7 +358,7 @@ function updateClientItemWithServerItem(
     ) {
       mergeStrategy = "IGNORE";
     } else {
-      window.consoleLog(
+      console.error(
         logPrefix,
         ` unexpected serverItem.disposition ${serverItem.disposition}:`,
         timestampRelation.join(` `),
@@ -334,7 +382,7 @@ function updateClientItemWithServerItem(
         deletedAt: getDeletedAtProperty(clientItem, serverItem),
       } as ItemDescendantClientStateType;
     } else {
-      window.consoleLog(
+      console.error(
         logPrefix,
         ` unexpected serverItem.disposition ${serverItem.disposition}:`,
         timestampRelation.join(` `),

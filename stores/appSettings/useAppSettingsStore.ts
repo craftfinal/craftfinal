@@ -4,27 +4,38 @@ import { StateCreator, create } from "zustand";
 import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-export type AppSettingsStoreState = {
-  // Settings to be exposed to user
-  autoSyncDelay: number;
-  autoSyncBackoffBase: number;
-  autoSyncBackoffExponent: number;
-  autoSyncBackoffExponentMax: number;
+export type AppSettingsType = {
+  // Flags have an effect only in development environment
+  // TODO: Make sure those flags are not exposed in settings in production
+  // impersonatingUserAuthProviderId: string | null;
+  isLoggingEnabled: boolean;
+};
 
+export type ItemDescendantSettingsType = {
   // Flags have an effect only in development environment
   // TODO: Make sure those flags are not exposed in settings in production
   showItemDescendantInternals: boolean;
   showItemDescendantIdentifiers: boolean;
   showItemDescendantSynchronization: boolean;
-  // allowDeleteAllItems: boolean;
-  // impersonatingUserAuthProviderId: string | null;
-  isLoggingEnabled: boolean;
+  allowDeleteAllItems: boolean;
+  // Delay to wait after a modification before a sync is executed [ms]
+  autoSyncDelay: number;
+  // Base for exponential backoff
+  autoSyncBackoffBase: number;
+  // Exponent multiplier, will be multiplied with number of failed attempts
+  autoSyncBackoffExponentScaleFactor: number;
+  // Maximal exponent as the product of the above parameter and the number of failed attempts
+  autoSyncBackoffExponentMax: number;
+};
+
+export type AppSettingsStoreState = {
+  app: AppSettingsType;
+  itemDescendant: ItemDescendantSettingsType;
 };
 
 export type AppSettingsStoreActions = {
-  setSettings: (newSettings: AppSettingsStoreState) => void;
-  // setSynchronizationInterval: (newInterval: number) => void;
-  // toggleAllowDeleteAllItems: () => void;
+  setAppSettings: (newSettings: AppSettingsType) => void;
+  setItemDescendantSettings: (newSettings: ItemDescendantSettingsType) => void;
 };
 
 export type AppSettingsStore = AppSettingsStoreState & AppSettingsStoreActions;
@@ -34,6 +45,24 @@ type AppSettingsSelectorType<T> = (state: AppSettingsStoreState) => T;
 
 // Hook type is used as a return type when using the store
 export type AppSettingsHookType = <T>(selector?: AppSettingsSelectorType<T>) => T;
+
+const initialState = {
+  app: {
+    // impersonatingUserAuthProviderId: null,
+    isLoggingEnabled: false,
+  },
+
+  itemDescendant: {
+    showItemDescendantInternals: false,
+    showItemDescendantIdentifiers: false,
+    showItemDescendantSynchronization: false,
+    allowDeleteAllItems: false,
+    autoSyncDelay: 1,
+    autoSyncBackoffBase: 2,
+    autoSyncBackoffExponentScaleFactor: 2,
+    autoSyncBackoffExponentMax: 10,
+  },
+};
 
 export const updateGlobalLogging =
   <T extends { isLoggingEnabled: boolean }>(config: StateCreator<T>): StateCreator<T> =>
@@ -55,29 +84,19 @@ const storeVersion = 1;
 const useAppSettingsStore = create(
   persist(
     immer<AppSettingsStore>((set /*, get */) => ({
-      autoSyncDelay: 1,
-      autoSyncBackoffBase: 2,
-      autoSyncBackoffExponent: 2,
-      autoSyncBackoffExponentMax: 10,
+      ...initialState,
 
-      showItemDescendantInternals: false,
-      showItemDescendantIdentifiers: false,
-      showItemDescendantSynchronization: false,
-      // allowDeleteAllItems: false,
-      // impersonatingUserAuthProviderId: null,
-      isLoggingEnabled: false,
-
-      setSettings: (newSettings): void => {
+      setAppSettings: (newSettings: AppSettingsType): void => {
         set((state) => {
-          Object.assign(state, newSettings);
+          Object.assign(state.app, newSettings);
         });
       },
 
-      // setSynchronizationInterval: (newInterval: number): void => {
-      //   set((state) => {
-      //     state.autoSyncDelay = newInterval;
-      //   });
-      // },
+      setItemDescendantSettings: (newSettings: ItemDescendantSettingsType): void => {
+        set((state) => {
+          Object.assign(state.itemDescendant, newSettings);
+        });
+      },
     })),
     {
       name: `settings.${storeNameSuffix}`, // unique name for localStorage key

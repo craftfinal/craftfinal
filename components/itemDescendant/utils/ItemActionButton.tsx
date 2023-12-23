@@ -6,7 +6,7 @@ import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
 import { ResumeActionType, resumeActionButtonIcons } from "@/types/resume";
 import Link from "next/link";
 import { Button } from "../../ui/button";
-import ItemDescendantListSynchronization from "./SyncButton";
+import ItemDescendantListSynchronization from "../sync/SyncButton";
 
 export interface ItemActionButtonProps {
   pathname: string;

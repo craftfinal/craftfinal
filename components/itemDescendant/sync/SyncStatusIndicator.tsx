@@ -2,17 +2,22 @@
 
 "use client";
 
-import { SyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
+import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
+import { useStoreName } from "@/contexts/StoreNameContext";
+import { StoreSyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
 import { cn } from "@/lib/utils";
 import { useEffect, useReducer, useState } from "react";
 import { IoAlertCircle, IoCheckmarkCircle } from "react-icons/io5";
 
 interface SyncIndicatorProps {
-  syncStatus: SyncStatus;
+  syncStatus?: StoreSyncStatus;
 }
-type StatusAction = { type: "ADD_STATUS"; status: SyncStatus } | { type: "REMOVE_STATUS" } | { type: "GET_STATUS" };
+type StatusAction =
+  | { type: "ADD_STATUS"; status: StoreSyncStatus }
+  | { type: "REMOVE_STATUS" }
+  | { type: "GET_STATUS" };
 
-function statusReducer(state: SyncStatus[], action: StatusAction): SyncStatus[] {
+function statusReducer(state: StoreSyncStatus[], action: StatusAction): StoreSyncStatus[] {
   switch (action.type) {
     case "ADD_STATUS":
       if (state.includes(action.status)) {
@@ -29,16 +34,21 @@ function statusReducer(state: SyncStatus[], action: StatusAction): SyncStatus[] 
 export const syncStatusDisplayDuration = 500; // Minimal duration to show state
 
 export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) {
+  // const syncStatusHook = useSyncStatus();
+  const store = useItemDescendantStore(useStoreName());
+  const syncStatusHook = store((state) => state.syncStatus);
+
+  const currenSyncStatus = syncStatus ?? syncStatusHook;
   const [queuedStatusChanges, dispatch] = useReducer(statusReducer, []);
-  const [displayedStatus, setDisplayedStatus] = useState<SyncStatus | null>(syncStatus);
+  const [displayedStatus, setDisplayedStatus] = useState<StoreSyncStatus | null>(currenSyncStatus);
   const [delayStatusChange, setDelayStatusChange] = useState(false);
 
   useEffect(() => {
-    dispatch({ type: "ADD_STATUS", status: syncStatus });
-    // console.log(`ADD ${syncStatus}:`, queuedStatusChanges);
-    if (!delayStatusChange && syncStatus !== displayedStatus) {
+    dispatch({ type: "ADD_STATUS", status: currenSyncStatus });
+    // console.log(`ADD ${currenSyncStatus}:`, queuedStatusChanges);
+    if (!delayStatusChange && currenSyncStatus !== displayedStatus) {
       setDelayStatusChange(true);
-      const display = queuedStatusChanges[0] || syncStatus;
+      const display = queuedStatusChanges[0] || currenSyncStatus;
       setDisplayedStatus(display);
       // console.log(`setDisplayedStatus:`, display);
       setTimeout(() => {
@@ -48,7 +58,7 @@ export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) 
       }, syncStatusDisplayDuration);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [syncStatus, delayStatusChange]);
+  }, [currenSyncStatus, delayStatusChange, syncStatusHook]);
 
   const indicatorAnimationClassName = "transition-all duration-500 ease-in-out ";
   const elementClassName = {
@@ -61,7 +71,7 @@ export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) 
   let icon, text;
 
   switch (displayedStatus) {
-    case SyncStatus.Modified:
+    case StoreSyncStatus.Modified:
       icon = (
         <div className={cn(elementClassName.iconWrapper, "")}>
           <IoAlertCircle className={cn(elementClassName.icon, "text-yellow-500/75")} />
@@ -69,7 +79,7 @@ export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) 
       );
       text = <span className={cn(elementClassName.text)}>Unsaved changes</span>;
       break;
-    case SyncStatus.InProgress:
+    case StoreSyncStatus.InProgress:
       icon = (
         <div className={cn(elementClassName.iconWrapper, "")}>
           <SpinningCircleIcon className={cn(elementClassName.icon, "text-blue-500/75")} />
@@ -77,7 +87,7 @@ export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) 
       );
       text = <span className={cn(elementClassName.text)}>Synchronizing...</span>;
       break;
-    case SyncStatus.Succeeded:
+    case StoreSyncStatus.Succeeded:
       icon = (
         <div className={cn(elementClassName.iconWrapper, "")}>
           <IoCheckmarkCircle className={cn(elementClassName.icon, "text-green-500/75")} />
@@ -85,7 +95,7 @@ export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) 
       );
       text = <span className={cn(elementClassName.text)}>Done</span>;
       break;
-    case SyncStatus.Failed:
+    case StoreSyncStatus.Failed:
       icon = (
         <div className={cn(elementClassName.iconWrapper, "opacity-100")}>
           <IoAlertCircle className={cn(elementClassName.icon, "text-red-500/75")} />

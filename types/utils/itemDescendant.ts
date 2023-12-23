@@ -53,6 +53,15 @@ export function getItemDataForUpdate<T extends ItemClientToServerType>(item: T) 
   return payload;
 }
 
+export const nonItemRootStateProperties = ["descendantDraft"];
+export const storeSyncProperties = [
+  "syncStatus",
+  "numFailedAttempts",
+  "lastSyncTime",
+  "syncTimeout",
+  "appSettingsStore",
+];
+
 export function getItemDescendantStoreStateForServer<T extends ItemDescendantStore>(rootState: T) {
   // Remove all properties that are not part of the item
   const storeActions: Array<keyof T> = [
@@ -69,14 +78,24 @@ export function getItemDescendantStoreStateForServer<T extends ItemDescendantSto
     "updateDescendantDraft",
     "commitDescendantDraft",
     "updateStoreWithServerData",
+
+    "setSyncStatus",
+    "syncWithServer",
+    "scheduleSyncWithServer",
+    "updateStoreWithServerData",
+    "updateLastModifiedOfModifiedItems",
+
+    "incrementFailedAttempts",
+    "resetFailedAttempts",
+    "setLastSyncTime",
+    "setSyncTimeout",
   ];
-  const nonItemRootStateProperties: Array<keyof T> = ["descendantDraft"];
 
   // Combine both sets of keys to remove
-  const propertiesToRemove = [...storeActions, ...nonItemRootStateProperties];
+  const propertiesToRemove = [...storeActions, ...nonItemRootStateProperties, ...storeSyncProperties];
 
   // const payload = stripFields(rootState, fieldsToStrip);
-  const payload = stripToType(rootState, propertiesToRemove);
+  const payload = stripToType(rootState, propertiesToRemove as Array<keyof T>);
   return payload as ItemDescendantClientStateType;
 }
 

@@ -1,5 +1,7 @@
 // @/stores/itemDescendant/createItemDescendantStore.ts
 import { siteConfig } from "@/config/site";
+import { StoreSyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
+import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { StateIdSchemaType, generateClientId } from "@/schemas/id";
 import { ItemDataType, ItemDataUntypedType, ItemOrderableClientStateType } from "@/schemas/item";
 import {
@@ -15,6 +17,7 @@ import {
 import { createDateSafeLocalStorage } from "@/stores/itemDescendantStore/utils/createDateSafeLocalStorage";
 import { ClientIdType, ItemDisposition } from "@/types/item";
 import { ItemDescendantModelNameType, getDescendantModel } from "@/types/itemDescendant";
+import { getItemDescendantStoreStateForServer } from "@/types/utils/itemDescendant";
 import { Draft } from "immer";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -24,25 +27,27 @@ import {
   reBalanceListOrderValues,
   updateListOrderValues,
 } from "./utils/descendantOrderValues";
-import { handleNestedItemDescendantListFromServer } from "./utils/syncItemDescendantStore";
+import { handleNestedItemDescendantListFromServer, syncStoreWithServer } from "./utils/syncItemDescendantStore";
 
-// NOTE: This type must be kept in sync with `ItemDescendantStoreStateType` in `@/schemas/itemDescendant`
-export type ItemDescendantStoreState = {
-  createdAt: Date;
-  lastModified: Date;
-  deletedAt: Date | null;
-  parentClientId: ClientIdType;
-  clientId: ClientIdType;
-  id: string | undefined;
-  parentId: string | undefined;
-  disposition: ItemDisposition;
-  itemModel: ItemDescendantModelNameType;
-  descendantModel: ItemDescendantModelNameType | null;
-  descendants: ItemDescendantStoreStateListType;
-  descendantDraft: ItemDataUntypedType;
+export type ItemDescendantStoreHook = ReturnType<typeof createItemDescendantStore>;
+
+// NOTE: This type must be kept in sync with:
+// `ItemDescendantStoreStateType` in `@/schemas/itemDescendant`
+// `getItemDescendantStoreStateForServer` in `@/types/utils/itemDescendant`
+export type StoreState = ItemDescendantStoreStateType & {
+  // Status of store synchronization with server
+  syncStatus: StoreSyncStatus;
+  // Number of consecutive failed attempts
+  numFailedAttempts: number;
+  // Time of last successful synchronization with server
+  lastSyncTime: Date | null;
+  // Pending timeout to synchronize store, or null
+  syncTimeout: NodeJS.Timeout | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useAppSettingsStore: any;
 };
 
-export type ItemDescendantStoreActions = {
+export type StoreActions = {
   setItemData: (data: ItemDataUntypedType) => void;
   markItemAsDeleted: () => void;
   restoreDeletedItem: () => void;
@@ -61,11 +66,24 @@ export type ItemDescendantStoreActions = {
   getDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => ItemDataUntypedType;
   updateDescendantDraft: (descendantData: ItemDataUntypedType, ancestorClientIds: Array<ClientIdType>) => void;
   commitDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => void;
+
+  setSyncStatus: (status: StoreSyncStatus) => void;
+  syncWithServer: (resetBackoff?: boolean, forceUpdate?: boolean) => void;
+  scheduleSyncWithServer: () => void;
   updateStoreWithServerData: (serverState: ItemDescendantServerStateType) => void;
   updateLastModifiedOfModifiedItems: (overrideLastModified?: Date) => void;
+
+  getNumFailedAttempts: () => number;
+  incrementFailedAttempts: () => number;
+  resetFailedAttempts: () => void;
+  setLastSyncTime: (time: Date | null) => void;
+  setSyncTimeout: (timeout: NodeJS.Timeout | null) => void;
+  cancelSyncTimeout: () => void;
+  resetSyncScheduler: () => void;
+  getSyncDelay: () => number;
 };
 
-export type ItemDescendantStore = ItemDescendantStoreState & ItemDescendantStoreActions;
+export type ItemDescendantStore = StoreState & StoreActions;
 
 // Selector type is used to type the return type when using the store with a selector
 type ItemDescendantSelectorType<T> = (state: ItemDescendantStore) => T;
@@ -83,13 +101,16 @@ export interface ItemDescendantStoreConfigType {
   id: StateIdSchemaType | undefined;
 
   storeName?: string;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  useAppSettingsStore: any;
 }
 
 const storeNameSuffix =
   process.env.NODE_ENV === "development" ? `devel.${siteConfig.canonicalDomainName}` : siteConfig.canonicalDomainName;
 
 export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfigType) => {
-  const { parentClientId, clientId, parentId, id, itemModel, storeName } = storeConfig;
+  const { parentClientId, clientId, parentId, id, itemModel, storeName, useAppSettingsStore } = storeConfig;
 
   const currentStoreName = storeName ?? `${itemModel}-${storeNameSuffix}`;
 
@@ -107,6 +128,13 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
     descendantModel: getDescendantModel(itemModel),
     descendants: [],
     descendantDraft: {} as ItemDataUntypedType,
+
+    syncStatus: StoreSyncStatus.Synced,
+    numFailedAttempts: 0,
+    lastSyncTime: null,
+    syncTimeout: null,
+
+    useAppSettingsStore,
   };
 
   // NOTE: Consider adding a migration path at the end of the `create` function below
@@ -311,6 +339,136 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
             }
           });
         },
+
+        setSyncStatus: (status: StoreSyncStatus) =>
+          set((state) => {
+            state.syncStatus = status;
+          }),
+        getNumFailedAttempts: (): number => {
+          return get().numFailedAttempts;
+        },
+        incrementFailedAttempts: () => {
+          set((state) => {
+            state.numFailedAttempts += 1;
+          });
+          return get().numFailedAttempts;
+        },
+        resetFailedAttempts: () =>
+          set((state) => {
+            state.numFailedAttempts = 0;
+          }),
+        setLastSyncTime: (time: Date | null) =>
+          set((state) => {
+            state.lastSyncTime = time;
+          }),
+        setSyncTimeout: (timeout: NodeJS.Timeout | null) =>
+          set((state) => {
+            state.syncTimeout = timeout;
+          }),
+        cancelSyncTimeout: () =>
+          set((state) => {
+            if (state.syncTimeout) {
+              clearTimeout(state.syncTimeout);
+            }
+            state.syncTimeout = null;
+          }),
+        resetSyncScheduler: () => {
+          get().cancelSyncTimeout();
+          get().resetFailedAttempts();
+        },
+        getSyncDelay: (): number => {
+          // Access the latest state of the AppSettingsStore
+          const storeSettings = useAppSettingsStore.getState().itemDescendant;
+          const autoSyncDelay = storeSettings.autoSyncDelay;
+          const autoSyncBackoffBase = storeSettings.autoSyncBackoffBase;
+          const autoSyncBackoffExponentScaleFactor = storeSettings.autoSyncBackoffExponentScaleFactor;
+          const autoSyncBackoffExponentMax = storeSettings.autoSyncBackoffExponentMax;
+
+          const now = new Date();
+          let delay = autoSyncDelay * 1000;
+          // Adjust delay if last sync was less than `backoffInterval` ago
+          const lastSyncTime = get().lastSyncTime;
+          if (lastSyncTime) {
+            const timeSinceLastSync = now.getTime() - lastSyncTime.getTime();
+            // Increase waiting period between attempts up to threshold
+            const backoffIntervalSecondsRaw: number =
+              autoSyncDelay *
+              autoSyncBackoffBase **
+                Math.min(autoSyncBackoffExponentScaleFactor * get().numFailedAttempts, autoSyncBackoffExponentMax);
+            let backoffIntervalSeconds = 0;
+            if (backoffIntervalSecondsRaw < 5) {
+              backoffIntervalSeconds = Math.round(backoffIntervalSecondsRaw * 10) / 10;
+            } else if (backoffIntervalSecondsRaw < 10) {
+              backoffIntervalSeconds = Math.round(backoffIntervalSecondsRaw);
+            } else if (backoffIntervalSecondsRaw < 60) {
+              backoffIntervalSeconds = Math.round(backoffIntervalSecondsRaw / 10) * 10;
+            } else if (backoffIntervalSecondsRaw < 240) {
+              backoffIntervalSeconds = Math.round(backoffIntervalSecondsRaw / 30) * 30;
+            } else if (backoffIntervalSecondsRaw < 900) {
+              backoffIntervalSeconds = Math.round(backoffIntervalSecondsRaw / 60) * 60;
+            } else {
+              backoffIntervalSeconds = Math.round(backoffIntervalSecondsRaw / 300) * 300;
+            }
+            const backoffInterval = backoffIntervalSeconds * 1000;
+            if (timeSinceLastSync < backoffInterval) {
+              window.consoleLog(
+                `useAutoSyncItemDescendantStore: ${
+                  get().numFailedAttempts
+                } attempts failed in a row; wait for backoffInterval=${backoffInterval / 1000} seconds`,
+              );
+              delay = backoffInterval - timeSinceLastSync;
+            }
+          }
+          return delay;
+        },
+
+        syncWithServer: (resetBackoff?: boolean, forceUpdate?: boolean): void => {
+          set((state) => {
+            state.syncStatus = StoreSyncStatus.InProgress;
+            const rootState = getItemDescendantStoreStateForServer(state);
+            // Make sure we only pass required state and required actions to the async function
+            syncStoreWithServer(
+              rootState,
+              state.updateLastModifiedOfModifiedItems,
+              state.updateStoreWithServerData,
+              state.scheduleSyncWithServer,
+              state.getNumFailedAttempts,
+              state.incrementFailedAttempts,
+              state.resetFailedAttempts,
+              state.setLastSyncTime,
+              state.resetSyncScheduler,
+              resetBackoff,
+              forceUpdate,
+            ).then((syncResult) => {
+              // Update syncStatus based on the result of the sync operation
+              set({ syncStatus: syncResult });
+            });
+          });
+        },
+        scheduleSyncWithServer: (): void => {
+          set((state) => {
+            // A sync is running, let's schedule the next unless one is scheduled
+            if (state.syncTimeout) {
+              window.consoleLog(
+                `scheduleSyncWithServer: not scheduling a sync as one is already scheduled:`,
+                state.syncTimeout,
+              );
+              return;
+            }
+            const delay = state.getSyncDelay();
+            const newSyncTimeout = setTimeout(() => {
+              window.consoleLog(`scheduleSyncWithServer: initiating scheduled syncWithServer`);
+              get().setSyncTimeout(null);
+              get().syncWithServer();
+            }, delay);
+            const nextSync = new Date(new Date().getTime() + delay);
+            state.syncTimeout = newSyncTimeout;
+            window.consoleLog(
+              `scheduleSyncWithServer: scheduled a sync in ${delay / 1000}s at ${dateToISOLocal(nextSync)}:`,
+              state.syncTimeout,
+            );
+          });
+        },
         updateStoreWithServerData: (serverState: ItemDescendantServerStateType) => {
           set((state) => {
             handleNestedItemDescendantListFromServer(state, serverState);
@@ -377,9 +535,7 @@ function getDescendantFromAncestorChain(
     return ancestorStateChain;
   }
   const ancestorClientId = ancestorClientIdChain[ancestorClientIdChain.length - 2];
-  const ancestorState = state.descendants.find(
-    (descendant) => descendant.clientId === ancestorClientId,
-  ) as ItemDescendantStoreState;
+  const ancestorState = state.descendants.find((descendant) => descendant.clientId === ancestorClientId) as StoreState;
   if (ancestorState) {
     if (lastModified) {
       ancestorState.lastModified = lastModified;

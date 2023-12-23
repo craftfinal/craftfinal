@@ -49,7 +49,7 @@ export default function DescendantListItemInput({
   >({} as SafeParseReturnType<ItemDataUntypedType, ItemDataUntypedType>);
 
   const settingsStore = useAppSettingsStore();
-  const { showItemDescendantInternals } = settingsStore;
+  const { showItemDescendantInternals } = settingsStore.itemDescendant;
   const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   // Initialize local state for field values
@@ -184,7 +184,7 @@ export default function DescendantListItemInput({
       </Button>
       {showListItemInternals && (
         <div className={cn("my-2 p-2 text-xs")}>
-          <pre>{JSON.stringify(itemDraft, undefined, 2)}</pre>
+          <pre>{JSON.stringify(itemDraft).replace(/^{\n?|\n?}$/g, "")}</pre>
         </div>
       )}
     </div>

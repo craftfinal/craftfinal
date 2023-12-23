@@ -1,5 +1,6 @@
-import { ItemDescendantStoreStateType } from "@/schemas/itemDescendant";
+import { storeSyncProperties } from "@/types/utils/itemDescendant";
 import { PersistStorage } from "zustand/middleware";
+import { ItemDescendantStore } from "../createItemDescendantStore";
 
 /*
 import { parse, stringify } from "devalue";
@@ -25,7 +26,7 @@ export function createTypesafeLocalstorage(): PersistStorage<ItemDescendantStore
 }
 */
 
-export function createDateSafeLocalStorage(): PersistStorage<ItemDescendantStoreStateType> {
+export function createDateSafeLocalStorage(): PersistStorage<ItemDescendantStore> {
   return {
     getItem: (name) => {
       const str = localStorage.getItem(name);
@@ -36,9 +37,12 @@ export function createDateSafeLocalStorage(): PersistStorage<ItemDescendantStore
       return item;
     },
     setItem: (name, value) => {
+      const storeStateKeysToExclude = new Set(storeSyncProperties);
       // Create a deep clone of the value, excluding functions
       const valueWithoutFunctions = JSON.parse(
-        JSON.stringify(value, (key, val) => (typeof val === "function" ? undefined : val)),
+        JSON.stringify(value, (key, val) =>
+          typeof val === "function" || storeStateKeysToExclude.has(key) ? undefined : val,
+        ),
       );
       localStorage.setItem(name, JSON.stringify(valueWithoutFunctions));
     },

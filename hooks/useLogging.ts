@@ -3,7 +3,7 @@ import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { useEffect } from "react";
 
 const useLogging = () => {
-  const isLoggingEnabled = useAppSettingsStore((state) => state.isLoggingEnabled);
+  const isLoggingEnabled = useAppSettingsStore((state) => state.app.isLoggingEnabled);
 
   useEffect(() => {
     // Check if window is defined (i.e., if we're running in the browser)

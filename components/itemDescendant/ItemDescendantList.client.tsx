@@ -5,6 +5,7 @@
 import { ItemDescendantStoreProvider, useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { ResumeActionProvider } from "@/contexts/ResumeActionContext";
 import { StoreNameProvider, useStoreName } from "@/contexts/StoreNameContext";
+import { useAutoSyncItemDescendantStore } from "@/hooks/useAutoSyncItemDescendantStore";
 import { generateClientId } from "@/schemas/id";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schemas/item";
 import { ItemDescendantClientStateType, ItemDescendantServerStateType } from "@/schemas/itemDescendant";
@@ -18,8 +19,8 @@ import RestoreItemDialog from "./RestoreItemDialog";
 import Descendant from "./descendant/Descendant";
 import DescendantInput from "./descendant/DescendantInput";
 import DescendantList from "./descendant/DescendantList";
-import { AutoSync } from "./utils/AutoSync";
-import ItemDescendantListSynchronization from "./utils/SyncButton";
+import ItemDescendantListSynchronization from "./sync/SyncButton";
+import SyncStatusIndicator from "./sync/SyncStatusIndicator";
 
 export interface ItemDescendantRenderProps {
   index: number;
@@ -166,9 +167,11 @@ function ItemDescendantListState(props: ItemDescendantListStateProps) {
   const commitDescendantDraft = store((state) => state.commitDescendantDraft);
 
   const settingsStore = useAppSettingsStore();
-  const { showItemDescendantIdentifiers, showItemDescendantSynchronization } = settingsStore;
+  const { showItemDescendantIdentifiers, showItemDescendantSynchronization } = settingsStore.itemDescendant;
   const showIdentifiers = process.env.NODE_ENV === "development" && showItemDescendantIdentifiers;
   const showSynchronization = process.env.NODE_ENV === "development" && showItemDescendantSynchronization;
+
+  useAutoSyncItemDescendantStore();
 
   const { serverState } = props;
 
@@ -207,7 +210,8 @@ function ItemDescendantListState(props: ItemDescendantListStateProps) {
 
   return !storeIsInitialized ? null : (
     <>
-      <AutoSync />
+      {/* <AutoSync /> */}
+      <SyncStatusIndicator />
       <ItemDescendantListRender {...clientProps} />
     </>
   );
@@ -231,7 +235,9 @@ export default function ItemDescendantListContext(props: ItemDescendantListConte
   return (
     <ResumeActionProvider resumeAction={resumeAction}>
       <StoreNameProvider storeName={`${itemModel}`}>
-        <ItemDescendantStoreProvider configs={[{ itemModel, parentClientId, clientId, parentId, id }]}>
+        <ItemDescendantStoreProvider
+          configs={[{ itemModel, parentClientId, clientId, parentId, id, useAppSettingsStore }]}
+        >
           <ItemDescendantListState {...props} />
         </ItemDescendantStoreProvider>
       </StoreNameProvider>

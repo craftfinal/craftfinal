@@ -73,7 +73,7 @@ export default function DescendantListItem<T extends ElementType = "li">(props: 
   const pathname = usePathname();
 
   const settingsStore = useAppSettingsStore();
-  const { showItemDescendantInternals } = settingsStore;
+  const { showItemDescendantInternals } = settingsStore.itemDescendant;
   const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   const itemFormSchema = getItemSchema(itemModel, "form");

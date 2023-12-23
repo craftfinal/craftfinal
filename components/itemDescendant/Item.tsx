@@ -24,7 +24,7 @@ import { ItemIcon } from "./utils/ItemIcon";
 export interface ItemProps extends ItemDescendantRenderProps {}
 export default function Item(props: ItemProps) {
   const settingsStore = useAppSettingsStore();
-  const { showItemDescendantInternals } = settingsStore;
+  const { showItemDescendantInternals } = settingsStore.itemDescendant;
   const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   return (

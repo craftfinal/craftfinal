@@ -182,19 +182,31 @@ async function processClientItem(
         prismaItemModelInstance,
       );
     } catch (error) {
-      // If the item cannot be found, it means that the client has an obsoleted
-      // and should remove it
-      const obsoletedClientItem = augmentClientStateToServerState(
-        clientItem,
-        ItemDisposition.Obsoleted,
-        currentTimestamp,
-      );
-      console.log(
-        logPrefix,
-        `: tell client to delete the item that does not exist on the server:`,
-        obsoletedClientItem,
-      );
-      return augmentServerStateToDescendantServerState(obsoletedClientItem);
+      if (!(error instanceof Object) || !("name" in error)) {
+        throw error;
+      }
+      if (error.name === "PrismaClientValidationError") {
+        console.error(logPrefix, `clientItem does not match Prisma model`, error);
+        throw error;
+      } else if (error.name === "PrismaClientKnownRequestError") {
+        throw error;
+
+        // If the item cannot be found, it means that the client has an obsoleted
+        // and should remove it
+        const obsoletedClientItem = augmentClientStateToServerState(
+          clientItem,
+          ItemDisposition.Obsoleted,
+          currentTimestamp,
+        );
+        console.log(
+          logPrefix,
+          `: tell client to delete the item that does not exist on the server:`,
+          obsoletedClientItem,
+        );
+        return augmentServerStateToDescendantServerState(obsoletedClientItem);
+      } else {
+        throw error;
+      }
     }
   } else {
     // Create item and augment it with `clientId` to return to client

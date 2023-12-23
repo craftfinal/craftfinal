@@ -129,7 +129,7 @@ async function getItemDescendantFromProps(
   if (!itemDescendant || !itemDescendantServerOutputSchema.parse(itemDescendant)) {
     throw Error(`ItemDescendantList/getServerOutputForProduction: invalid itemDescendant=${itemDescendant}`);
   }
-  console.log(`ItemDescendantList: itemDescendant:`, itemDescendant);
+  // console.log(`ItemDescendantList: itemDescendant:`, itemDescendant);
   return { itemDescendant, leafItemModel };
 }
 
