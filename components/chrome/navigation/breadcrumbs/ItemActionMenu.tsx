@@ -114,16 +114,29 @@ export function getItemActionMenu(pathname: string, title?: string) {
   };
 }
 
-export default function ItemActionMenu(pathname: string, title?: string): ReactNode {
+export interface ItemActionMenuClassNameType {
+  menu?: string;
+  menuList?: string;
+  menuItem?: string;
+  menuTrigger?: string;
+  menuContent?: string;
+}
+export default function ItemActionMenu(
+  className: ItemActionMenuClassNameType,
+  pathname: string,
+  title?: string,
+): ReactNode {
   // Render an action menu if and only if we are already on a specific item
   const itemActions = getItemActionMenu(pathname, title);
   if (!itemActions) return null;
 
   return (
-    <NavigationMenu className="z-5">
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>{itemActions.menuTitle}</NavigationMenuTrigger>
+    <NavigationMenu className={cn("z-5", className.menu)}>
+      <NavigationMenuList className={cn("", className.menuList)}>
+        <NavigationMenuItem className={cn("", className.menuItem)}>
+          <NavigationMenuTrigger className={cn("font-normal", className.menuTrigger)}>
+            {itemActions.menuTitle}
+          </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="flex w-max flex-col">
               {Object.entries(itemActions.actions).map(([actionKey, action]) => {

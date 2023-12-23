@@ -6,7 +6,7 @@ import { getItemModelOrNullFromStateId, renderClientIdPrefix } from "@/schemas/i
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
-import ItemActionMenu from "./ItemActionMenu";
+import ItemActionMenu, { ItemActionMenuClassNameType } from "./ItemActionMenu";
 
 export default function RenderBreadcrumbs({
   pathname,
@@ -46,7 +46,7 @@ function renderBreadcrumbs(
 
   const breadcrumbsProps: BreadcrumbsProps = {
     transformLabel: transformLabel,
-    containerClassName: "flex py-1 lg:text-base mb-4 text-muted-foreground",
+    containerClassName: "flex py-1 text-sm sm:text-base mb-4 text-muted-foreground",
     listClassName: "inline-flex items-center gap-1 flex-wrap md:gap-2",
     inactiveItemClassName: "inline-flex items-center",
     activeItemClassName: "inline-flex items-center",
@@ -276,7 +276,12 @@ function renderBreadcrumbsWithParams(
     )}`;
   }
 
-  const itemActionMenu = ItemActionMenu(pathname, actionMenuTitle);
+  const itemActionMenuClassName: ItemActionMenuClassNameType = {
+    menuTrigger: "text-sm sm:text-base",
+    menuContent: "text-sm sm:text-base",
+  };
+
+  const itemActionMenu = ItemActionMenu(itemActionMenuClassName, pathname, actionMenuTitle);
   const actionMenuClassName = activeItemClassName;
 
   return breadcrumbs.length === 0 || breadcrumbs[0].href === "/" ? null : (

@@ -209,7 +209,11 @@ export default function DescendantList(props: DescendantListProps) {
             })}
           </ItemDescendantSortableWrapper>
           {canEdit && !inlineInsert ? (
-            <DescendantInput {...props} itemModel={descendantModel} itemIcon={!descendantsAreDragable} />
+            <DescendantInput
+              {...{ ...props, className: "" }}
+              itemModel={descendantModel}
+              itemIcon={!descendantsAreDragable}
+            />
           ) : null}
         </ul>
       </DndContext>
