@@ -2,9 +2,10 @@
 
 "use client";
 
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useStoreName } from "@/contexts/StoreNameContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useIsOnline } from "./useIsOnline";
 
 export enum StoreSyncStatus {
   Synced = "Synced", // No current sync operation
@@ -15,13 +16,17 @@ export enum StoreSyncStatus {
 }
 
 export function useSyncStatus() {
-  const store = useItemDescendantStore(useStoreName());
+  const store = useCurrentItemDescendantStore();
   return store((state) => state.syncStatus);
 }
 
 export function useAutoSyncItemDescendantStore() {
-  const store = useItemDescendantStore(useStoreName());
+  const { isOnline /*, isOffline, error */ } = useIsOnline();
+  const [lastOnline, setLastOnline] = useState<Date | null>(null);
+
+  const store = useCurrentItemDescendantStore();
   const scheduleSyncWithServer = store((state) => state.scheduleSyncWithServer);
+  const resetSyncScheduler = store((state) => state.resetSyncScheduler);
 
   const lastModified = store((state) => state.lastModified);
   const lastModifiedRef = useRef(lastModified);
@@ -32,7 +37,19 @@ export function useAutoSyncItemDescendantStore() {
       return;
     }
     lastModifiedRef.current = lastModified;
-    scheduleSyncWithServer();
+    if (isOnline) {
+      setLastOnline(new Date());
+      if (lastOnline === null) {
+        console.log(`useAutoSyncItemDescendantStore: still online: scheduling sync`);
+        scheduleSyncWithServer();
+      } else {
+        console.log(`useAutoSyncItemDescendantStore: now online again: reset sync scheduler and schedule sync`);
+        resetSyncScheduler();
+        scheduleSyncWithServer();
+      }
+    } else {
+      console.log(`useAutoSyncItemDescendantStore: offline: not scheduling sync`);
+    }
 
     return () => {
       // Cleanup logic if needed

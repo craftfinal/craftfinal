@@ -14,21 +14,24 @@ import { ClientIdType } from "@/types/item";
 import { ItemDescendantModelNameType, getDescendantModel, getParentModel } from "@/types/itemDescendant";
 import { ResumeActionType } from "@/types/resume";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
-import RenderItem, { RenderItemProps } from "./RenderItem";
-import RestoreItemDialog from "./RestoreItemDialog";
-import Descendant from "./descendant/Descendant";
-import DescendantInput from "./descendant/DescendantInput";
-import DescendantList from "./descendant/DescendantList";
-import ItemDescendantListSynchronization from "./sync/SyncButton";
-import SyncStatusIndicator from "./sync/SyncStatusIndicator";
+import RenderItem from "../itemDescendant/RenderItem";
+import RestoreItemDialog from "../itemDescendant/RestoreItemDialog";
+import Descendant from "../itemDescendant/descendant/Descendant";
+import DescendantInput from "../itemDescendant/descendant/DescendantInput";
+import DescendantList from "../itemDescendant/descendant/DescendantList";
+import SyncButton from "../itemDescendant/sync/SyncButton";
+import SyncStatusIndicator from "../itemDescendant/sync/SyncStatusIndicator";
 
-export interface ItemDescendantRenderProps extends RenderItemProps<ItemDescendantClientStateType> {
+export interface ItemDescendantRenderProps {
   index: number;
-  itemModel: ItemDescendantModelNameType;
   inputFieldIndex: number;
   ancestorClientIdChain: Array<ClientIdType>;
+  // id: string;
+  item: ItemDescendantClientStateType;
+  itemModel: ItemDescendantModelNameType;
   rootItemModel: ItemDescendantModelNameType;
   leafItemModel: ItemDescendantModelNameType;
+  resumeAction: ResumeActionType;
   editingInput: boolean;
   setEditingInput: Dispatch<SetStateAction<boolean>>;
   setDescendantData: (
@@ -43,6 +46,10 @@ export interface ItemDescendantRenderProps extends RenderItemProps<ItemDescendan
   getDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => ItemDataType<ItemClientStateType>;
   updateDescendantDraft: (descendantData: ItemDataUntypedType, ancestorClientIds: Array<ClientIdType>) => void;
   commitDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => void;
+  showIdentifiers: boolean;
+  showSynchronization: boolean;
+  className?: string;
+  itemIcon?: boolean;
 }
 function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
   const { ancestorClientIdChain, item, rootItemModel, leafItemModel, editingInput, showSynchronization } = props;
@@ -98,7 +105,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
   return (
     <>
       {item.deletedAt ? <RestoreItemDialog {...descendantProps} /> : null}
-      {atRootLevel && editingInput && showSynchronization ? <ItemDescendantListSynchronization /> : null}
+      {atRootLevel && editingInput && showSynchronization ? <SyncButton /> : null}
       {atRootLevel ? <RenderItem {...itemProps} /> : <Descendant {...itemProps} />}
       {item.descendantModel === leafItemModel ? (
         <DescendantList {...descendantProps} />
@@ -202,7 +209,6 @@ function ItemDescendantListState(props: ItemDescendantListStateProps) {
 
   return !storeIsInitialized ? null : (
     <>
-      {/* <AutoSync /> */}
       <SyncStatusIndicator />
       <ItemDescendantListRender {...clientProps} />
     </>

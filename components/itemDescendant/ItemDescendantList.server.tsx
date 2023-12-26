@@ -44,7 +44,7 @@ export default async function ItemDescendantList({ itemModel, itemId, ...props }
 
     let serverOutput;
     if (devel) {
-      serverOutput = await getItemDescendantFromProps(validUserId, validModelName, itemId); //getItemDescendantFromPropsForDevelopment(validUserId, validModelName, itemId);
+      serverOutput = await getItemDescendantFromProps(validUserId, validModelName, itemId);
     } else {
       serverOutput = await getItemDescendantFromProps(validUserId, validModelName, itemId);
     }
@@ -132,77 +132,6 @@ async function getItemDescendantFromProps(
   // console.log(`ItemDescendantList: itemDescendant:`, itemDescendant);
   return { itemDescendant, leafItemModel };
 }
-
-/*
-async function getItemDescendantFromPropsForDevelopment(
-  userId: StateIdSchemaType,
-  itemModel: ItemDescendantModelNameType,
-  itemId: StateIdSchemaType | undefined,
-): ItemDescendantServerOutputType | null {
-  if (rootItemId) {
-    // If we are at the top level ("user"), we only show a flat list of
-    // direct descendants, which are currently using the model "resume"
-    if (itemModel === itemDescendantModelHierarchy[0]) {
-      leafItemModel = getDescendantModel(itemModel)!;
-      console.log(
-        `ItemDescendantList: itemModel=${itemModel} itemId=${rootItemId}: ${itemModel} is root of hierarchy; set leafItemModel=${leafItemModel}`,
-      );
-      serverOutput = await getItemDescendantList(itemModel, rootItemId);
-      console.log(`ItemDescendantList: serverOutput:`, serverOutput);
-    } else {
-      serverOutput = await getItemDescendantList(itemModel, rootItemId);
-    }
-  } else if (devel && pathname.startsWith(siteNavigation.itemRoot)) {
-    // Otherwise:
-    // - If itemModel is resume, we show all resumes of the user
-    // - For any other itemModel, we try to descend the hierarchy along the least
-    // recently created item of the given itemModel
-    const targetItemModel = itemModel;
-    let derivedItemId: StateIdSchemaType = validUserId;
-
-    // Start with a list of resumes owned by the current user
-    let derivedItemModel: ItemDescendantModelNameType = itemDescendantModelHierarchy[0];
-    if (derivedItemModel !== "user") {
-      throw Error(`ItemDescendantServerComponent: invalid initial itemModel=${derivedItemModel}; should be "user"`);
-    }
-    levels = [{ itemModel: derivedItemModel, itemId: derivedItemId }];
-
-    while ((leafItemModel = getDescendantModel(derivedItemModel)) !== targetItemModel && leafItemModel) {
-      derivedItemModel = leafItemModel;
-      const itemList = await getItemsByParentId(derivedItemModel, derivedItemId);
-      if (itemList?.length > 0) {
-        derivedItemId = itemList[0].id;
-        levels = [...levels, { itemModel: derivedItemModel, itemId: derivedItemId }];
-      } else if (renderLevels) {
-        return (
-          <>
-            <RenderLevels itemModel={targetItemModel} levels={levels} />
-            <p>
-              Failed to descend to <code>{derivedItemModel}</code>: <code>{getParentModel(derivedItemModel)}</code> with
-              itemId <code>{derivedItemId}</code> has no descendants.
-            </p>
-          </>
-        );
-      }
-    }
-    if (!derivedItemModel) {
-      throw Error(
-        `ItemDescendantServerComponent: ItemDescendantServerComponent(itemModel=${itemModel}): Failed to descend to this model`,
-      );
-    }
-
-    if (leafItemModel && derivedItemId) {
-      serverOutput = await getItemDescendantList(derivedItemModel, derivedItemId);
-
-      console.log(`ItemDescendantServerComponent: serverOutput:`, serverOutput);
-    } else {
-      throw Error(
-        `ItemDescendantServerComponent: getItemDescendantList(leafItemModel=${leafItemModel}, derivedItemId=${derivedItemId}) returned nothing`,
-      );
-    }
-  }
-}
-*/
 
 async function RenderLevels({
   itemModel,

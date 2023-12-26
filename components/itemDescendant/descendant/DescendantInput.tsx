@@ -1,15 +1,14 @@
 // @/components/itemDescendant/descendant/DescendantInput.tsx
 
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
-import { useStoreName } from "@/contexts/StoreNameContext";
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 // import { useState } from "react";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schemas/item";
 // import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import { ItemIcon } from "../utils/ItemIcon";
 import DescendantListItemInput from "./DescendantListItemInput";
-import { cn } from "@/lib/utils";
 
 export default function DescendantInput(props: ItemDescendantRenderProps) {
   const { className, ancestorClientIdChain, /*inputFieldIndex, */ item, itemModel, resumeAction } = props;
@@ -21,8 +20,7 @@ export default function DescendantInput(props: ItemDescendantRenderProps) {
   // const { showItemDescendantIdentifiers } = settingsStore;
   // const showIdentifiers = process.env.NODE_ENV === "development" && showItemDescendantIdentifiers;
 
-  const storeName = useStoreName();
-  const store = useItemDescendantStore(storeName);
+  const store = useCurrentItemDescendantStore();
   const getDescendantDraft = store((state) => state.getDescendantDraft);
   const updateDescendantDraft = store((state) => state.updateDescendantDraft);
   const commitDescendantDraft = store((state) => state.commitDescendantDraft);

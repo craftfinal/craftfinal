@@ -2,8 +2,7 @@
 
 "use client";
 
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
-import { useStoreName } from "@/contexts/StoreNameContext";
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { StoreSyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
 import { cn } from "@/lib/utils";
 import { useEffect, useReducer, useState } from "react";
@@ -35,7 +34,7 @@ export const syncStatusDisplayDuration = 500; // Minimal duration to show state
 
 export default function SyncStatusIndicator({ syncStatus }: SyncIndicatorProps) {
   // const syncStatusHook = useSyncStatus();
-  const store = useItemDescendantStore(useStoreName());
+  const store = useCurrentItemDescendantStore();
   const syncStatusHook = store((state) => state.syncStatus);
 
   const currenSyncStatus = syncStatus ?? syncStatusHook;
@@ -138,6 +137,21 @@ function SpinningCircleIcon(props: React.SVGProps<SVGSVGElement>) {
           </path>
         </g>
       </g>
+    </svg>
+  );
+}
+
+export function SpinningCircleIconTrueNAS(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" focusable="false" viewBox="0 0 100 100" stroke="currentColor" {...props}>
+      <circle
+        cx="50%"
+        cy="50%"
+        r="45"
+        strokeDasharray="282.743px"
+        strokeDashoffset="141.372px"
+        strokeWidth="10%"
+      ></circle>
     </svg>
   );
 }

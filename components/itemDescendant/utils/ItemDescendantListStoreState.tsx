@@ -1,7 +1,7 @@
 // @/components/itemDescendant/ItemDescendantListStoreState.tsx
 
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useStoreName } from "@/contexts/StoreNameContext";
 import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { ItemDescendantServerStateType } from "@/schemas/itemDescendant";
@@ -14,7 +14,7 @@ interface ItemDescendantStoreStateTypeProps {
 
 export default function ItemDescendantListStoreStateComponent(props: ItemDescendantStoreStateTypeProps) {
   const storeName = useStoreName();
-  const store = useItemDescendantStore(storeName);
+  const store = useCurrentItemDescendantStore();
   const rootState = store((state) => state);
   const itemModel = store((state) => state.itemModel);
   const descendants = store((state) => state.descendants);

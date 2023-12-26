@@ -1,8 +1,7 @@
 // @/components/itemDescendant/ItemDescendantList.tsx
 
 import { Button } from "@/components/ui/button";
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
-import { useStoreName } from "@/contexts/StoreNameContext";
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { cn } from "@/lib/utils";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schemas/item";
 import {
@@ -47,14 +46,11 @@ export default function DescendantList(props: DescendantListProps) {
 
   const settingsStore = useAppSettingsStore();
   const { showItemDescendantInternals } = settingsStore.itemDescendant;
-  const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   const descendantModel = item.descendantModel;
   const descendantsAreDragable = descendantModel === "achievement";
 
-  const storeName = useStoreName();
-  const store = useItemDescendantStore(storeName);
-
+  const store = useCurrentItemDescendantStore();
   const getDescendants = store((state) => state.getDescendants);
   const reArrangeDescendants = store((state) => state.reArrangeDescendants);
   const resetDescendantsOrderValues = store((state) => state.resetDescendantsOrderValues);
@@ -154,7 +150,7 @@ export default function DescendantList(props: DescendantListProps) {
 
   return !descendantModel ? null : (
     <>
-      {canEdit && descendantModel === "achievement" && descendants.length > 0 && showListItemInternals ? (
+      {canEdit && descendantModel === "achievement" && descendants.length > 0 && showItemDescendantInternals ? (
         <div className="flex items-center justify-end px-4">
           <Button
             className="h-4 text-muted-foreground"

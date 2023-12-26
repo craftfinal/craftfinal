@@ -2,9 +2,9 @@
 
 "use client";
 
-import { ItemDescendantStoreProvider, useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
+import { ItemDescendantStoreProvider, useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { ResumeActionProvider } from "@/contexts/ResumeActionContext";
-import { StoreNameProvider, useStoreName } from "@/contexts/StoreNameContext";
+import { StoreNameProvider } from "@/contexts/StoreNameContext";
 import { generateClientId } from "@/schemas/id";
 import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
 
@@ -84,8 +84,7 @@ interface ItemDescendantClientContextProps extends ItemDescendantListContextProp
 function ItemDescendantClientContext(props: ItemDescendantClientContextProps) {
   const [isStoreInitialized, setStoreInitialized] = useState(false);
 
-  const globalStoreName = useStoreName();
-  const store = useItemDescendantStore(globalStoreName);
+  const store = useCurrentItemDescendantStore();
   const rootState = store((state) => state);
   const updateStoreWithServerData = store((state) => state.updateStoreWithServerData);
 

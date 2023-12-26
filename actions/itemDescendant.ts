@@ -174,9 +174,13 @@ async function getDbItemsByDbParentId(
 ): Promise<ItemDescendantServerOutputListType> {
   const transactionClient = prismaTransaction ?? prismaClient;
   const prismaItemModelInstance = getModelAccessor(itemModel, transactionClient);
+  let whereClause: Record<string, string | undefined> = { parentId };
+  if (parentId === dbIdDefault) {
+    whereClause = { id: undefined };
+  }
   // Retrieve the items
   const items = await prismaItemModelInstance.findMany({
-    where: { parentId },
+    where: whereClause,
     orderBy: { createdAt: "asc" },
   });
   return items;

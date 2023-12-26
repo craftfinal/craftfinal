@@ -1,7 +1,6 @@
 // @/components/itemDescendant/ItemDescendantItem.tsx
 
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
-import { useStoreName } from "@/contexts/StoreNameContext";
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
 import { ItemDescendantModelNameType } from "@/types/itemDescendant";
 import { ItemDescendantRenderProps } from "./ItemDescendantList.client";
@@ -27,8 +26,7 @@ export interface ItemProps extends ItemDescendantRenderProps {
 export default function Item(props: ItemProps) {
   const { item } = props;
   // const [editingInput, setEditingInput] = useState(resumeAction === "edit");
-  const storeName = useStoreName();
-  const store = useItemDescendantStore(storeName);
+  const store = useCurrentItemDescendantStore();
   const restoreDeletedItem = store((state) => state.restoreDeletedItem);
 
   const [open, setOpen] = useState(!!item.deletedAt);

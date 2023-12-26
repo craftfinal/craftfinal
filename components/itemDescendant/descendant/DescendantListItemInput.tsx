@@ -50,7 +50,6 @@ export default function DescendantListItemInput({
 
   const settingsStore = useAppSettingsStore();
   const { showItemDescendantInternals } = settingsStore.itemDescendant;
-  const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   // Initialize local state for field values
   const [itemDraftState, setItemDraftState] = useState(getInitialItemDraftState(itemDraft, itemFormFields));
@@ -182,7 +181,7 @@ export default function DescendantListItemInput({
       >
         {<CheckCircleIcon />}
       </Button>
-      {showListItemInternals && (
+      {showItemDescendantInternals && (
         <div className={cn("my-2 p-2 text-xs")}>
           <pre>{JSON.stringify(itemDraft).replace(/^{\n?|\n?}$/g, "")}</pre>
         </div>

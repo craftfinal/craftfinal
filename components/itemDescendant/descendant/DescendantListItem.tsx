@@ -17,16 +17,27 @@ import { useForm } from "react-hook-form";
 import { ItemClientStateType, ItemDataUntypedType } from "@/schemas/item";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ClientIdType, ItemDisposition } from "@/types/item";
-import { itemDescendantModelHierarchy } from "@/types/itemDescendant";
+import { ItemDescendantModelNameType, itemDescendantModelHierarchy } from "@/types/itemDescendant";
 import { Slot } from "@radix-ui/react-slot";
 import { Grip } from "lucide-react";
-import { ElementType, useState } from "react";
+import { ElementType, ReactNode, useState } from "react";
 import { InputProps } from "react-editext";
-import { ListItemInternals } from "../Item";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
+import { RenderItemProps } from "../RenderItem";
+import { ListItemInternals } from "../devel/ListItemInternals";
+import { ResumeItemCard } from "../models/resume/ResumeItemCard";
 import EditableField from "../utils/EditableField";
 import { ItemActionButton } from "../utils/ItemActionButton";
 import { ItemIcon } from "../utils/ItemIcon";
+
+export type RenderItemComponentType = (props: RenderItemProps<ItemClientStateType>) => ReactNode;
+export const ItemComponent: Record<ItemDescendantModelNameType, RenderItemComponentType | null> = {
+  user: null,
+  resume: ResumeItemCard as RenderItemComponentType,
+  organization: null,
+  role: null,
+  achievement: null,
+};
 
 // export interface DescendantListItemProps extends ItemDescendantRenderProps {
 //   as: string;
@@ -59,6 +70,7 @@ export type DescendantListItemElementProps<T extends ElementType> = {
 // export default function DescendantListItem({
 export default function DescendantListItem<T extends ElementType = "li">(props: DescendantListItemElementProps<T>) {
   const { as, asChild = false, resumeAction = "view", itemModel, item, setItemData, itemIsDragable, canEdit } = props;
+
   const Comp = asChild ? Slot : as || "li";
 
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -74,7 +86,6 @@ export default function DescendantListItem<T extends ElementType = "li">(props: 
 
   const settingsStore = useAppSettingsStore();
   const { showItemDescendantInternals } = settingsStore.itemDescendant;
-  const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   const itemFormSchema = getItemSchema(itemModel, "form");
   const itemFormFields = getSchemaFields(itemModel, "display");
@@ -88,6 +99,11 @@ export default function DescendantListItem<T extends ElementType = "li">(props: 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [inputIsValid, setInputIsValid] = useState(true);
+
+  if (item.deletedAt)
+    throw Error(
+      `DescendantListItem: called with deleted item: deletedAt=${item.deletedAt}` + "\n" + JSON.stringify(item),
+    );
 
   const updateValidationStatus = () => {
     const validationStatus = itemFormSchema.safeParse({ ...item });
@@ -132,68 +148,74 @@ export default function DescendantListItem<T extends ElementType = "li">(props: 
   //   }
   // };
 
-  const content = (
-    <Comp
-      key={item.clientId}
-      className={cn(
-        "border-shadow-light dark:border-dark-txt-1 bg-elem-light dark:bg-elem-dark-1 group flex flex-1 cursor-auto items-center justify-between rounded-md",
-        {
-          // "bg-background/50 text-muted-foreground bg-blend-soft-light": item.disposition !== ItemDisposition.Synced,
-          "text-muted-foreground": item.disposition !== ItemDisposition.Synced,
-          "outline-red-500": !inputIsValid,
-          "outline-none": inputIsValid,
-          "basis-1/4": showListItemInternals,
-        },
-      )}
-      ref={setNodeRef}
-      style={styles}
-      {...attributes}
-    >
-      <>
-        {itemModel == itemDescendantModelHierarchy[1] || !canEdit ? null : ItemIcon(itemModel)}
+  let content = null;
+  const CustomComponent = ItemComponent[itemModel];
+  if (CustomComponent !== null) {
+    content = <CustomComponent {...{ item, index: 0, itemModel, resumeAction }} />;
+  } else {
+    content = (
+      <Comp
+        key={item.clientId}
+        className={cn(
+          "border-shadow-light dark:border-dark-txt-1 bg-elem-light dark:bg-elem-dark-1 group flex flex-1 cursor-auto items-center justify-between rounded-md",
+          {
+            // "bg-background/50 text-muted-foreground bg-blend-soft-light": item.disposition !== ItemDisposition.Synced,
+            "text-muted-foreground": item.disposition !== ItemDisposition.Synced,
+            "outline-red-500": !inputIsValid,
+            "outline-none": inputIsValid,
+            "basis-1/4": showItemDescendantInternals,
+          },
+        )}
+        ref={setNodeRef}
+        style={styles}
+        {...attributes}
+      >
+        <>
+          {itemModel == itemDescendantModelHierarchy[1] || !canEdit ? null : ItemIcon(itemModel)}
 
-        {item.id && (itemModel === "resume" || pathname.startsWith("/item")) ? (
-          <ItemActionButton pathname={pathname} item={item} action={resumeAction} />
-        ) : null}
-        {canEdit && itemIsDragable ? (
-          <div
-            className={cn("flex h-full items-center", {
-              "hover:cursor-grab active:cursor-grabbing": itemIsDragable,
+          {item.id && (itemModel === "resume" || pathname.startsWith("/item")) ? (
+            <ItemActionButton pathname={pathname} item={item} action={resumeAction} />
+          ) : null}
+          {canEdit && itemIsDragable ? (
+            <div
+              className={cn("flex h-full items-center", {
+                "hover:cursor-grab active:cursor-grabbing": itemIsDragable,
+              })}
+              {...listeners}
+            >
+              <Grip className="mr-2 lg:mr-4" />
+            </div>
+          ) : null}
+          <div className="flex flex-1 flex-wrap justify-between gap-y-2">
+            {itemFormFields.map((fieldName) => {
+              const inputProps = getInputProps(item, itemModel, fieldName);
+
+              return (
+                <div
+                  key={fieldName}
+                  className="text-shadow-dark dark:text-light-txt-1 text-dark-txt-1 dark:text-light-txt-4 flex-1"
+                >
+                  <EditableField
+                    key={inputProps.key}
+                    fieldName={inputProps.fieldName}
+                    value={item[fieldName as keyof ItemClientStateType] as string}
+                    placeholder={inputProps.placeholder}
+                    onChange={handleChange}
+                    onSave={handleSave}
+                    canEdit={canEdit}
+                  />
+                </div>
+              );
             })}
-            {...listeners}
-          >
-            <Grip className="mr-2 lg:mr-4" />
+            {/* TODO: Handle and display errors from formState.errors */}
           </div>
-        ) : null}
-        <div className="flex flex-1 flex-wrap justify-between gap-y-2">
-          {itemFormFields.map((fieldName) => {
-            const inputProps = getInputProps(item, itemModel, fieldName);
-
-            return (
-              <div
-                key={fieldName}
-                className="text-shadow-dark dark:text-light-txt-1 text-dark-txt-1 dark:text-light-txt-4 flex-1"
-              >
-                <EditableField
-                  key={inputProps.key}
-                  fieldName={inputProps.fieldName}
-                  value={item[fieldName as keyof ItemClientStateType] as string}
-                  placeholder={inputProps.placeholder}
-                  onChange={handleChange}
-                  onSave={handleSave}
-                  canEdit={canEdit}
-                />
-              </div>
-            );
-          })}
-          {/* TODO: Handle and display errors from formState.errors */}
-        </div>
-        <ListItemDeleteButton {...props} />
-        {showListItemInternals && <ListItemInternals {...props} />}
-      </>
-    </Comp>
-  );
-  return item.deletedAt ? null : asChild ? <Comp>{content}</Comp> : content;
+          <ListItemDeleteButton {...props} />
+          {showItemDescendantInternals && <ListItemInternals {...props} />}
+        </>
+      </Comp>
+    );
+  }
+  return asChild ? <Comp>{content}</Comp> : content;
 }
 
 export function ListItemDeleteButton(props: DescendantListItemProps) {

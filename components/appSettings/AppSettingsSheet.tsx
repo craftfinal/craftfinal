@@ -28,7 +28,7 @@ export default function AppSettingsSheet({ account }: AppSettingsSheetProps) {
   // return !(account?.type === AccountType.Registered) ? null : (
   return !account ? null : (
     <Sheet>
-      <SheetTrigger name="App settings toggle" aria-label="Show settings" className="flex flex-wrap items-center px-2">
+      <SheetTrigger name="App settings toggle" aria-label="Show settings" className="flex items-center">
         {<Settings2Icon />}
       </SheetTrigger>
       <SheetContent>

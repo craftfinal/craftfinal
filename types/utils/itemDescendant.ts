@@ -18,7 +18,12 @@ import {
 import { ItemDescendantStore } from "@/stores/itemDescendantStore/createItemDescendantStore";
 import { sortDescendantsByOrderValues } from "@/stores/itemDescendantStore/utils/descendantOrderValues";
 import { ItemDisposition } from "../item";
-import { ItemDescendantModelNameType, getDescendantModel, getItemOrderFunction } from "../itemDescendant";
+import {
+  ItemDescendantModelNameType,
+  getDescendantModel,
+  getItemOrderFunction,
+  itemDescendantModelHierarchy,
+} from "../itemDescendant";
 
 export function stripFieldsForDatabase<T extends ItemClientToServerType>(item: T, fieldsToStrip: Set<keyof T>) {
   return stripFields(item, fieldsToStrip);
@@ -262,3 +267,7 @@ export function augmentToItemDescendantServerState(
 export const findItemIndexByClientId = (arr: Array<ItemClientStateType>, id: StateIdSchemaType): number => {
   return arr.findIndex((descendant) => descendant.clientId === id);
 };
+
+export function isValidModelName(itemModel?: ItemDescendantModelNameType) {
+  return itemModel && itemDescendantModelHierarchy.indexOf(itemModel) >= 0;
+}

@@ -1,18 +1,16 @@
 // @/components/itemDescendant/ItemDescendantItem.tsx
 
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
-import { useStoreName } from "@/contexts/StoreNameContext";
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
+import { cn } from "@/lib/utils";
 import { ItemDataUntypedType } from "@/schemas/item";
 import { ClientIdType } from "@/types/item";
 import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import DescendantListItem from "./DescendantListItem";
-import { cn } from "@/lib/utils";
 
 export default function Descendant(props: ItemDescendantRenderProps) {
   const { className, ancestorClientIdChain, itemModel, index, resumeAction } = props;
   // const [editingInput, setEditingInput] = useState(resumeAction === "edit");
-  const storeName = useStoreName();
-  const store = useItemDescendantStore(storeName);
+  const store = useCurrentItemDescendantStore();
   const setDescendantData = store((state) => state.setDescendantData);
   const markDescendantAsDeleted = store((state) => state.markDescendantAsDeleted);
 

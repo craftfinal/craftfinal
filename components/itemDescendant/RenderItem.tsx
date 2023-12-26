@@ -1,9 +1,9 @@
 // @/components/itemDescendant/ItemDescendantItem.tsx
 
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
-import { useStoreName } from "@/contexts/StoreNameContext";
+"use client";
+
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { cn } from "@/lib/utils";
-import { DateTimeFormat, DateTimeSeparator, dateToISOLocal } from "@/lib/utils/formatDate";
 import {
   getItemSchema,
   getSchemaFields,
@@ -11,40 +11,56 @@ import {
   getUpdateFromEvent,
 } from "@/lib/utils/itemDescendantListUtils";
 import { ItemClientStateType } from "@/schemas/item";
+import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ItemDisposition } from "@/types/item";
+import { ItemDescendantModelNameType } from "@/types/itemDescendant";
+import { ResumeActionType } from "@/types/resume";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { InputProps } from "react-editext";
 import { useForm } from "react-hook-form";
-import { ItemDescendantRenderProps } from "./ItemDescendantList.client";
+import { ListItemInternals } from "./devel/ListItemInternals";
 import EditableField from "./utils/EditableField";
 import { ItemIcon } from "./utils/ItemIcon";
 
-export interface ItemProps extends ItemDescendantRenderProps {}
-export default function Item(props: ItemProps) {
+export type RenderItemProps<T extends ItemClientStateType | ItemDescendantClientStateType> = {
+  index: number;
+  item: T;
+  itemModel: ItemDescendantModelNameType;
+  resumeAction: ResumeActionType;
+  showIdentifiers?: boolean;
+  showSynchronization?: boolean;
+  className?: string;
+  itemIcon?: boolean;
+};
+export default function RenderItem<T extends ItemClientStateType | ItemDescendantClientStateType>({
+  className,
+  ...props
+}: RenderItemProps<T>) {
   const settingsStore = useAppSettingsStore();
   const { showItemDescendantInternals } = settingsStore.itemDescendant;
-  const showListItemInternals = process.env.NODE_ENV === "development" && showItemDescendantInternals;
 
   return (
-    <div className={cn("gap-y-2lg:gap-3 flex flex-1 items-center justify-between xl:gap-4", props.className)}>
+    <div className={cn("gap-y-2lg:gap-3 flex flex-1 items-center justify-between xl:gap-4", className)}>
       <div className="flex flex-1 items-center gap-1 lg:gap-2 xl:gap-3">
         <ItemHeader {...props} />
       </div>
-      {showListItemInternals && <ListItemInternals {...props} />}
+      {showItemDescendantInternals && <ListItemInternals {...props} />}
     </div>
   );
 }
 
-function ItemHeader(props: ItemProps) {
+function ItemHeader<T extends ItemClientStateType | ItemDescendantClientStateType>(props: RenderItemProps<T>) {
   const { itemModel, item, resumeAction } = props;
   // const [editingInput, setEditingInput] = useState(resumeAction === "edit");
   const descendantModel = item.descendantModel;
-  const numDescendants = item.descendants.filter((descendant) => !descendant.deletedAt).length;
+  let numDescendants = 0;
+  if ("descendants" in item) {
+    numDescendants = item.descendants.filter((descendant) => !descendant.deletedAt).length;
+  }
 
-  const storeName = useStoreName();
-  const store = useItemDescendantStore(storeName);
+  const store = useCurrentItemDescendantStore();
   const setItemData = store((state) => state.setItemData);
   const markItemAsDeleted = store((state) => state.markItemAsDeleted);
 
@@ -145,66 +161,6 @@ function ItemHeader(props: ItemProps) {
           </svg>
         </button>
       )}
-    </div>
-  );
-}
-
-export function ListItemInternals(props: ItemProps) {
-  const { index, item } = props;
-  return (
-    <div className="flex cursor-auto items-center gap-x-4 px-4 py-2 text-xs text-slate-600">
-      <p className="flex h-full items-center bg-slate-200 px-2 text-lg">{index}</p>
-      <table>
-        <tbody>
-          <tr>
-            <td
-              className={cn("py-0", {
-                "text-red-500": item.disposition !== ItemDisposition.Synced,
-              })}
-            >
-              {item.disposition}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <table className="w-auto">
-        <tbody>
-          <tr>
-            <td
-              className={cn("py-0", {
-                "text-red-500": item.disposition !== ItemDisposition.Synced,
-              })}
-            >
-              <span className="text-xs text-muted-foreground">modified</span>:&nbsp;
-              <span className="py-0">
-                {dateToISOLocal(item.lastModified, DateTimeFormat.MonthDayTime, DateTimeSeparator.Newline)}
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td className={"py-0"}>
-              <span className="text-xs text-muted-foreground">created</span>:&nbsp;
-              {dateToISOLocal(item.createdAt, DateTimeFormat.MonthDayTime, DateTimeSeparator.Newline)}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <table className="w-auto">
-        <tbody>
-          <tr>
-            <td className="py-0">
-              <span className="text-xs text-muted-foreground">client</span>&nbsp;
-              <code>{item.clientId?.substring(0, 8)}&hellip;</code>
-            </td>
-          </tr>
-          <tr>
-            <td className="py-0">
-              <span className="text-xs text-muted-foreground">server</span>&nbsp;
-              <code>{item.id?.substring(0, 8)}&hellip;</code>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   );
 }

@@ -12,12 +12,17 @@ import useAppSettingsStore, {
   ItemDescendantSettingsType,
 } from "@/stores/appSettings/useAppSettingsStore";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Fragment, ReactNode } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { DialogClose } from "../ui/dialog";
 import { Input } from "../ui/input";
 
 type FormValueType = string | number | boolean;
+const componentSchemas = {
+  appSettings: appSettingsSchema,
+  itemDescendantSettings: itemDescendantSettingsSchema,
+};
 
 const unifiedSchema = z.object({
   appSettings: appSettingsSchema,
@@ -26,6 +31,7 @@ const unifiedSchema = z.object({
 type UnifiedSettingsType = z.infer<typeof unifiedSchema>;
 
 export default function AppSettingsForm() {
+  const devel = process.env.NODE_ENV === "development";
   const appSettings = useAppSettingsStore((state) => state.app);
   const itemDescendantSettings = useAppSettingsStore((state) => state.itemDescendant);
   const setAppSettings = useAppSettingsStore((state) => state.setAppSettings);
@@ -123,15 +129,30 @@ export default function AppSettingsForm() {
     });
   };
 
+  interface FormSectionType {
+    id: keyof UnifiedSettingsType;
+    title: ReactNode;
+    predicate: () => boolean;
+  }
+  const formSections: Array<FormSectionType> = [
+    { id: "appSettings", title: <>App settings</>, predicate: () => devel },
+    { id: "itemDescendantSettings", title: <>ItemDescendant settings</>, predicate: () => devel },
+  ];
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <h3>App Settings</h3>
-        {renderFields(appSettingsSchema, "appSettings")}
-
-        <h3>Item Descendant Settings</h3>
-        {renderFields(itemDescendantSettingsSchema, "itemDescendantSettings")}
-
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
+        {formSections.map((section, index) => {
+          return (
+            section.predicate() && (
+              <Fragment key={section.id}>
+                {index > 0 && <hr className="my-2 md:my-4 xl:my-6" />}
+                <h3>{section.title}</h3>
+                {renderFields(componentSchemas[section.id], section.id)}
+              </Fragment>
+            )
+          );
+        })}
         <DialogClose asChild>
           <Button type="submit">Close</Button>
         </DialogClose>

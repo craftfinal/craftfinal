@@ -3,8 +3,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
-import { useStoreName } from "@/contexts/StoreNameContext";
+import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { useRef } from "react";
 
 export interface ItemDescendantListSyncButtonProps {
@@ -15,7 +14,7 @@ export default function SyncButton(props: ItemDescendantListSyncButtonProps) {
 
   const title = props.title ?? "Sync now";
 
-  const store = useItemDescendantStore(useStoreName());
+  const store = useCurrentItemDescendantStore();
   const syncWithServer = store((state) => state.syncWithServer);
 
   async function handleSynchronization(e: React.MouseEvent) {
