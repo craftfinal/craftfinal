@@ -33,7 +33,7 @@ import DescendantListItemInput from "./DescendantListItemInput";
 
 interface DescendantListProps extends ItemDescendantRenderProps {}
 export default function DescendantList(props: DescendantListProps) {
-  const { className, ancestorClientIdChain, rootItemModel, leafItemModel, itemModel, item, resumeAction } = props;
+  const { className, ancestorChain, rootItemModel, leafItemModel, itemModel, item, resumeAction } = props;
 
   const canEdit = resumeAction === "edit";
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -58,8 +58,8 @@ export default function DescendantList(props: DescendantListProps) {
   const markDescendantAsDeleted = store((state) => state.markDescendantAsDeleted);
 
   const getItems = (): ItemDescendantOrderableStoreStateListType => {
-    // window.consoleLog(`DescendantInput:getItems(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
-    return getDescendants(ancestorClientIdChain) as ItemDescendantOrderableStoreStateListType;
+    // window.consoleLog(`DescendantInput:getItems(): ancestorChain=${JSON.stringify(ancestorChain)}`);
+    return getDescendants(ancestorChain) as ItemDescendantOrderableStoreStateListType;
   };
 
   const setItemData = (descendantData: ItemDataUntypedType, clientId: ClientIdType): void => {
@@ -68,31 +68,31 @@ export default function DescendantList(props: DescendantListProps) {
         descendantData,
         undefined,
         2,
-      )}, clientId=${clientId}): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`,
+      )}, clientId=${clientId}): ancestorChain=${JSON.stringify(ancestorChain)}`,
     );
-    setDescendantData(descendantData, clientId, ancestorClientIdChain);
+    setDescendantData(descendantData, clientId, ancestorChain);
   };
 
   const markItemAsDeleted = (clientId: ClientIdType): void => {
     window.consoleLog(
-      `Descendant:markItemAsDeleted(clientId=${clientId}): ancestorClientIdChain=${JSON.stringify(
-        ancestorClientIdChain,
+      `Descendant:markItemAsDeleted(clientId=${clientId}): ancestorChain=${JSON.stringify(
+        ancestorChain,
         undefined,
         2,
       )}`,
     );
-    markDescendantAsDeleted(clientId, ancestorClientIdChain);
+    markDescendantAsDeleted(clientId, ancestorChain);
   };
 
   const descendants = getItems();
 
   // Update the state with the new array
   const reArrangeItems = (updatedItemList: ItemDescendantOrderableClientStateListType) => {
-    reArrangeDescendants(updatedItemList, ancestorClientIdChain);
+    reArrangeDescendants(updatedItemList, ancestorChain);
   };
 
   const resetItemsOrderValues = () => {
-    resetDescendantsOrderValues(ancestorClientIdChain);
+    resetDescendantsOrderValues(ancestorChain);
   };
 
   const getDescendantDraft = store((state) => state.getDescendantDraft);
@@ -100,22 +100,22 @@ export default function DescendantList(props: DescendantListProps) {
   const commitDescendantDraft = store((state) => state.commitDescendantDraft);
 
   const getItemDraft = (): ItemDataType<ItemClientStateType> => {
-    // window.consoleLog(`DescendantInput:getItemDraft(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
-    return getDescendantDraft(ancestorClientIdChain);
+    // window.consoleLog(`DescendantInput:getItemDraft(): ancestorChain=${JSON.stringify(ancestorChain)}`);
+    return getDescendantDraft(ancestorChain);
   };
 
   const updateItemDraft = (descendantData: ItemDataUntypedType): void => {
     // window.consoleLog(
-    //   `DescendantInput:updateItemDraft(descendantData=${descendantData}): ancestorClientIdChain=${JSON.stringify(
-    //     ancestorClientIdChain,
+    //   `DescendantInput:updateItemDraft(descendantData=${descendantData}): ancestorChain=${JSON.stringify(
+    //     ancestorChain,
     //   )}`,
     // );
-    updateDescendantDraft(descendantData, ancestorClientIdChain);
+    updateDescendantDraft(descendantData, ancestorChain);
   };
 
   const commitItemDraft = (): void => {
-    // window.consoleLog(`DescendantInput:commitItemDraft(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
-    commitDescendantDraft(ancestorClientIdChain);
+    // window.consoleLog(`DescendantInput:commitItemDraft(): ancestorChain=${JSON.stringify(ancestorChain)}`);
+    commitDescendantDraft(ancestorChain);
   };
 
   const itemDraft = getItemDraft();

@@ -1,5 +1,7 @@
 // @/components/itemDescendant/ItemDescendantListItemInput.tsx
 
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import {
   extractFieldName,
@@ -12,13 +14,22 @@ import {
 import { ItemDataUntypedType } from "@/schemas/item";
 import useAppSettingsStore from "@/stores/appSettings/useAppSettingsStore";
 import { ItemDescendantModelNameType } from "@/types/itemDescendant";
+import { Slot } from "@radix-ui/react-slot";
 import { CheckCircleIcon } from "lucide-react";
-import { /*Dispatch, SetStateAction, */ useEffect, useState } from "react";
+import { ElementType, ReactNode, useEffect, useState } from "react";
 import { InputProps } from "react-editext";
 import { SafeParseReturnType, z } from "zod";
-import { Button } from "../../ui/button";
-import { toast } from "../../ui/use-toast";
+import { RenderInputProps, ResumeInputCard } from "../models/resume/ResumeInputCard";
 import EditableInputField from "../utils/EditableInputField";
+
+export type RenderInputComponentType = (props: RenderInputProps) => ReactNode;
+export const InputComponent: Record<ItemDescendantModelNameType, RenderInputComponentType | null> = {
+  user: null,
+  resume: ResumeInputCard as RenderInputComponentType,
+  organization: null,
+  role: null,
+  achievement: null,
+};
 
 interface DescendantListItemInputProps {
   itemModel: ItemDescendantModelNameType;
@@ -29,19 +40,34 @@ interface DescendantListItemInputProps {
   editingInput: boolean;
   // setEditingInput: Dispatch<SetStateAction<boolean>>;
 }
-export default function DescendantListItemInput({
+
+// Define a type that conditionally checks if T is a string (like 'div', 'span', etc.)
+// and uses JSX.IntrinsicElements[T] to get the correct prop types.
+type ElementProps<T extends ElementType> = T extends keyof JSX.IntrinsicElements ? JSX.IntrinsicElements[T] : T;
+
+export type DescendantListItemInputElementProps<T extends ElementType> = {
+  as?: T;
+  asChild?: boolean;
+} & ElementProps<T> &
+  DescendantListItemInputProps;
+
+export default function DescendantListItemInput<T extends ElementType = "li">({
+  as,
+  asChild,
   canEdit,
   editingInput /* setEditingInput, */,
   itemModel,
   itemDraft,
   updateItemDraft,
   commitItemDraft,
-}: Readonly<DescendantListItemInputProps>) {
+}: DescendantListItemInputElementProps<T>) {
+  const Comp = asChild ? Slot : as ?? "li";
+
   const itemFormSchema = getItemSchema(itemModel, "form");
   const itemFormFields = getSchemaFields(itemModel, "display");
 
-  type ItemDataType = z.output<typeof itemFormSchema>;
-  type ItemDataFieldNameType = keyof ItemDataType;
+  type ItemFormDataType = z.output<typeof itemFormSchema>;
+  type ItemDataFieldNameType = keyof ItemFormDataType;
   type ItemDataFieldValueType = string | number;
 
   const [draftValidationStatus, setDraftValidationStatus] = useState<
@@ -153,39 +179,46 @@ export default function DescendantListItemInput({
   //   setEditingInput(false);
   // };
 
-  return (
-    <div className="flex flex-grow items-center">
-      <div className="flex flex-grow flex-wrap justify-between gap-x-4 gap-y-2">
-        {itemFormFields.map((fieldName) => {
-          const inputProps = getInputProps(itemDraftState, itemModel, fieldName);
-          return (
-            <EditableInputField
-              key={inputProps.key}
-              fieldName={inputProps.fieldName}
-              value={inputProps.value}
-              placeholder={inputProps.placeholder}
-              onChange={handleChange}
-              onSave={handleSave}
-              editing={editingInput}
-              canEdit={canEdit}
-              className="flex flex-1 gap-x-4 gap-y-2"
-            />
-          );
-        })}
-      </div>
-      <Button
-        variant="ghost"
-        disabled={!draftValidationStatus.success}
-        onClick={handleSubmitButton}
-        title={`Create ${itemModel}`}
-      >
-        {<CheckCircleIcon />}
-      </Button>
-      {showItemDescendantInternals && (
-        <div className={cn("my-2 p-2 text-xs")}>
-          <pre>{JSON.stringify(itemDraft).replace(/^{\n?|\n?}$/g, "")}</pre>
+  let content = null;
+  const CustomComponent = InputComponent[itemModel];
+  if (CustomComponent !== null) {
+    content = <CustomComponent {...{ index: 0, itemModel, canEdit }} />;
+  } else {
+    content = (
+      <Comp className="flex flex-grow items-center">
+        <div className="flex flex-grow flex-wrap justify-between gap-x-4 gap-y-2">
+          {itemFormFields.map((fieldName) => {
+            const inputProps = getInputProps(itemDraftState, itemModel, fieldName);
+            return (
+              <EditableInputField
+                key={inputProps.key}
+                name={inputProps.name}
+                value={inputProps.value}
+                placeholder={inputProps.placeholder}
+                onChange={handleChange}
+                onSave={handleSave}
+                editing={editingInput}
+                canEdit={canEdit}
+                className="flex flex-1 gap-x-4 gap-y-2"
+              />
+            );
+          })}
         </div>
-      )}
-    </div>
-  );
+        <Button
+          variant="ghost"
+          disabled={!draftValidationStatus.success}
+          onClick={handleSubmitButton}
+          title={`Create ${itemModel}`}
+        >
+          {<CheckCircleIcon />}
+        </Button>
+        {showItemDescendantInternals && (
+          <div className={cn("my-2 p-2 text-xs")}>
+            <pre>{JSON.stringify(itemDraft).replace(/^{\n?|\n?}$/g, "")}</pre>
+          </div>
+        )}
+      </Comp>
+    );
+  }
+  return asChild ? <Comp>{content}</Comp> : content;
 }

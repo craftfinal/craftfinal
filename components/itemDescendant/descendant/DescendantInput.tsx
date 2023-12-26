@@ -11,7 +11,7 @@ import { ItemIcon } from "../utils/ItemIcon";
 import DescendantListItemInput from "./DescendantListItemInput";
 
 export default function DescendantInput(props: ItemDescendantRenderProps) {
-  const { className, ancestorClientIdChain, /*inputFieldIndex, */ item, itemModel, resumeAction } = props;
+  const { className, ancestorChain, /*inputFieldIndex, */ item, itemModel, resumeAction } = props;
   const canEdit = resumeAction === "edit";
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editingInput, setEditingInput] = useState(canEdit);
@@ -26,18 +26,18 @@ export default function DescendantInput(props: ItemDescendantRenderProps) {
   const commitDescendantDraft = store((state) => state.commitDescendantDraft);
 
   const getItemDraft = (): ItemDataType<ItemClientStateType> => {
-    // window.consoleLog(`DescendantInput:getItemDraft(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
-    return getDescendantDraft(ancestorClientIdChain);
+    // window.consoleLog(`DescendantInput:getItemDraft(): ancestorChain=${JSON.stringify(ancestorChain)}`);
+    return getDescendantDraft(ancestorChain);
   };
 
   const updateItemDraft = (descendantData: ItemDataUntypedType): void => {
-    // window.consoleLog(`DescendantInput:updateItemDraft(descendantData=${descendantData}): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`);
-    updateDescendantDraft(descendantData, ancestorClientIdChain);
+    // window.consoleLog(`DescendantInput:updateItemDraft(descendantData=${descendantData}): ancestorChain=${JSON.stringify(ancestorChain)}`);
+    updateDescendantDraft(descendantData, ancestorChain);
   };
 
   const commitItemDraft = (): void => {
-    // window.consoleLog(`DescendantInput:commitItemDraft(): ancestorClientIdChain=${JSON.stringify(ancestorClientIdChain)}`,);
-    commitDescendantDraft(ancestorClientIdChain);
+    // window.consoleLog(`DescendantInput:commitItemDraft(): ancestorChain=${JSON.stringify(ancestorChain)}`,);
+    commitDescendantDraft(ancestorChain);
   };
 
   const itemDraft = getItemDraft();

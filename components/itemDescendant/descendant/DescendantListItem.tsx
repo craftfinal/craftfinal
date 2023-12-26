@@ -197,7 +197,7 @@ export default function DescendantListItem<T extends ElementType = "li">(props: 
                 >
                   <EditableField
                     key={inputProps.key}
-                    fieldName={inputProps.fieldName}
+                    fieldName={inputProps.name}
                     value={item[fieldName as keyof ItemClientStateType] as string}
                     placeholder={inputProps.placeholder}
                     onChange={handleChange}

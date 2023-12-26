@@ -8,7 +8,7 @@ import { roleSchema } from "@/schemas/role";
 import { userSchema } from "@/schemas/user";
 import { ItemDescendantModelNameType } from "@/types/itemDescendant";
 import { InputProps } from "react-editext";
-import { ZodNumber, ZodObject, ZodTypeAny } from "zod";
+import { SafeParseReturnType, ZodNumber, ZodObject, ZodTypeAny } from "zod";
 
 export type SchemaKindType = keyof Record<"form" | "display", ZodTypeAny>;
 
@@ -69,7 +69,7 @@ export function extractFieldName(input: string): ItemDataUntypedFieldNameType {
 
 export interface InputItemPersistInputProps {
   key: string;
-  fieldName: string;
+  name: string;
   placeholder: string;
   value: string;
 }
@@ -81,7 +81,7 @@ export function getInputProps(
 ): InputItemPersistInputProps {
   return {
     key: fieldName,
-    fieldName: `${itemModel}-${fieldName}`,
+    name: `${itemModel}-${fieldName}`,
     placeholder: `${fieldName} for ${itemModel}`,
     value: fieldValues[fieldName],
   };
@@ -139,6 +139,21 @@ export function getUpdateFromEvent(
   event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
 ): ItemDataUntypedType | undefined {
   return parseUpdate(itemFormSchema, getUpdatedKeyValueFromEvent(event));
+}
+
+export function formatValidationErrors(
+  validationResult: SafeParseReturnType<ItemDataUntypedType, ItemDataUntypedType>,
+): Record<keyof ItemDataUntypedType, string> {
+  const errors: Partial<Record<keyof ItemDataUntypedType, string>> = {};
+  if (!validationResult.success) {
+    validationResult.error.issues.forEach((issue) => {
+      const fieldName = issue.path[0];
+      if (typeof fieldName === "string" || typeof fieldName === "number") {
+        errors[fieldName] = issue.message;
+      }
+    });
+  }
+  return errors as Record<keyof ItemDataUntypedType, string>;
 }
 
 export function getUpdateFromEdiTextField(

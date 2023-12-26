@@ -5,14 +5,14 @@ import EdiText, { EdiTextProps } from "react-editext";
 import { EditableFieldEdiTextProps } from "./EditableField";
 
 interface EditableInputFieldProps extends EdiTextProps {
-  fieldName: string;
+  name: string;
   placeholder?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 export default function EditableInputField({
-  fieldName,
-  placeholder,
+  name,
+  placeholder = "",
   onChange,
   inputProps,
   ...rest
@@ -25,8 +25,8 @@ export default function EditableInputField({
       inputProps={{
         ...EditableFieldEdiTextProps.inputProps,
         ...inputProps,
-        name: fieldName,
-        placeholder: placeholder || "",
+        name,
+        placeholder,
         onChange: onChange,
         className: cn(EditableFieldEdiTextProps.inputProps.className, "px-0"),
       }}

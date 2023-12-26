@@ -26,7 +26,7 @@ export interface ItemDescendantRenderProps extends RenderItemProps<ItemDescendan
   index: number;
   itemModel: ItemDescendantModelNameType;
   inputFieldIndex: number;
-  ancestorClientIdChain: Array<ClientIdType>;
+  ancestorChain: Array<ClientIdType>;
   rootItemModel: ItemDescendantModelNameType;
   leafItemModel: ItemDescendantModelNameType;
   editingInput: boolean;
@@ -34,18 +34,18 @@ export interface ItemDescendantRenderProps extends RenderItemProps<ItemDescendan
   setDescendantData: (
     descendantData: ItemDataUntypedType,
     clientId: ClientIdType,
-    ancestorClientIds: Array<ClientIdType>,
+    ancestorChain: Array<ClientIdType>,
   ) => void;
   // addDescendant: (descendantData: ItemDataType<C>) => void; // FIXME: Untested
-  markDescendantAsDeleted: (clientId: ClientIdType, ancestorClientIds: Array<ClientIdType>) => void;
+  markDescendantAsDeleted: (clientId: ClientIdType, ancestorChain: Array<ClientIdType>) => void;
   // reArrangeDescendants: (reArrangedDescendants: ItemDescendantClientStateListType) => void;
   // resetDescendantsOrderValues: () => void;
-  getDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => ItemDataType<ItemClientStateType>;
-  updateDescendantDraft: (descendantData: ItemDataUntypedType, ancestorClientIds: Array<ClientIdType>) => void;
-  commitDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => void;
+  getDescendantDraft: (ancestorChain: Array<ClientIdType>) => ItemDataType<ItemClientStateType>;
+  updateDescendantDraft: (descendantData: ItemDataUntypedType, ancestorChain: Array<ClientIdType>) => void;
+  commitDescendantDraft: (ancestorChain: Array<ClientIdType>) => void;
 }
 function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
-  const { ancestorClientIdChain, item, rootItemModel, leafItemModel, editingInput, showSynchronization } = props;
+  const { ancestorChain, item, rootItemModel, leafItemModel, editingInput, showSynchronization } = props;
   const { itemModel, descendantModel, descendants } = item;
 
   let inputFieldIndex = props.inputFieldIndex;
@@ -68,7 +68,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
     return editingInput && itemModel ? modelClassname[descendantModel] : "";
   };
 
-  // Props for descendants of current item have the same ancestorClientIdChain
+  // Props for descendants of current item have the same ancestorChain
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const descendantListItemProps = {
     ...props,
@@ -80,7 +80,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
     className: itemModelClassname(),
   };
 
-  // Props for descendants of current item have the same ancestorClientIdChain
+  // Props for descendants of current item have the same ancestorChain
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const descendantProps = {
     ...props,
@@ -90,7 +90,7 @@ function ItemDescendantListRender(props: ItemDescendantRenderProps): ReactNode {
     descendantModel: descendantDescendantModel,
     parentId: item.id,
     parentClientId: item.clientId,
-    ancestorClientIdChain: [item.clientId, ...ancestorClientIdChain],
+    ancestorChain: [item.clientId, ...ancestorChain],
   };
 
   const showInput = editingInput && item.descendantModel !== leafItemModel && descendantDescendantModel;
@@ -171,7 +171,7 @@ function ItemDescendantListState(props: ItemDescendantListStateProps) {
     ...props,
     index: 0,
     inputFieldIndex: 0,
-    ancestorClientIdChain: [],
+    ancestorChain: [],
     item: rootState,
     itemModel: props.rootItemModel,
     editingInput,

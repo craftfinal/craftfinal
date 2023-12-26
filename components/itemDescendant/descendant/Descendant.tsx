@@ -8,7 +8,7 @@ import { ItemDescendantRenderProps } from "../ItemDescendantList.client";
 import DescendantListItem from "./DescendantListItem";
 
 export default function Descendant(props: ItemDescendantRenderProps) {
-  const { className, ancestorClientIdChain, itemModel, index, resumeAction } = props;
+  const { className, ancestorChain, itemModel, index, resumeAction } = props;
   // const [editingInput, setEditingInput] = useState(resumeAction === "edit");
   const store = useCurrentItemDescendantStore();
   const setDescendantData = store((state) => state.setDescendantData);
@@ -16,18 +16,16 @@ export default function Descendant(props: ItemDescendantRenderProps) {
 
   const setItemData = (descendantData: ItemDataUntypedType, clientId: ClientIdType): void => {
     window.consoleLog(
-      `Descendant:setItemData(descendantData=${descendantData}): ancestorClientIdChain=${JSON.stringify(
-        ancestorClientIdChain,
-      )}`,
+      `Descendant:setItemData(descendantData=${descendantData}): ancestorChain=${JSON.stringify(ancestorChain)}`,
     );
-    setDescendantData(descendantData, clientId, ancestorClientIdChain);
+    setDescendantData(descendantData, clientId, ancestorChain);
   };
 
   const markItemAsDeleted = (clientId: ClientIdType): void => {
     window.consoleLog(
-      `Descendant:markDescendantAsDeleted(clientId=${clientId}): parentItem=${JSON.stringify(ancestorClientIdChain)}`,
+      `Descendant:markDescendantAsDeleted(clientId=${clientId}): parentItem=${JSON.stringify(ancestorChain)}`,
     );
-    markDescendantAsDeleted(clientId, ancestorClientIdChain);
+    markDescendantAsDeleted(clientId, ancestorChain);
   };
 
   const canEdit = itemModel === "user" ? false : resumeAction === "edit";

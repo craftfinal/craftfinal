@@ -51,21 +51,21 @@ export type StoreActions = {
   setItemData: (data: ItemDataUntypedType) => void;
   markItemAsDeleted: () => void;
   restoreDeletedItem: () => void;
-  getDescendants: (ancestorClientIds: Array<ClientIdType>) => ItemDescendantStoreStateListType;
+  getDescendants: (ancestorChain: Array<ClientIdType>) => ItemDescendantStoreStateListType;
   setDescendantData: (
     descendantData: ItemDataUntypedType,
     clientId: ClientIdType,
-    ancestorClientIds: Array<ClientIdType>,
+    ancestorChain: Array<ClientIdType>,
   ) => void;
-  markDescendantAsDeleted: (clientId: ClientIdType, ancestorClientIds: Array<ClientIdType>) => void;
+  markDescendantAsDeleted: (clientId: ClientIdType, ancestorChain: Array<ClientIdType>) => void;
   reArrangeDescendants: (
     reArrangedDescendants: ItemDescendantOrderableClientStateListType,
-    ancestorClientIds: Array<ClientIdType>,
+    ancestorChain: Array<ClientIdType>,
   ) => void;
-  resetDescendantsOrderValues: (ancestorClientIds: Array<ClientIdType>) => void;
-  getDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => ItemDataUntypedType;
-  updateDescendantDraft: (descendantData: ItemDataUntypedType, ancestorClientIds: Array<ClientIdType>) => void;
-  commitDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => void;
+  resetDescendantsOrderValues: (ancestorChain: Array<ClientIdType>) => void;
+  getDescendantDraft: (ancestorChain: Array<ClientIdType>) => ItemDataUntypedType;
+  updateDescendantDraft: (descendantData: ItemDataUntypedType, ancestorChain: Array<ClientIdType>) => void;
+  commitDescendantDraft: (ancestorChain: Array<ClientIdType>) => void;
 
   setSyncStatus: (status: StoreSyncStatus) => void;
   syncWithServer: (resetBackoff?: boolean, forceUpdate?: boolean) => void;
@@ -186,19 +186,19 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
             state.lastModified = now;
           });
         },
-        getDescendants: (ancestorClientIds: Array<ClientIdType>): ItemDescendantStoreStateListType => {
-          const ancestorStateChain = getDescendantFromAncestorChain([get()], ancestorClientIds);
+        getDescendants: (ancestorChain: Array<ClientIdType>): ItemDescendantStoreStateListType => {
+          const ancestorStateChain = getDescendantFromAncestorChain([get()], ancestorChain);
           const ancestorState = ancestorStateChain[0];
           return ancestorState.descendants;
         },
         setDescendantData: (
           descendantData: ItemDataUntypedType,
           clientId: ClientIdType,
-          ancestorClientIds: Array<ClientIdType>,
+          ancestorChain: Array<ClientIdType>,
         ): void => {
           const now = new Date();
           set((state) => {
-            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorClientIds, now);
+            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorChain, now);
             const ancestorState = ancestorStateChain[0];
             // Update the state with the deletedAt timestamp for the specified descendant
             ancestorState.descendants = ancestorState.descendants.map((descendant) => {
@@ -214,10 +214,10 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
             });
           });
         },
-        markDescendantAsDeleted: (clientId: ClientIdType, ancestorClientIds: Array<ClientIdType>): void => {
+        markDescendantAsDeleted: (clientId: ClientIdType, ancestorChain: Array<ClientIdType>): void => {
           const now = new Date();
           set((state) => {
-            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorClientIds, now);
+            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorChain, now);
             const ancestorState = ancestorStateChain[0];
             // Update the state with the deletedAt timestamp for the specified descendant
             ancestorState.descendants = ancestorState.descendants.map((descendant) => {
@@ -236,11 +236,11 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
         },
         reArrangeDescendants: (
           reArrangedDescendants: ItemDescendantOrderableClientStateListType,
-          ancestorClientIds: Array<ClientIdType>,
+          ancestorChain: Array<ClientIdType>,
         ): void => {
           const now = new Date();
           set((state) => {
-            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorClientIds, now);
+            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorChain, now);
             const ancestorState = ancestorStateChain[0];
             // Update the state with the re-ordered descendants
             ancestorState.descendants = updateListOrderValues(
@@ -249,10 +249,10 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
             ) as unknown as Draft<ItemDescendantOrderableStoreStateListType>;
           });
         },
-        resetDescendantsOrderValues: (ancestorClientIds: Array<ClientIdType>): void => {
+        resetDescendantsOrderValues: (ancestorChain: Array<ClientIdType>): void => {
           const now = new Date();
           set((state) => {
-            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorClientIds, now);
+            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorChain, now);
             const ancestorState = ancestorStateChain[0];
             // Update the state with the descendants having balanced order values
             ancestorState.descendants = reBalanceListOrderValues(
@@ -263,14 +263,14 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
           });
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        getDescendantDraft: (ancestorClientIds: Array<ClientIdType>): ItemDataType<any> => {
-          const ancestorStateChain = getDescendantFromAncestorChain([get()], ancestorClientIds);
+        getDescendantDraft: (ancestorChain: Array<ClientIdType>): ItemDataType<any> => {
+          const ancestorStateChain = getDescendantFromAncestorChain([get()], ancestorChain);
           const ancestorState = ancestorStateChain[0];
           return ancestorState.descendantDraft;
         },
-        updateDescendantDraft: (descendantData: ItemDataUntypedType, ancestorClientIds: Array<ClientIdType>) => {
+        updateDescendantDraft: (descendantData: ItemDataUntypedType, ancestorChain: Array<ClientIdType>) => {
           set((state) => {
-            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorClientIds);
+            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorChain);
             // Update the state with the new draft descendant data
             const ancestorState = ancestorStateChain[0];
             ancestorState.descendantDraft = {
@@ -279,9 +279,9 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
             } as Draft<ItemDataUntypedType>;
           });
         },
-        commitDescendantDraft: (ancestorClientIds: Array<ClientIdType>) => {
+        commitDescendantDraft: (ancestorChain: Array<ClientIdType>) => {
           set((state) => {
-            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorClientIds, new Date());
+            const ancestorStateChain = getDescendantFromAncestorChain([state], ancestorChain, new Date());
             const ancestorState = ancestorStateChain[0];
             const descendantOfDescendantModel = ancestorState.descendantModel
               ? getDescendantModel(ancestorState.descendantModel)
@@ -514,7 +514,7 @@ export const createItemDescendantStore = (storeConfig: ItemDescendantStoreConfig
 
 function getDescendantFromAncestorChain(
   ancestorStateChain: ItemDescendantStoreStateListType,
-  ancestorClientIdChain: Array<ClientIdType>,
+  ancestorChain: Array<ClientIdType>,
   lastModified?: Date,
 ): ItemDescendantStoreStateListType {
   /*
@@ -522,19 +522,19 @@ function getDescendantFromAncestorChain(
     "getDescendantFromAncestorChain:\n",
     `ancestorStateChain: ${ancestorStateChain.map((item) => item.clientId).join("->")}`,
     "\n",
-    `ancestorClientIdChain: ${ancestorClientIdChain.join("->")}`,
+    `ancestorChain: ${ancestorChain.join("->")}`,
   );
   */
-  // Descend from the `state` all the way down to the descendant based on the `ancestorClientIdChain` array
+  // Descend from the `state` all the way down to the descendant based on the `ancestorChain` array
   const state = ancestorStateChain[0];
   if (lastModified) {
     state.lastModified = lastModified;
     state.disposition = ItemDisposition.Modified;
   }
-  if (ancestorClientIdChain.length === 0) {
+  if (!ancestorChain || ancestorChain.length === 0) {
     return ancestorStateChain;
   }
-  const ancestorClientId = ancestorClientIdChain[ancestorClientIdChain.length - 2];
+  const ancestorClientId = ancestorChain[ancestorChain.length - 2];
   const ancestorState = state.descendants.find((descendant) => descendant.clientId === ancestorClientId) as StoreState;
   if (ancestorState) {
     if (lastModified) {
@@ -543,7 +543,7 @@ function getDescendantFromAncestorChain(
     }
     return getDescendantFromAncestorChain(
       [ancestorState, ...ancestorStateChain],
-      ancestorClientIdChain.slice(0, -1),
+      ancestorChain.slice(0, -1),
       lastModified,
     );
   }
