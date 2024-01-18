@@ -12,7 +12,6 @@ import {
   getStateIdFromDbId,
   isValidDbId,
   isValidStateId,
-  stateIdDefault,
 } from "@/schemas/id";
 import { ItemServerOutputType } from "@/schemas/item";
 import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";

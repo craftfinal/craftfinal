@@ -188,10 +188,10 @@ export default function DescendantListItemInput<T extends ElementType = "li">({
       <Comp className="flex flex-grow items-center">
         <div className="flex flex-grow flex-wrap justify-between gap-x-4 gap-y-2">
           {itemFormFields.map((fieldName) => {
-            const inputProps = getInputProps(itemDraftState, itemModel, fieldName);
+            const inputProps = getInputProps(itemDraftState, itemModel, fieldName, handleChange);
             return (
               <EditableInputField
-                key={inputProps.key}
+                key={inputProps.name}
                 name={inputProps.name}
                 value={inputProps.value}
                 placeholder={inputProps.placeholder}
