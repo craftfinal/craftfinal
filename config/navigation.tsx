@@ -24,6 +24,25 @@ export const siteNavigationUntyped /*: SiteNavigationMapType */ = {
     menuContentIcon: <SiteLogo />,
     href: "/about",
   },
+  team: {
+    title: `Simon Heimlicher`,
+    menuTitle: `Team`,
+    menuContent: `Learn more about the team behind ${siteConfig.name}`,
+    // menuContentIcon: <SiteLogo />,
+    href: "/about/team",
+  },
+  simonHeimlicher: {
+    title: `Simon Heimlicher`,
+    menuTitle: `Simon Heimlicher`,
+    menuContent: `Learn more about the founder of ${siteConfig.name}`,
+    // menuContentIcon: <SiteLogo />,
+    href: "/about/simon-heimlicher",
+  },
+  blog: {
+    title: `The ${siteConfig.name} blog`,
+    menuTitle: `Blog`,
+    href: "/article",
+  },
   howItWorks: {
     title: `Our vision of how ${siteConfig.name} will revolutionize the creative process of crafting a pitch`,
     menuTitle: `Product`,
@@ -35,8 +54,9 @@ export const siteNavigationUntyped /*: SiteNavigationMapType */ = {
     href: "/use-cases",
   },
   faq: {
-    title: `Frequently asked questions (FAQ) ${siteConfig.name}`,
+    title: `Frequently asked questions (FAQ)`,
     menuTitle: `FAQ`,
+    menuContent: `Get answers to the most frequently asked questions about ${siteConfig.name}`,
     href: "/about/faq",
   },
   privacyPolicy: {
@@ -160,7 +180,8 @@ export const siteNavigation: SiteNavigationMapType = siteNavigationUntyped;
 
 export const mainNavigationKeys: NavMenuItemType[] = [
   { item: "howItWorks", children: ["useCases"] },
-  { item: "about", children: ["privacyPolicy", "termsOfUse"] },
+  "blog" as SiteNavigationKeyType,
+  { item: "about", children: ["team", "faq", "privacyPolicy", "termsOfUse"] },
   {
     item: "antePlayground",
     render: [

@@ -9,7 +9,7 @@ export enum AppRouteType {
 export type AppRouteMapType = Record<AppRouteType, string[] | string>;
 
 const contentRoutes = ["/(about|terms|privacy)(/.*)?"];
-const marketingRoutes = ["/(product|use-cases)(/.*)?"];
+const marketingRoutes = ["/(article|product|use-cases)(/.*)?"];
 const authenticatedRoutes = ["/(try|playground)(/.*)?"];
 
 export const appRoutes: AppRouteMapType = {
