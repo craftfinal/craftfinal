@@ -43,15 +43,15 @@ export const siteNavigationUntyped /*: SiteNavigationMapType */ = {
     menuTitle: `Blog`,
     href: "/article",
   },
-  howItWorks: {
+  product: {
     title: `Our vision of how ${siteConfig.name} will revolutionize the creative process of crafting a pitch`,
     menuTitle: `Product`,
     href: "/product",
   },
-  useCases: {
-    title: `Use ${siteConfig.name} in consulting, strategy and research`,
-    menuTitle: `Use cases`,
-    href: "/use-cases",
+  howItWorks: {
+    title: `Use ${siteConfig.name} across industries including consulting, strategy and research`,
+    menuTitle: `How ${siteConfig.name} works`,
+    href: "/product/how-it-works",
   },
   faq: {
     title: `Frequently asked questions (FAQ)`,
@@ -179,7 +179,7 @@ export type SiteNavigationMapType = Record<SiteNavigationKeyType, NavItem>;
 export const siteNavigation: SiteNavigationMapType = siteNavigationUntyped;
 
 export const mainNavigationKeys: NavMenuItemType[] = [
-  { item: "howItWorks", children: ["useCases"] },
+  { item: "product", children: ["howItWorks"] },
   "blog" as SiteNavigationKeyType,
   { item: "about", children: ["team", "faq", "privacyPolicy", "termsOfUse"] },
   {
