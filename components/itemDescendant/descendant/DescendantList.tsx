@@ -185,31 +185,28 @@ export default function DescendantList(props: DescendantListProps) {
             />
           ) : null}
           <ItemDescendantSortableWrapper items={descendants} disabled={!descendantsAreDragable}>
-            {descendants.map((item: ItemDescendantClientStateType, index: number) => {
-              return (
-                <DescendantListItem
-                  {...props}
-                  key={item.clientId}
-                  index={index}
-                  rootItemModel={rootItemModel}
-                  itemModel={descendantModel}
-                  itemIcon={!canEdit}
-                  item={item as ItemDescendantClientStateType}
-                  setItemData={setItemData}
-                  resumeAction={resumeAction}
-                  markItemAsDeleted={markItemAsDeleted}
-                  itemIsDragable={descendantsAreDragable}
-                  canEdit={canEdit}
-                />
-              );
-            })}
+            {descendants
+              .filter((descendant) => !descendant.deletedAt)
+              .map((item: ItemDescendantClientStateType, index: number) => {
+                return (
+                  <DescendantListItem
+                    {...props}
+                    key={item.clientId}
+                    index={index}
+                    rootItemModel={rootItemModel}
+                    itemModel={descendantModel}
+                    item={item as ItemDescendantClientStateType}
+                    setItemData={setItemData}
+                    resumeAction={resumeAction}
+                    markItemAsDeleted={markItemAsDeleted}
+                    itemIsDragable={descendantsAreDragable}
+                    canEdit={canEdit}
+                  />
+                );
+              })}
           </ItemDescendantSortableWrapper>
           {canEdit && !inlineInsert ? (
-            <DescendantInput
-              {...{ ...props, className: "" }}
-              itemModel={descendantModel}
-              itemIcon={!descendantsAreDragable}
-            />
+            <DescendantInput {...{ ...props, className: "" }} itemModel={descendantModel} />
           ) : null}
         </ul>
       </DndContext>

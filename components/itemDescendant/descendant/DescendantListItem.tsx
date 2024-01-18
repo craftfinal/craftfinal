@@ -149,9 +149,13 @@ export default function DescendantListItem<T extends ElementType = "li">(props: 
   // };
 
   let content = null;
+  // FIXME: Properly pass ancestorChain
+  const ancestorChain = [item.parentClientId];
   const CustomComponent = ItemComponent[itemModel];
   if (CustomComponent !== null) {
-    content = <CustomComponent {...{ item, index: 0, itemModel, resumeAction }} />;
+    content = (
+      <CustomComponent {...{ item, index: 0, itemModel, resumeAction, canEdit, ancestorChain, itemIsDragable }} />
+    );
   } else {
     content = (
       <Comp
@@ -188,7 +192,7 @@ export default function DescendantListItem<T extends ElementType = "li">(props: 
           ) : null}
           <div className="flex flex-1 flex-wrap justify-between gap-y-2">
             {itemFormFields.map((fieldName) => {
-              const inputProps = getInputProps(item, itemModel, fieldName);
+              const inputProps = getInputProps(item, itemModel, fieldName, handleChange);
 
               return (
                 <div
@@ -196,11 +200,10 @@ export default function DescendantListItem<T extends ElementType = "li">(props: 
                   className="text-shadow-dark dark:text-light-txt-1 text-dark-txt-1 dark:text-light-txt-4 flex-1"
                 >
                   <EditableField
-                    key={inputProps.key}
                     fieldName={inputProps.name}
                     value={item[fieldName as keyof ItemClientStateType] as string}
                     placeholder={inputProps.placeholder}
-                    onChange={handleChange}
+                    onChange={inputProps.onChange}
                     onSave={handleSave}
                     canEdit={canEdit}
                   />

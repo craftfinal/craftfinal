@@ -15,16 +15,10 @@ export default function Descendant(props: ItemDescendantRenderProps) {
   const markDescendantAsDeleted = store((state) => state.markDescendantAsDeleted);
 
   const setItemData = (descendantData: ItemDataUntypedType, clientId: ClientIdType): void => {
-    window.consoleLog(
-      `Descendant:setItemData(descendantData=${descendantData}): ancestorChain=${JSON.stringify(ancestorChain)}`,
-    );
     setDescendantData(descendantData, clientId, ancestorChain);
   };
 
   const markItemAsDeleted = (clientId: ClientIdType): void => {
-    window.consoleLog(
-      `Descendant:markDescendantAsDeleted(clientId=${clientId}): parentItem=${JSON.stringify(ancestorChain)}`,
-    );
     markDescendantAsDeleted(clientId, ancestorChain);
   };
 

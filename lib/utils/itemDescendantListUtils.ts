@@ -67,24 +67,37 @@ export function extractFieldName(input: string): ItemDataUntypedFieldNameType {
   return parts[parts.length - 1];
 }
 
+export type onChangeHandlerType = (
+  event: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>,
+) => void;
+
 export interface InputItemPersistInputProps {
-  key: string;
   name: string;
   placeholder: string;
   value: string;
+  onChange: onChangeHandlerType;
 }
 
 export function getInputProps(
   fieldValues: FieldValueMapType,
   itemModel: ItemDescendantModelNameType,
   fieldName: string,
+  onChange: onChangeHandlerType,
 ): InputItemPersistInputProps {
   return {
-    key: fieldName,
     name: `${itemModel}-${fieldName}`,
     placeholder: `${fieldName} for ${itemModel}`,
     value: fieldValues[fieldName],
+    onChange,
   };
+}
+
+export interface InputFormFieldType {
+  fieldName: string;
+  inputProps: InputItemPersistInputProps;
+  onSave: (value?: string, inputProps?: InputProps) => void;
+  editingInput: boolean;
+  canEdit: boolean;
 }
 
 export function getInitialItemDraftState(itemDraft: ItemDataUntypedType, itemFormFields: string[]) {
@@ -141,18 +154,21 @@ export function getUpdateFromEvent(
   return parseUpdate(itemFormSchema, getUpdatedKeyValueFromEvent(event));
 }
 
-export function formatValidationErrors(
+export type FormValidationRecordType = Record<keyof ItemDataUntypedType, string>;
+export function extractFormValidationErrors(
   validationResult: SafeParseReturnType<ItemDataUntypedType, ItemDataUntypedType>,
-): Record<keyof ItemDataUntypedType, string> {
-  const errors: Partial<Record<keyof ItemDataUntypedType, string>> = {};
-  if (!validationResult.success) {
-    validationResult.error.issues.forEach((issue) => {
-      const fieldName = issue.path[0];
-      if (typeof fieldName === "string" || typeof fieldName === "number") {
-        errors[fieldName] = issue.message;
-      }
-    });
+): FormValidationRecordType {
+  if (validationResult.success) {
+    return {};
   }
+
+  const errors: Partial<Record<keyof ItemDataUntypedType, string>> = {};
+  validationResult.error.issues.forEach((issue) => {
+    const fieldName = issue.path[0];
+    if (typeof fieldName === "string" || typeof fieldName === "number") {
+      errors[fieldName] = issue.message;
+    }
+  });
   return errors as Record<keyof ItemDataUntypedType, string>;
 }
 

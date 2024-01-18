@@ -5,7 +5,7 @@
 import { ItemDescendantStoreProvider, useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
 import { ResumeActionProvider } from "@/contexts/ResumeActionContext";
 import { StoreNameProvider } from "@/contexts/StoreNameContext";
-import { useAutoSyncItemDescendantStore } from "@/hooks/useAutoSyncItemDescendantStore";
+import { useAutoSyncItemDescendantStore } from "@/components/itemDescendant/hooks/useAutoSyncItemDescendantStore";
 import { generateClientId } from "@/schemas/id";
 import { ItemClientStateType, ItemDataType, ItemDataUntypedType } from "@/schemas/item";
 import { ItemDescendantClientStateType, ItemDescendantServerStateType } from "@/schemas/itemDescendant";

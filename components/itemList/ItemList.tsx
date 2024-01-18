@@ -6,11 +6,13 @@ import { siteNavigation } from "@/config/navigation";
 import {
   DbIdSchemaType,
   StateIdSchemaType,
+  dbIdDefault,
   generateClientId,
   getDbIdAndModelFromStateId,
   getStateIdFromDbId,
   isValidDbId,
   isValidStateId,
+  stateIdDefault,
 } from "@/schemas/id";
 import { ItemServerOutputType } from "@/schemas/item";
 import { ItemDescendantClientStateType } from "@/schemas/itemDescendant";
@@ -78,6 +80,8 @@ async function RenderItemList({ itemModel, parentId, ...props }: Readonly<ItemLi
       } else {
         throw Error(logPrefix + `: invalid parentId: ${parentId}`);
       }
+    } else if (itemDescendantModelHierarchy.indexOf(validItemModel) === 0) {
+      validParentId = getStateIdFromDbId(dbIdDefault, validItemModel);
     } else if (itemDescendantModelHierarchy.indexOf(validItemModel) === 1) {
       validParentId = userId!;
     } else {

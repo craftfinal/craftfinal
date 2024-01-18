@@ -3,7 +3,7 @@
 "use client";
 
 import { useCurrentItemDescendantStore } from "@/contexts/ItemDescendantStoreContext";
-import { StoreSyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
+import { StoreSyncStatus } from "@/components/itemDescendant/hooks/useAutoSyncItemDescendantStore";
 import { cn } from "@/lib/utils";
 import { useEffect, useReducer, useState } from "react";
 import { IoAlertCircle, IoCheckmarkCircle } from "react-icons/io5";

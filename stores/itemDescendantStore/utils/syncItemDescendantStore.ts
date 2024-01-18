@@ -2,7 +2,7 @@
 
 import { handleNestedItemDescendantListFromClient } from "@/actions/syncItemDescendant";
 import { toast } from "@/components/ui/use-toast";
-import { StoreSyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
+import { StoreSyncStatus } from "@/components/itemDescendant/hooks/useAutoSyncItemDescendantStore";
 import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { generateClientId, isValidClientId } from "@/schemas/id";
 import { ItemDataUntypedType } from "@/schemas/item";

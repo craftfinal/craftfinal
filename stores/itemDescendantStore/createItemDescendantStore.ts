@@ -1,6 +1,6 @@
 // @/stores/itemDescendant/createItemDescendantStore.ts
 import { siteConfig } from "@/config/site";
-import { StoreSyncStatus } from "@/hooks/useAutoSyncItemDescendantStore";
+import { StoreSyncStatus } from "@/components/itemDescendant/hooks/useAutoSyncItemDescendantStore";
 import { dateToISOLocal } from "@/lib/utils/formatDate";
 import { StateIdSchemaType, generateClientId } from "@/schemas/id";
 import { ItemDataType, ItemDataUntypedType, ItemOrderableClientStateType } from "@/schemas/item";
